@@ -16,8 +16,8 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <script src="firebase-config.js"></script>
   <style>
+    html { font-size: 17px; }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    /* prevent iOS font-size auto-zoom on input focus */
     input, textarea, select { font-size: 16px !important; }
     button, a { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     * { -webkit-user-select: none; user-select: none; }
@@ -417,16 +417,90 @@
     .note-del-btn { color: var(--err) !important; }
     /* sync dot */
     .cal-arr { background: var(--c2); color: var(--t1); }
+
+    /* ── Dark mode ──────────────────────────────────────────── */
+    html.dark {
+      --bg:   #000; --c1: #1c1c1e; --c2: #2c2c2e; --c3: #3a3a3c;
+      --sep:  rgba(255,255,255,.1);
+      --t1:   #fff; --t2: rgba(255,255,255,.55); --t3: rgba(255,255,255,.25);
+      --tint: #D4A574; --tintd: #B8854E;
+      --ok:   #6BBF8E; --err: #E07878; --warn: #E8A870;
+    }
+    html.dark .hdr   { background: rgba(0,0,0,.9); }
+    html.dark .tabbar { background: rgba(28,28,30,.95); }
+    html.dark .fab   { background: #1c1c1e; box-shadow: 0 2px 10px rgba(0,0,0,.5); }
+    html.dark .card, html.dark .meal-card, html.dark .notes-card, html.dark .modal { box-shadow: none; }
+    html.dark .meal-card.fed     { background: rgba(48,209,88,.07); border-color: rgba(48,209,88,.35); }
+    html.dark .meal-card.overdue { border-color: rgba(255,69,58,.35); }
+    html.dark .badge.done    { background: rgba(48,209,88,.2);  color: #6ee7b7; }
+    html.dark .badge.overdue { background: rgba(255,69,58,.15); color: #fca5a5; }
+    html.dark .badge.pending { background: #2c2c2e; color: rgba(255,255,255,.55); }
+    html.dark .fed-detail .hi { color: #6ee7b7; }
+    html.dark .cday          { color: rgba(255,255,255,.55); }
+    html.dark .cday.full     { background: #064e3b; color: #6ee7b7; }
+    html.dark .cday.partial  { background: #451a03; color: #fcd34d; }
+    html.dark .cday.missed   { color: #fca5a5; }
+    html.dark .cday.is-today { box-shadow: 0 0 0 2px var(--tint); color: var(--tint); }
+    html.dark .note-check.done { background: var(--ok); border-color: var(--ok); color: #000; }
+    html.dark .si.active, html.dark .si.done { color: #000; }
+    html.dark .btn-main, html.dark .btn-feed, html.dark .btn-save,
+    html.dark .btn-next, html.dark .btn-add-note { color: #000; }
+    html.dark .btn-main.done, html.dark .btn-feed.done { background: #2c2c2e; color: rgba(255,255,255,.4); }
+    html.dark .chip.sel { background: rgba(212,165,116,.15); color: var(--tint); }
+    html.dark .cal-arr { background: #2c2c2e; color: #fff; }
+    html.dark .dark-btn { color: var(--t1); }
+    html.dark #syncBar { background: #1c1c1e; }
+    html.dark .pri-sel { background: var(--c2); color: var(--t2); }
+    html.dark #ps-high.active { background: rgba(224,120,120,.15); }
+    html.dark #ps-mid.active  { background: rgba(232,168,112,.15); }
+    html.dark #ps-low.active  { background: rgba(255,255,255,.08); }
+
+    /* ── Priority notes ─────────────────────────────────────── */
+    .pri-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+    .pri-dot-high { background: var(--err); }
+    .pri-dot-mid  { background: var(--warn); }
+    .pri-dot-low  { background: var(--t3); }
+    .pri-sel {
+      flex: 1; padding: 11px 6px; border-radius: 10px;
+      border: 1.5px solid var(--sep); background: var(--c2);
+      font-size: .82rem; font-family: inherit; cursor: pointer;
+      transition: all .15s; color: var(--t2);
+    }
+    #ps-high.active { border-color: var(--err); background: rgba(217,100,100,.1); color: var(--err); }
+    #ps-mid.active  { border-color: var(--warn); background: rgba(212,146,79,.1); color: var(--warn); }
+    #ps-low.active  { border-color: var(--t3); color: var(--t1); }
+
+    /* ── Sync bar (bottom) ──────────────────────────────────── */
+    #syncBar {
+      position: fixed;
+      bottom: calc(var(--navh) + env(safe-area-inset-bottom,0px));
+      left: 0; right: 0; z-index: 19;
+      font-size: .75rem; text-align: center;
+      padding: 6px 16px;
+      background: var(--c1); border-top: .5px solid var(--sep);
+      display: none;
+    }
+
+    /* ── Dark mode toggle button ────────────────────────────── */
+    .dark-btn {
+      position: absolute; top: 14px; right: 16px;
+      background: none; border: none; font-size: 1.1rem;
+      cursor: pointer; line-height: 1; padding: 4px;
+      color: var(--t2);
+    }
   </style>
 </head>
 <body>
 
-<div class="hdr">
+<div class="hdr" style="position:relative">
+  <button class="dark-btn" id="darkBtn" onclick="toggleDark()">🌙</button>
   <div class="hdr-name" id="hdrName">🐾 มอคค่า</div>
   <div class="hdr-date" id="hdrDate"></div>
   <div class="hdr-next" id="hdrNext"></div>
-  <div id="syncStatus" style="font-size:.68rem;color:var(--t3);margin-top:3px;cursor:pointer" onclick="document.getElementById('syncStatus').textContent==='🔴 ไม่ได้ sync'&&location.reload()">⏳ กำลังเชื่อมต่อ…</div>
 </div>
+
+<!-- Sync status bar — bottom of screen -->
+<div id="syncBar"></div>
 
 <!-- Page: Today -->
 <div class="page active" id="page-today">
@@ -548,6 +622,12 @@
       <div class="modal-head">
         <span class="modal-title">เพิ่มบันทึก</span>
         <button class="btn-close" onclick="closeNoteModal()">✕</button>
+      </div>
+      <div style="font-size:.8rem;color:var(--t2);font-weight:700;margin-bottom:8px">ระดับความสำคัญ</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <button class="pri-sel" id="ps-high" onclick="setPri('high')">🔴 สำคัญมาก</button>
+        <button class="pri-sel active" id="ps-mid" onclick="setPri('mid')">🟡 ปกติ</button>
+        <button class="pri-sel" id="ps-low" onclick="setPri('low')">⚪ ทั่วไป</button>
       </div>
       <textarea id="noteTextInput" placeholder="เช่น: มอคค่าไม่กินข้าวเช้า, ให้ยาพยาธิแล้ว..."></textarea>
       <button class="btn-save" onclick="saveNote()">บันทึก</button>
@@ -692,8 +772,13 @@ function renderNotes() {
   const list = document.getElementById('notesList');
   const notes = getNotes();
   if (!notes.length) { list.innerHTML='<div class="notes-empty">ยังไม่มีบันทึกวันนี้</div>'; return; }
-  list.innerHTML = notes.map(n => `
+  const PRI = { high:0, mid:1, low:2 };
+  const sorted = [...notes].sort((a,b) => (PRI[a.priority||'mid']||1) - (PRI[b.priority||'mid']||1));
+  list.innerHTML = sorted.map(n => {
+    const dotClass = `pri-dot pri-dot-${n.priority||'mid'}`;
+    return `
     <div class="note-item" id="note-${n.id}">
+      <div class="${dotClass}"></div>
       <div class="note-check${n.done?' done':''}" onclick="toggleNoteDone(${n.id})">${n.done?'✓':''}</div>
       <div class="note-body">
         <div class="note-text${n.done?' done':''}">${escHtml(n.text)}</div>
@@ -703,13 +788,27 @@ function renderNotes() {
         <button class="note-edit-btn" onclick="startEditNote(${n.id})">✏️</button>
         <button class="note-edit-btn note-del-btn" onclick="deleteNote(${n.id})">🗑</button>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
 function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-function openNoteModal() { document.getElementById('noteTextInput').value=''; document.getElementById('ovNote').classList.add('open'); setTimeout(()=>document.getElementById('noteTextInput').focus(),120); }
+let notePri = 'mid';
+function setPri(p) {
+  notePri = p;
+  ['high','mid','low'].forEach(x => {
+    const el = document.getElementById(`ps-${x}`);
+    if (el) el.classList.toggle('active', x===p);
+  });
+}
+
+function openNoteModal() {
+  document.getElementById('noteTextInput').value='';
+  notePri = 'mid'; setPri('mid');
+  document.getElementById('ovNote').classList.add('open');
+  setTimeout(()=>document.getElementById('noteTextInput').focus(),120);
+}
 function closeNoteModal() { document.getElementById('ovNote').classList.remove('open'); }
 
 function saveNote() {
@@ -717,7 +816,8 @@ function saveNote() {
   if (!text) return;
   const now=new Date();
   const time=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-  const notes=getNotes(); notes.push({ id:Date.now(), text, time, done:false, by:'' });
+  const notes=getNotes();
+  notes.push({ id:Date.now(), text, time, done:false, priority:notePri });
   saveNotes(notes); closeNoteModal(); renderNotes();
 }
 
@@ -1108,14 +1208,20 @@ function showPage(name, btn) {
 
 // ── Firebase real-time sync ────────────────────────────────────────────
 function setSyncStatus(state, detail) {
-  const el = document.getElementById('syncStatus');
-  if (!el) return;
-  if (state === 'ok')       el.textContent = '🟢 sync แล้ว';
-  else if (state === 'off') el.textContent = '🔴 ไม่ได้ sync — แตะที่นี่เพื่อ refresh';
-  else                      el.textContent = '⏳ กำลังเชื่อมต่อ…';
-  el.style.color = state==='ok' ? 'rgba(48,209,88,.7)' : state==='off' ? 'rgba(255,69,58,.7)' : 'var(--t3)';
-  el.onclick = state==='off' ? ()=>location.reload() : null;
-  if (detail) console.warn('[Sync fail]', detail);
+  const bar = document.getElementById('syncBar');
+  if (!bar) return;
+  if (state === 'ok') {
+    bar.style.display = 'none';
+  } else if (state === 'off') {
+    bar.style.display = 'block';
+    bar.style.color = 'var(--err)';
+    bar.innerHTML = '🔴 ไม่ได้ sync — <span style="text-decoration:underline;cursor:pointer" onclick="location.reload()">แตะเพื่อ refresh</span>';
+  } else {
+    bar.style.display = 'block';
+    bar.style.color = 'var(--t3)';
+    bar.textContent = '⏳ กำลังเชื่อมต่อ Firebase…';
+  }
+  if (detail) console.warn('[Sync]', detail);
 }
 
 function startSync() {
@@ -1169,8 +1275,22 @@ function startSync() {
   });
 }
 
+// ── Dark mode ─────────────────────────────────────────────────────────
+function toggleDark() {
+  const isDark = document.documentElement.classList.toggle('dark');
+  localStorage.setItem('darkMode', isDark ? '1' : '0');
+  document.getElementById('darkBtn').textContent = isDark ? '☀️' : '🌙';
+}
+function applyDarkMode() {
+  const isDark = localStorage.getItem('darkMode') === '1';
+  document.documentElement.classList.toggle('dark', isDark);
+  const btn = document.getElementById('darkBtn');
+  if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+}
+
 // ── SW + Boot ──────────────────────────────────────────────────────────
 if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+applyDarkMode();
 renderHeader(); renderToday(); renderNotes();
 startSync();
 setInterval(()=>{renderHeader();renderToday();checkNotif();},30000);

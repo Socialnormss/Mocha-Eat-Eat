@@ -14,6 +14,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <script src="firebase-config.js"></script>
   <style>
+    html { font-size: 17px; }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     input, textarea, select { font-size: 16px !important; }
     button, a { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
@@ -170,6 +171,41 @@
     .emergency p  { font-size: .78rem; color: var(--t2); line-height: 1.6; }
     .emergency strong { color: var(--err); }
 
+    /* ── Dark mode ──────────────────────────────────────────── */
+    html.dark {
+      --bg:#000; --c1:#1c1c1e; --c2:#2c2c2e; --sep:rgba(255,255,255,.1);
+      --t1:#fff; --t2:rgba(255,255,255,.55); --t3:rgba(255,255,255,.25);
+      --tint:#D4A574; --ok:#6BBF8E; --err:#E07878;
+    }
+    html.dark .topbar { background: rgba(0,0,0,.9); }
+    html.dark .btn-save-info { color: #000; }
+    html.dark .gb-rec  { background: rgba(48,209,88,.12);  color: #6ee7b7; }
+    html.dark .gb-gen  { background: rgba(212,165,116,.12); color: var(--tint); }
+    html.dark .gb-supp { background: rgba(255,255,255,.06); color: rgba(255,255,255,.5); }
+    html.dark .lv-crit { background: rgba(224,120,120,.15); color: #fca5a5; }
+    html.dark .lv-high { background: rgba(232,168,112,.12); color: #fdba74; }
+    html.dark .lv-mid  { background: rgba(255,255,255,.06); color: rgba(255,255,255,.4); }
+    html.dark .emergency { background: rgba(224,120,120,.08); border-color: rgba(224,120,120,.3); }
+    html.dark .dark-btn { color: rgba(255,255,255,.6); }
+
+    /* ── Collapsible detail items ────────────────────────────── */
+    .expand-icon { margin-left: auto; font-size: .85rem; color: var(--t3); transition: transform .2s; flex-shrink:0; }
+    .food-item.open .expand-icon,
+    .danger-item.open .expand-icon,
+    .tip-item.open .expand-icon { transform: rotate(90deg); }
+    .detail-body { display: none; padding: 6px 0 2px 44px; font-size: .8rem; color: var(--t2); line-height: 1.5; }
+    .food-item.open .detail-body,
+    .danger-item.open .detail-body,
+    .tip-item.open .detail-body { display: block; }
+    .food-item, .danger-item, .tip-item { cursor: pointer; }
+    .food-item:active, .danger-item:active, .tip-item:active { opacity: .85; }
+
+    /* ── Dark btn ─────────────────────────────────────────────── */
+    .dark-btn {
+      background: none; border: none; font-size: 1.1rem;
+      cursor: pointer; padding: 4px; color: var(--t2);
+    }
+
     /* ── Poodle light-theme overrides ──────────────────────── */
     .topbar { background: rgba(250,245,238,.96); }
     .btn-save-info { color: #fff; }
@@ -201,6 +237,7 @@
 <div class="topbar">
   <a href="index.html" class="back">‹</a>
   <span class="topbar-title">โภชนาการมอคค่า</span>
+  <button class="dark-btn" id="darkBtnN" onclick="toggleDark()" style="margin-right:4px">🌙</button>
   <button class="btn-edit-cfg" id="editCfgBtn" onclick="toggleEdit()">✏️ แก้ไข</button>
 </div>
 
@@ -345,9 +382,16 @@ function getDogInfo() {
 }
 
 function saveDogInfo() {
+  const ageY = document.getElementById('ei-age-y').value.trim();
+  const ageM = document.getElementById('ei-age-m').value.trim();
+  const ageParts = [];
+  if (ageY && ageY!=='0') ageParts.push(`${ageY} ปี`);
+  if (ageM && ageM!=='0') ageParts.push(`${ageM} เดือน`);
   const info = {
     name:     document.getElementById('ei-name').value.trim()    || INFO_DEFAULTS.name,
-    age:      document.getElementById('ei-age').value.trim()     || INFO_DEFAULTS.age,
+    age:      ageParts.join(' ') || INFO_DEFAULTS.age,
+    ageY:     ageY,
+    ageM:     ageM,
     weight:   document.getElementById('ei-weight').value.trim()  || '',
     calories: document.getElementById('ei-cal').value.trim()     || '',
   };
@@ -396,7 +440,15 @@ function renderInfo() {
   if (isEditing) {
     grid.innerHTML = `
       <div class="info-cell"><div class="ic-label">ชื่อ</div><input class="ic-input" id="ei-name" value="${escHtml(info.name)}"></div>
-      <div class="info-cell"><div class="ic-label">อายุ</div><input class="ic-input" id="ei-age" value="${escHtml(info.age)}" placeholder="เช่น 1 ปี 3 เดือน"></div>
+      <div class="info-cell">
+        <div class="ic-label">อายุ</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <input class="ic-input" id="ei-age-y" type="number" min="0" max="20" placeholder="0" value="${escHtml(info.ageY||'')}" style="flex:1;min-width:0">
+          <span style="font-size:.85rem;color:var(--t2);white-space:nowrap">ปี</span>
+          <input class="ic-input" id="ei-age-m" type="number" min="0" max="11" placeholder="0" value="${escHtml(info.ageM||'')}" style="flex:1;min-width:0">
+          <span style="font-size:.85rem;color:var(--t2);white-space:nowrap">เดือน</span>
+        </div>
+      </div>
       <div class="info-cell">
         <div class="ic-label">น้ำหนัก</div>
         <input class="ic-input" id="ei-weight" value="${escHtml(info.weight)}" placeholder="0.0" oninput="autoKcal()" type="number" step="0.1" min="0.5" max="10">
@@ -431,7 +483,68 @@ function toggleEdit() {
 
 function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
+// ── Dark mode ──────────────────────────────────────────────────────
+function toggleDark() {
+  const isDark = document.documentElement.classList.toggle('dark');
+  localStorage.setItem('darkMode', isDark ? '1' : '0');
+  const btn = document.getElementById('darkBtnN');
+  if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+}
+function applyDarkMode() {
+  const isDark = localStorage.getItem('darkMode') === '1';
+  document.documentElement.classList.toggle('dark', isDark);
+  const btn = document.getElementById('darkBtnN');
+  if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+}
+
+// ── Collapsible items ──────────────────────────────────────────────
+function makeCollapsible() {
+  // food items
+  document.querySelectorAll('.food-item').forEach(item => {
+    const note = item.querySelector('.fi-note');
+    if (!note) return;
+    // wrap note content
+    note.outerHTML = `<div class="detail-body">${note.outerHTML.replace(/<div class="fi-note">|<\/div>$/g,'')}</div>`;
+  });
+
+  // restructure food items — add expand icon + hide detail
+  document.querySelectorAll('.food-item').forEach(item => {
+    const detail = item.querySelector('.detail-body');
+    const nameEl = item.querySelector('.fi-name');
+    if (!detail || !nameEl) return;
+    // move detail out, add toggle
+    const icon = document.createElement('span');
+    icon.className = 'expand-icon'; icon.textContent = '›';
+    item.querySelector('.fi-ico')?.parentElement?.appendChild(icon) || nameEl.after(icon);
+    item.addEventListener('click', () => item.classList.toggle('open'));
+  });
+
+  // danger items
+  document.querySelectorAll('.danger-item').forEach(item => {
+    const why = item.querySelector('.di-why');
+    if (!why) return;
+    why.classList.add('detail-body'); why.classList.remove('di-why');
+    const icon = document.createElement('span');
+    icon.className = 'expand-icon'; icon.textContent = '›';
+    item.querySelector('.di-right')?.appendChild(icon);
+    item.addEventListener('click', () => item.classList.toggle('open'));
+  });
+
+  // tip items
+  document.querySelectorAll('.tip-item').forEach(item => {
+    const body = item.querySelector('.tip-body');
+    if (!body) return;
+    body.classList.add('detail-body'); body.classList.remove('tip-body');
+    const icon = document.createElement('span');
+    icon.className = 'expand-icon'; icon.textContent = '›';
+    item.querySelector('.tip-ico')?.after(icon);
+    item.addEventListener('click', () => item.classList.toggle('open'));
+  });
+}
+
 renderInfo();
+applyDarkMode();
+makeCollapsible();
 </script>
 </body>
 </html>
