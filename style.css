@@ -631,9 +631,28 @@
     html.dark .danger-item.mid  { border-left-color: rgba(255,255,255,.2); }
 
     /* ── Settings compact ───────────────────── */
-    .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; overflow: clip; width: 100%; max-width: 100%; }
-    .time-grid .fld { margin-bottom: 0; min-width: 0; overflow: clip; max-width: 100%; }
-    .time-grid .fld input { padding: 10px 4px; font-size: .82rem !important; text-align: center; width: 100%; min-width: 0; max-width: 100%; box-sizing: border-box; }
+    .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; width: 100%; }
+    .time-grid .fld {
+      margin-bottom: 0; min-width: 0; max-width: 100%;
+      background: var(--c2); border-radius: 12px;
+      padding: 10px 12px 10px; overflow: hidden;
+      border: 1.5px solid var(--sep);
+    }
+    .time-grid .fld label {
+      display: block; font-size: .68rem; font-weight: 700;
+      color: var(--t2); margin-bottom: 6px;
+    }
+    .time-grid .fld input {
+      display: block; width: 100%; min-width: 0; max-width: 100%;
+      box-sizing: border-box;
+      background: transparent; border: none; border-radius: 0;
+      padding: 0; margin: 0;
+      font-size: .95rem !important; font-weight: 800;
+      color: var(--t1); font-family: inherit;
+      text-align: center;
+      -webkit-appearance: none; appearance: none; outline: none;
+    }
+    .time-grid .fld input:focus { color: var(--tint); }
     .btn-edit-profile {
       display: block; width: 100%; padding: 12px; margin-bottom: 10px;
       background: var(--c2); border: 1.5px solid var(--tint);
