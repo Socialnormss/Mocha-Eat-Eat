@@ -1495,6 +1495,7 @@ if ('serviceWorker' in navigator) {
     });
   }).catch(()=>{});
 }
+if (!localStorage.getItem('adminPin')) localStorage.setItem('adminPin','000000');
 applyDarkMode();
 renderHeader(); renderToday(); renderNotes();
 renderInfo(); renderCalc(); makeCollapsible(); renderFoodProducts();
