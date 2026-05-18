@@ -90,8 +90,8 @@
 <!-- Page: Nutrition -->
 <div class="page" id="page-nutrition">
   <div class="nutr-wrap">
-    <div class="nutr-edit-bar">
-      <button class="btn-edit-cfg" id="editCfgBtn" onclick="requestToggleEdit()">✏️ แก้ไข</button>
+    <div class="nutr-edit-bar" style="display:none">
+      <button class="btn-edit-cfg" id="editCfgBtn" onclick="toggleEdit()">✏️ แก้ไข</button>
     </div>
     <div class="hero">
       <div class="hero-avatar">🐩</div>
@@ -143,6 +143,9 @@
         </div>
       </div>
     </div>
+
+    <div class="sec-title">🛒 อาหารเม็ดแนะนำสำหรับ Toy Poodle</div>
+    <div id="foodProductGrid"></div>
 
     <div class="sec-title">✅ อาหารที่กินได้</div>
     <div class="food-group">
@@ -365,10 +368,17 @@
         <button class="btn-close" onclick="closeSettings()">✕</button>
       </div>
       <button class="btn-notif" id="notifBtn" onclick="reqNotif()">🔔 เปิดการแจ้งเตือน</button>
-      <div class="fld"><label>มื้อเช้า</label><input id="cfg0" type="time"></div>
-      <div class="fld"><label>มื้อกลางวัน</label><input id="cfg1" type="time"></div>
-      <div class="fld"><label>มื้อเย็น</label><input id="cfg2" type="time"></div>
-      <div class="fld"><label>มื้อดึก</label><input id="cfg3" type="time"></div>
+      <div class="time-grid">
+        <div class="fld"><label>🌅 มื้อเช้า</label><input id="cfg0" type="time"></div>
+        <div class="fld"><label>☀️ มื้อกลางวัน</label><input id="cfg1" type="time"></div>
+        <div class="fld"><label>🌆 มื้อเย็น</label><input id="cfg2" type="time"></div>
+        <div class="fld"><label>🌙 มื้อดึก</label><input id="cfg3" type="time"></div>
+      </div>
+      <div class="fld" style="border-top:.5px solid var(--sep);padding-top:12px;margin-top:4px">
+        <label>🔐 รหัส Admin (แก้ไขบันทึกย้อนหลัง)</label>
+        <input id="cfgPin" type="password" placeholder="ตั้งรหัส 4 หลัก..." maxlength="8">
+      </div>
+      <button class="btn-edit-profile" onclick="goEditProfile()">👤 แก้ไขข้อมูลโปรไฟล์</button>
       <button class="btn-save" onclick="saveSettings()">บันทึก</button>
     </div>
   </div>
@@ -902,13 +912,60 @@ function openDay(key, d) {
       body.appendChild(el);
     });
   }
+  if (localStorage.getItem('adminPin')) {
+    const editBtn=document.createElement('button');
+    editBtn.className='btn-undo'; editBtn.style.marginTop='16px';
+    editBtn.textContent='🔐 แก้ไขบันทึก (Admin)';
+    editBtn.onclick=()=>adminEditDay(key,d);
+    body.appendChild(editBtn);
+  }
   document.getElementById('ovDay').classList.add('open');
 }
 function closeDay() { document.getElementById('ovDay').classList.remove('open'); }
 
+function adminEditDay(key, d) {
+  const pin = localStorage.getItem('adminPin');
+  const input = prompt(`🔐 ใส่รหัส Admin เพื่อแก้ไขวันที่ ${d} ${MONTHS_S[calM]} ${calY+543}:`);
+  if (input !== pin) { alert('รหัสไม่ถูกต้อง'); return; }
+  const allLog = JSON.parse(localStorage.getItem('log')||'{}');
+  const dl = allLog[key]||{};
+  const checks = MEALS.map(m=>`
+    <label style="display:flex;align-items:center;gap:10px;padding:8px 0;border-top:.5px solid var(--sep);font-size:.9rem">
+      <input type="checkbox" id="ae-${m.id}" ${dl[m.id]?'checked':''} style="width:20px;height:20px">
+      ${m.icon} ${m.label}
+    </label>`).join('');
+  const body=document.getElementById('dayBody');
+  body.innerHTML=`<div style="font-size:.8rem;color:var(--warn);margin-bottom:12px">โหมดแก้ไข Admin — ${d} ${MONTHS_S[calM]} ${calY+543}</div>
+    ${checks}
+    <button class="btn-save" style="margin-top:16px" onclick="saveAdminEdit('${key}')">บันทึกการแก้ไข</button>
+    <button class="btn-undo" style="margin-top:8px" onclick="openDay('${key}',${d})">ยกเลิก</button>`;
+}
+
+function saveAdminEdit(key) {
+  const allLog = JSON.parse(localStorage.getItem('log')||'{}');
+  if (!allLog[key]) allLog[key]={};
+  MEALS.forEach(m=>{
+    const checked = document.getElementById(`ae-${m.id}`)?.checked;
+    if (checked && !allLog[key][m.id]) allLog[key][m.id]={time:'(แก้ไขโดย Admin)',by:'Admin',food:''};
+    if (!checked) delete allLog[key][m.id];
+  });
+  localStorage.setItem('log',JSON.stringify(allLog));
+  if(window.db) try{ window.db.collection('logs').doc(key).set(allLog[key]||{}); }catch(e){}
+  closeDay(); renderCalendar(); renderDash();
+  alert('บันทึกการแก้ไขเรียบร้อย');
+}
+
 // ── Settings ──────────────────────────────────────────────────────────
+function goEditProfile() {
+  closeSettings();
+  const nutritionBtn = document.querySelector('.tab:nth-child(3)');
+  showPage('nutrition', nutritionBtn || document.querySelectorAll('.tab')[2]);
+  if (!isEditing) toggleEdit();
+}
+
 function openSettings() {
   const cfg=getCfg();
+  document.getElementById('cfgPin').value = localStorage.getItem('adminPin')||'';
   document.getElementById('cfg0').value=cfg.times[0];
   document.getElementById('cfg1').value=cfg.times[1];
   document.getElementById('cfg2').value=cfg.times[2];
@@ -918,6 +975,8 @@ function openSettings() {
 }
 function closeSettings() { document.getElementById('ovSettings').classList.remove('open'); }
 function saveSettings() {
+  const pin = document.getElementById('cfgPin').value.trim();
+  if (pin) localStorage.setItem('adminPin', pin);
   const prev = getCfg();
   const cfg = {
     name: prev.name,
@@ -963,7 +1022,7 @@ function showPage(name, btn) {
   document.getElementById(`page-${name}`).classList.add('active');
   btn.classList.add('active');
   if(name==='calendar') { renderCalendar(); renderDash(); }
-  if(name==='nutrition') { renderInfo(); renderCalc(); }
+  if(name==='nutrition') { renderInfo(); renderCalc(); renderFoodProducts(); }
 }
 
 // ── Overlay dismiss ────────────────────────────────────────────────────
@@ -1168,6 +1227,40 @@ function toggleEdit() {
   renderInfo();
 }
 
+// ── Food Product Grid ────────────────────────────────────────────────
+const FOOD_PRODUCTS = [
+  { cat:'🏆 สูตรสำหรับพันธุ์', items:[
+    { brand:'Royal Canin', name:'Toy Poodle Adult', kcal:340, note:'สูตรเฉพาะพันธุ์ ขนดี', bg:'#c8102e', fg:'#fff', ico:'👑' },
+    { brand:"Hill's Science", name:'Small & Mini Adult', kcal:358, note:'โปรตีนสูง ย่อยง่าย', bg:'#005eb8', fg:'#fff', ico:'🏔' },
+    { brand:'Purina Pro Plan', name:'Small & Toy Breed', kcal:370, note:'เหมาะสุนัขกระตือรือร้น', bg:'#e31837', fg:'#fff', ico:'🐾' },
+  ]},
+  { cat:'⚖️ สูตรควบคุมน้ำหนัก', items:[
+    { brand:'Royal Canin', name:'Satiety Small', kcal:285, note:'กากใยสูง อิ่มนาน', bg:'#c8102e', fg:'#fff', ico:'👑' },
+    { brand:"Hill's", name:'Metabolic Small', kcal:298, note:'เผาผลาญดีขึ้น', bg:'#005eb8', fg:'#fff', ico:'🏔' },
+    { brand:'Purina', name:'Weight Management', kcal:318, note:'ไขมันต่ำ โปรตีนสูง', bg:'#e31837', fg:'#fff', ico:'🐾' },
+  ]},
+  { cat:'⭐ Premium / Grain-Free', items:[
+    { brand:'Orijen', name:'Small & Mini', kcal:465, note:'เนื้อสัตว์ 85% grain-free', bg:'#6b3a2a', fg:'#fff', ico:'🦅' },
+    { brand:'Acana', name:'Small Breed', kcal:423, note:'ส่วนผสมจากธรรมชาติ', bg:'#2d5a3d', fg:'#fff', ico:'🌿' },
+    { brand:'Ziwi Peak', name:'Air-Dried', kcal:388, note:'คุณภาพระดับ Vet', bg:'#1a3a5c', fg:'#fff', ico:'🐟' },
+  ]},
+];
+
+function renderFoodProducts() {
+  const el = document.getElementById('foodProductGrid'); if (!el) return;
+  el.innerHTML = FOOD_PRODUCTS.map(cat=>`
+    <div class="fp-cat-label">${cat.cat}</div>
+    <div class="fp-grid">${cat.items.map(p=>`
+      <div class="fp-card">
+        <div class="fp-ico" style="background:${p.bg};color:${p.fg}">${p.ico}</div>
+        <div class="fp-brand">${p.brand}</div>
+        <div class="fp-name">${p.name}</div>
+        <div class="fp-kcal">${p.kcal} kcal/100g</div>
+        <div class="fp-note">${p.note}</div>
+      </div>`).join('')}
+    </div>`).join('');
+}
+
 let collapsibleReady = false;
 function makeCollapsible() {
   if (collapsibleReady) return;
@@ -1209,13 +1302,14 @@ let calcCombo = 'dry';
 let calcMeat  = '🐔 ไก่';
 let calcGoal  = 'maintain';
 
+// Toy Poodle adult (neutered) specific multipliers — ref: NRC 2006, WSAVA Nutritional Guidelines
 const GOAL_DATA = {
-  lose:     { factor:1.0, meals:3, color:'var(--ok)',   label:'ลดน้ำหนัก',
-              tip:'แนะนำ 3 มื้อ/วัน เพื่อกระจายแคลอรี่ ลดไขมัน เพิ่มผักเป็นเครื่องเคียงเพื่อความอิ่มโดยไม่เพิ่มพลังงาน' },
-  maintain: { factor:1.6, meals:null, color:'var(--tint)', label:'ปกติ',
-              tip:'จำนวนมื้อตามที่ตั้งค่าไว้ในแอป รักษาน้ำหนักที่เหมาะสม' },
-  gain:     { factor:1.8, meals:4, color:'var(--warn)',  label:'เพิ่มน้ำหนัก',
-              tip:'แนะนำ 3-4 มื้อ/วัน อาหารเม็ดผสมเนื้อไม่ติดมัน การให้บ่อยขึ้นช่วยให้ร่างกายดูดซึมสารอาหารได้ดีกว่า' },
+  lose:     { factor:1.0, meals:3, color:'var(--ok)', label:'ลดน้ำหนัก',
+              tip:'Toy Poodle อ้วนง่าย — ให้ที่ RER × 1.0 (ประมาณ 80% ของปกติ) แบ่ง 3 มื้อ/วัน เพิ่มผักต้มสุกเป็นเครื่องเคียง (แครอท บร็อคโคลี) เพื่อความอิ่มโดยไม่เพิ่มพลังงาน ควรปรึกษาสัตวแพทย์ก่อนเริ่มโปรแกรมลดน้ำหนัก' },
+  maintain: { factor:1.4, meals:3, color:'var(--tint)', label:'ปกติ',
+              tip:'Toy Poodle ผู้ใหญ่ที่ตัดแต่งพันธุ์แล้ว (Neutered) ใช้ RER × 1.4 เหมาะสมกว่า × 1.6 เนื่องจากเป็นสุนัขในบ้าน กิจกรรมน้อย แนะนำ 2-3 มื้อ/วัน — การให้ 3 มื้อช่วยป้องกันภาวะน้ำตาลในเลือดต่ำ (Hypoglycemia) ซึ่งพบได้ในสุนัขพันธุ์เล็ก' },
+  gain:     { factor:1.8, meals:3, color:'var(--warn)', label:'เพิ่มน้ำหนัก',
+              tip:'สำหรับ Toy Poodle ที่น้ำหนักต่ำกว่าเกณฑ์หรืออยู่ในช่วงฟื้นตัว ใช้ RER × 1.8 แบ่ง 3 มื้อ/วัน เสริมเนื้อสัตว์ไม่ติดมัน (ไก่ต้ม ปลาแซลมอน) 20-25% ของแต่ละมื้อ ไม่แนะนำให้เกิน × 2.0 เพราะจะสะสมไขมันมากเกินไปในสุนัขพันธุ์เล็ก' },
 };
 
 function setCalcGoal(g) {
@@ -1403,7 +1497,7 @@ if ('serviceWorker' in navigator) {
 }
 applyDarkMode();
 renderHeader(); renderToday(); renderNotes();
-renderInfo(); renderCalc(); makeCollapsible();
+renderInfo(); renderCalc(); makeCollapsible(); renderFoodProducts();
 startSync();
 tickClock();
 setInterval(tickClock, 1000);

@@ -22,7 +22,11 @@
       --navh:  80px;
     }
     body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
-      background: var(--bg); color: var(--t1); min-height: 100dvh; }
+      background: var(--bg); color: var(--t1); min-height: 100dvh;
+      scrollbar-width: none; }
+    body::-webkit-scrollbar { display: none; }
+    .page, .nutr-wrap, .modal { scrollbar-width: none; }
+    .page::-webkit-scrollbar, .nutr-wrap::-webkit-scrollbar, .modal::-webkit-scrollbar { display: none; }
 
     /* ── Header ──────────────────────────────── */
     .hdr {
@@ -644,6 +648,28 @@
     html.dark .danger-item.crit { border-left-color: var(--err); }
     html.dark .danger-item.high { border-left-color: var(--warn); }
     html.dark .danger-item.mid  { border-left-color: rgba(255,255,255,.2); }
+
+    /* ── Settings compact ───────────────────── */
+    .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+    .time-grid .fld { margin-bottom: 0; }
+    .time-grid .fld input { padding: 10px 10px; font-size: .88rem !important; text-align: center; }
+    .btn-edit-profile {
+      display: block; width: 100%; padding: 12px; margin-bottom: 10px;
+      background: var(--c2); border: 1.5px solid var(--tint);
+      border-radius: 10px; color: var(--tint); font-size: .88rem; font-weight: 700;
+      font-family: inherit; cursor: pointer;
+    }
+
+    /* ── Food product grid ───────────────────── */
+    .fp-cat-label { font-size: .72rem; font-weight: 700; color: var(--t2); text-transform: uppercase; letter-spacing: .5px; margin: 14px 0 8px; }
+    .fp-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 4px; }
+    .fp-card { background: var(--c1); border-radius: 12px; padding: 10px 8px; text-align: center; box-shadow: 0 1px 6px rgba(44,24,16,.06); }
+    .fp-ico { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin: 0 auto 6px; }
+    .fp-brand { font-size: .6rem; color: var(--t3); font-weight: 700; text-transform: uppercase; letter-spacing: .3px; margin-bottom: 2px; }
+    .fp-name { font-size: .72rem; font-weight: 800; line-height: 1.3; margin-bottom: 3px; }
+    .fp-kcal { font-size: .65rem; color: var(--tint); font-weight: 700; margin-bottom: 3px; }
+    .fp-note { font-size: .62rem; color: var(--t2); line-height: 1.4; }
+    html.dark .fp-card { box-shadow: none; }
 
     /* ── Calorie Calculator ───────────────────── */
     .calc-card {
