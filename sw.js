@@ -1,5 +1,5 @@
 const CACHE = 'dog-feeder-v1';
-const ASSETS = ['./index.html', './nutrition.html', './manifest.json', './icon.svg'];
+const ASSETS = ['./index.html', './nutrition.html', './manifest.json', './icon.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));

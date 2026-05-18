@@ -2,12 +2,19 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no">
   <title>โภชนาการมอคค่า</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon.png">
   <meta name="theme-color" content="#000000">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    input, textarea, select { font-size: 16px !important; }
+    button, a { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+    * { -webkit-user-select: none; user-select: none; }
+    input, textarea { -webkit-user-select: text; user-select: text; }
     :root {
       --bg:   #000;
       --c1:   #1c1c1e;
@@ -320,6 +327,25 @@ function saveDogInfo() {
   renderInfo();
 }
 
+// RER × 1.6 (adult, moderate activity) — standard vet formula
+function calcKcal(w) {
+  w = parseFloat(w);
+  if (isNaN(w) || w <= 0 || w > 15) return '';
+  return Math.round(70 * Math.pow(w, 0.75) * 1.6);
+}
+
+function autoKcal() {
+  const kcal = calcKcal(document.getElementById('ei-weight').value);
+  const calInput = document.getElementById('ei-cal');
+  const hint = document.getElementById('kcal-hint');
+  if (kcal) {
+    calInput.value = kcal;
+    if (hint) hint.textContent = `คำนวณอัตโนมัติ (RER × 1.6)`;
+  } else {
+    if (hint) hint.textContent = '';
+  }
+}
+
 function renderInfo() {
   const info = getDogInfo();
   document.getElementById('heroName').textContent = info.name;
@@ -327,16 +353,27 @@ function renderInfo() {
   if (isEditing) {
     grid.innerHTML = `
       <div class="info-cell"><div class="ic-label">ชื่อ</div><input class="ic-input" id="ei-name" value="${escHtml(info.name)}"></div>
-      <div class="info-cell"><div class="ic-label">อายุ</div><input class="ic-input" id="ei-age" value="${escHtml(info.age)}" placeholder="เช่น 1 ปี"></div>
-      <div class="info-cell"><div class="ic-label">น้ำหนัก</div><input class="ic-input" id="ei-weight" value="${escHtml(info.weight)}" placeholder="กก."><div class="ic-unit">กิโลกรัม</div></div>
-      <div class="info-cell"><div class="ic-label">แคลอรี่ต่อวัน</div><input class="ic-input" id="ei-cal" value="${escHtml(info.calories)}" placeholder="kcal"><div class="ic-unit">kcal/วัน</div></div>`;
+      <div class="info-cell"><div class="ic-label">อายุ</div><input class="ic-input" id="ei-age" value="${escHtml(info.age)}" placeholder="เช่น 1 ปี 3 เดือน"></div>
+      <div class="info-cell">
+        <div class="ic-label">น้ำหนัก</div>
+        <input class="ic-input" id="ei-weight" value="${escHtml(info.weight)}" placeholder="0.0" oninput="autoKcal()" type="number" step="0.1" min="0.5" max="10">
+        <div class="ic-unit">กิโลกรัม</div>
+      </div>
+      <div class="info-cell">
+        <div class="ic-label">แคลอรี่ต่อวัน</div>
+        <input class="ic-input" id="ei-cal" value="${escHtml(info.calories)}" placeholder="kcal" type="number">
+        <div class="ic-unit" id="kcal-hint" style="color:var(--ok);font-size:.68rem;margin-top:3px">${info.weight ? 'คำนวณอัตโนมัติ (RER × 1.6)' : 'ใส่น้ำหนักเพื่อคำนวณ'}</div>
+      </div>`;
     document.getElementById('infoSaveRow').style.display = 'block';
   } else {
+    const kcalAuto = info.weight ? calcKcal(info.weight) : null;
+    const kcalDisplay = info.calories || (kcalAuto ? `~${kcalAuto}` : '—');
+    const kcalNote = (!info.calories && kcalAuto) ? `<div class="ic-unit" style="color:var(--ok)">คำนวณจาก ${info.weight} กก.</div>` : '';
     grid.innerHTML = `
       <div class="info-cell"><div class="ic-label">ชื่อ</div><div class="ic-val">${escHtml(info.name)}</div></div>
       <div class="info-cell"><div class="ic-label">อายุ</div><div class="ic-val">${escHtml(info.age||'—')}</div></div>
       <div class="info-cell"><div class="ic-label">น้ำหนัก</div><div class="ic-val">${escHtml(info.weight||'—')}</div><div class="ic-unit">กิโลกรัม</div></div>
-      <div class="info-cell"><div class="ic-label">แคลอรี่/วัน</div><div class="ic-val">${escHtml(info.calories||'—')}</div><div class="ic-unit">kcal</div></div>`;
+      <div class="info-cell"><div class="ic-label">แคลอรี่/วัน</div><div class="ic-val">${escHtml(kcalDisplay)}</div>${kcalNote}</div>`;
     document.getElementById('infoSaveRow').style.display = 'none';
   }
 }

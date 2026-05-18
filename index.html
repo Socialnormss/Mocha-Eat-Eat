@@ -2,15 +2,22 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no">
   <title>มอคค่า 🐾</title>
   <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon.png">
   <meta name="theme-color" content="#000000">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="มอคค่า">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    /* prevent iOS font-size auto-zoom on input focus */
+    input, textarea, select { font-size: 16px !important; }
+    button, a { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+    * { -webkit-user-select: none; user-select: none; }
+    input, textarea { -webkit-user-select: text; user-select: text; }
     :root {
       --bg:    #000;
       --c1:    #1c1c1e;
@@ -549,8 +556,8 @@ const MEALS = [
 const FEEDERS = [
   { code:'PP', name:'ปาป๊า'  },
   { code:'MM', name:'มาม๊า'  },
-  { code:'N',  name:'เจ้นัท' },
-  { code:'L',  name:'เฮียหลิว' },
+  { code:'JN', name:'เจ้นัท' },
+  { code:'LL', name:'เฮียหลิว' },
   { code:'NT', name:'น้องธิป' },
   { code:'JK', name:'เจ้กุง' },
 ];
