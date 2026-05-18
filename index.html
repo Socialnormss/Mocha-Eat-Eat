@@ -238,7 +238,7 @@
       padding: 0 0 calc(20px + env(safe-area-inset-bottom,0px));
       max-height: 92dvh; overflow-y: auto;
     }
-    .modal-inner { padding: 20px 18px 0; }
+    .modal-inner { padding: 20px 18px 24px; }
 
     .modal-drag { width: 36px; height: 4px; background: var(--c3); border-radius: 2px; margin: 10px auto 0; }
     .modal-head { display: flex; justify-content: space-between; align-items: center; margin: 16px 0 6px; }
@@ -857,8 +857,8 @@ function renderToday() {
   const cfg=getCfg(), log=getLog(), now=new Date(), c=document.getElementById('cards');
   c.innerHTML='';
   MEALS.forEach((meal,i) => {
-    const t=cfg.times[i], fed=asFed(log[meal.id]);
-    const [h,mn]=t.split(':').map(Number);
+    const t=cfg.times?.[i] || '00:00', fed=asFed(log[meal.id]);
+    const parts=t.split(':'), h=Number(parts[0])||0, mn=Number(parts[1])||0;
     const mt=new Date(now); mt.setHours(h,mn,0,0);
     const overdue=!fed && now>mt;
     const card=document.createElement('div');
