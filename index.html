@@ -7,7 +7,7 @@
   <title>มอคค่า 🐾</title>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon.png">
-  <meta name="theme-color" content="#000000">
+  <meta name="theme-color" content="#9B6B45">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="มอคค่า">
@@ -23,19 +23,19 @@
     * { -webkit-user-select: none; user-select: none; }
     input, textarea { -webkit-user-select: text; user-select: text; }
     :root {
-      --bg:    #000;
-      --c1:    #1c1c1e;
-      --c2:    #2c2c2e;
-      --c3:    #3a3a3c;
-      --sep:   rgba(255,255,255,.1);
-      --t1:    #fff;
-      --t2:    rgba(255,255,255,.55);
-      --t3:    rgba(255,255,255,.25);
-      --tint:  #f59e0b;
-      --tintd: #d97706;
-      --ok:    #30d158;
-      --err:   #ff453a;
-      --warn:  #ff9f0a;
+      --bg:    #FAF5EE;              /* warm cream — like poodle coat */
+      --c1:    #FFFFFF;              /* white card */
+      --c2:    #F5EDE0;              /* light beige */
+      --c3:    #EAD9C4;              /* beige */
+      --sep:   rgba(139,95,60,.12);  /* warm separator */
+      --t1:    #2C1810;              /* espresso brown */
+      --t2:    rgba(44,24,16,.5);
+      --t3:    rgba(44,24,16,.22);
+      --tint:  #9B6B45;              /* caramel — main accent */
+      --tintd: #7D5233;              /* dark caramel */
+      --ok:    #5DA87A;              /* pastel mint */
+      --err:   #D96464;              /* pastel coral */
+      --warn:  #D4924F;              /* pastel amber */
       --r:     16px;
       --navh:  72px;
     }
@@ -380,6 +380,43 @@
       resize: none; min-height: 90px; margin-bottom: 12px;
     }
     #noteTextInput:focus { outline: none; border-color: var(--tint); }
+
+    /* ── Poodle light-theme overrides ──────────────────────── */
+    .hdr  { background: rgba(250,245,238,.96); }
+    .tabbar { background: rgba(255,255,255,.96); }
+    .fab  { background: var(--c1); box-shadow: 0 2px 12px rgba(44,24,16,.12); }
+    .card, .meal-card, .notes-card, .modal { box-shadow: 0 1px 10px rgba(44,24,16,.07); }
+    /* buttons: white text on caramel */
+    .btn-main  { color: #fff; }
+    .btn-feed  { color: #fff; }
+    .btn-save  { color: #fff; }
+    .btn-next  { color: #fff; }
+    .btn-add-note { color: #fff; }
+    .btn-main.done, .btn-feed.done { color: var(--t2); }
+    /* meal cards */
+    .meal-card.fed     { background: rgba(93,168,122,.07); border-color: rgba(93,168,122,.4); }
+    .meal-card.overdue { border-color: rgba(217,100,100,.4); }
+    /* badges */
+    .badge.done    { background: rgba(93,168,122,.15); color: #2E7A52; }
+    .badge.overdue { background: rgba(217,100,100,.1); color: #B84040; }
+    .badge.pending { background: var(--c2); color: var(--t2); }
+    .fed-detail .hi { color: #2E7A52; }
+    /* calendar */
+    .cday          { color: var(--t1); }
+    .cday.is-today { box-shadow: 0 0 0 2px var(--tint); color: var(--tint); }
+    .cday.full     { background: rgba(93,168,122,.2); color: #2E7A52; }
+    .cday.partial  { background: rgba(155,107,69,.15); color: var(--tint); }
+    .cday.missed   { color: var(--err); }
+    /* step indicator */
+    .si.active { color: #fff; }
+    .si.done   { color: #fff; }
+    /* chips */
+    .chip.sel { color: var(--tint); }
+    /* note */
+    .note-check.done { background: var(--ok); border-color: var(--ok); color: #fff; }
+    .note-del-btn { color: var(--err) !important; }
+    /* sync dot */
+    .cal-arr { background: var(--c2); color: var(--t1); }
   </style>
 </head>
 <body>
@@ -664,7 +701,7 @@ function renderNotes() {
       </div>
       <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">
         <button class="note-edit-btn" onclick="startEditNote(${n.id})">✏️</button>
-        <button class="note-edit-btn" onclick="deleteNote(${n.id})" style="color:rgba(255,69,58,.6)">🗑</button>
+        <button class="note-edit-btn note-del-btn" onclick="deleteNote(${n.id})">🗑</button>
       </div>
     </div>
   `).join('');

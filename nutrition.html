@@ -7,7 +7,7 @@
   <title>โภชนาการมอคค่า</title>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon.png">
-  <meta name="theme-color" content="#000000">
+  <meta name="theme-color" content="#9B6B45">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -20,16 +20,16 @@
     * { -webkit-user-select: none; user-select: none; }
     input, textarea { -webkit-user-select: text; user-select: text; }
     :root {
-      --bg:   #000;
-      --c1:   #1c1c1e;
-      --c2:   #2c2c2e;
-      --sep:  rgba(255,255,255,.1);
-      --t1:   #fff;
-      --t2:   rgba(255,255,255,.55);
-      --t3:   rgba(255,255,255,.25);
-      --tint: #f59e0b;
-      --ok:   #30d158;
-      --err:  #ff453a;
+      --bg:   #FAF5EE;
+      --c1:   #FFFFFF;
+      --c2:   #F5EDE0;
+      --sep:  rgba(139,95,60,.12);
+      --t1:   #2C1810;
+      --t2:   rgba(44,24,16,.5);
+      --t3:   rgba(44,24,16,.22);
+      --tint: #9B6B45;
+      --ok:   #5DA87A;
+      --err:  #D96464;
       --warn: #ff9f0a;
       --r:    16px;
     }
@@ -168,7 +168,32 @@
     }
     .emergency h3 { color: var(--err); font-size: .9rem; margin-bottom: 6px; }
     .emergency p  { font-size: .78rem; color: var(--t2); line-height: 1.6; }
-    .emergency strong { color: #ff6b6b; }
+    .emergency strong { color: var(--err); }
+
+    /* ── Poodle light-theme overrides ──────────────────────── */
+    .topbar { background: rgba(250,245,238,.96); }
+    .btn-save-info { color: #fff; }
+    .back { color: var(--t1); }
+    /* food group badges */
+    .gb-rec  { background: rgba(93,168,122,.15);  color: #2E7A52; }
+    .gb-gen  { background: rgba(155,107,69,.12);  color: var(--tint); }
+    .gb-supp { background: rgba(44,24,16,.08);    color: var(--t2); }
+    /* danger levels */
+    .lv-crit { background: rgba(217,100,100,.12); color: #B84040; }
+    .lv-high { background: rgba(212,146,79,.12);  color: #9B6040; }
+    .lv-mid  { background: rgba(44,24,16,.06);    color: var(--t2); }
+    /* danger borders */
+    .danger-item.crit { border-left-color: var(--err); }
+    .danger-item.high { border-left-color: #D4924F; }
+    .danger-item.mid  { border-left-color: rgba(44,24,16,.25); }
+    /* tips */
+    .tip, .food-card, .food-group, .danger-group, .tips-group {
+      box-shadow: 0 1px 8px rgba(44,24,16,.06);
+    }
+    /* emergency */
+    .emergency { background: rgba(217,100,100,.06); border-color: rgba(217,100,100,.25); }
+    /* info card */
+    .info-card { box-shadow: 0 1px 8px rgba(44,24,16,.06); }
   </style>
 </head>
 <body>
