@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>มอคค่า 🐾</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#f59e0b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="มอคค่า">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --amber:  #f59e0b;
+      --ambd:   #d97706;
+      --green:  #10b981;
+      --red:    #ef4444;
+      --orange: #f97316;
+      --bg:     #0f172a;
+      --card:   #1e293b;
+      --bdr:    #334155;
+      --text:   #f1f5f9;
+      --muted:  #94a3b8;
+      --navh:   58px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100dvh;
+    }
+
+    /* ── Header ─────────── */
+    .hdr {
+      background: var(--card);
+      border-bottom: 1px solid var(--bdr);
+      padding: 16px 16px 12px;
+      text-align: center;
+      position: sticky; top: 0; z-index: 20;
+    }
+    .hdr-name { font-size: 1.4rem; font-weight: 800; color: var(--amber); }
+    .hdr-date { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+    .hdr-next { font-size: 0.82rem; color: var(--muted); margin-top: 5px; min-height: 1.2em; }
+    .hdr-next.soon { color: var(--orange); font-weight: 700; }
+    .hdr-next.all  { color: var(--green);  font-weight: 700; }
+
+    /* ── Bottom Nav ─────── */
+    .bot-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--card); border-top: 1px solid var(--bdr);
+      display: flex; z-index: 20;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    .ni {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; padding: 9px 8px 6px;
+      cursor: pointer; color: var(--muted); text-decoration: none;
+      font-size: 0.68rem; border: none; background: none; font-family: inherit;
+    }
+    .ni .ico { font-size: 1.3rem; line-height: 1; margin-bottom: 2px; }
+    .ni.active { color: var(--amber); }
+
+    /* ── Pages ──────────── */
+    .page { display: none; }
+    .page.active { display: block; }
+    .wrap {
+      padding: 14px 16px;
+      max-width: 500px; margin: 0 auto;
+      padding-bottom: calc(var(--navh) + env(safe-area-inset-bottom,0px) + 80px);
+    }
+
+    /* ── Meal Card ──────── */
+    .card {
+      background: var(--card); border: 2px solid var(--bdr);
+      border-radius: 16px; padding: 14px; margin-bottom: 12px;
+      transition: border-color .2s, background .2s;
+    }
+    .card.fed     { border-color: var(--green); background: #071e16; }
+    .card.overdue { border-color: var(--red); }
+
+    .card-top {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .meal-row  { display: flex; align-items: center; gap: 10px; }
+    .meal-ico  { font-size: 1.5rem; }
+    .meal-name { font-weight: 700; font-size: 1rem; }
+    .meal-time { font-size: 0.78rem; color: var(--muted); }
+
+    .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; }
+    .badge.pending { background: var(--bdr);  color: var(--muted); }
+    .badge.done    { background: #064e3b; color: #6ee7b7; }
+    .badge.overdue { background: #450a0a; color: #fca5a5; }
+
+    .fed-meta     { font-size: 0.72rem; color: var(--muted); margin-top: 2px; text-align: right; }
+    .fed-meta .t  { color: var(--green); }
+
+    .btn-main {
+      display: block; width: 100%; padding: 12px;
+      background: var(--amber); color: #000;
+      border: none; border-radius: 10px;
+      font-size: 0.95rem; font-weight: 700; font-family: inherit; cursor: pointer;
+      transition: background .1s, transform .1s;
+    }
+    .btn-main:active { background: var(--ambd); transform: scale(.97); }
+    .btn-main.done   { background: var(--bdr); color: var(--muted); cursor: default; }
+
+    .btn-ghost {
+      display: block; width: 100%; padding: 8px; margin-top: 6px;
+      background: transparent; border: 1px solid var(--bdr);
+      border-radius: 9px; color: var(--muted);
+      font-size: 0.78rem; font-family: inherit; cursor: pointer;
+    }
+    .btn-ghost:active { background: rgba(255,255,255,.04); }
+
+    /* ── Calendar ───────── */
+    .cal-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .cal-arrow {
+      background: var(--card); border: 1px solid var(--bdr);
+      border-radius: 8px; padding: 6px 14px;
+      color: var(--text); font-size: 1.1rem; cursor: pointer;
+    }
+    .cal-title { font-size: 1rem; font-weight: 700; }
+
+    .cal-legend {
+      display: flex; gap: 12px; flex-wrap: wrap;
+      font-size: 0.7rem; color: var(--muted); margin-bottom: 12px;
+    }
+    .cal-legend span { display: flex; align-items: center; gap: 4px; }
+    .dot {
+      width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0;
+    }
+    .d-full    { background: var(--green); }
+    .d-partial { background: var(--amber); }
+    .d-missed  { background: var(--red); }
+
+    .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; }
+    .dow {
+      text-align: center; font-size: 0.68rem; color: var(--muted);
+      padding: 4px 0; font-weight: 600;
+    }
+    .cday {
+      aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+      border-radius: 50%; font-size: 0.82rem; font-weight: 600;
+      cursor: pointer; transition: transform .1s;
+    }
+    .cday:active   { transform: scale(.88); }
+    .cday.empty    { cursor: default; }
+    .cday.is-today { box-shadow: 0 0 0 2px var(--amber); color: var(--amber); }
+    .cday.full     { background: #064e3b; color: #6ee7b7; }
+    .cday.partial  { background: #451a03; color: #fcd34d; }
+    .cday.missed   { color: #fca5a5; }
+
+    /* ── FAB ─────────────── */
+    .fab {
+      position: fixed;
+      bottom: calc(var(--navh) + env(safe-area-inset-bottom,0px) + 14px);
+      right: 16px;
+      width: 46px; height: 46px;
+      background: var(--card); border: 1px solid var(--bdr);
+      border-radius: 50%; font-size: 1.1rem;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,.4); z-index: 10;
+    }
+
+    /* ── Modal base ─────── */
+    .ov {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.65); z-index: 100;
+      align-items: flex-end; justify-content: center;
+    }
+    .ov.open { display: flex; }
+    .modal {
+      background: var(--card); border-radius: 20px 20px 0 0;
+      padding: 20px 18px calc(28px + env(safe-area-inset-bottom,0px));
+      width: 100%; max-width: 500px;
+    }
+    .modal-head {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 18px;
+    }
+    .modal-title { font-size: 1rem; font-weight: 800; }
+    .btn-close {
+      background: none; border: none; color: var(--muted);
+      font-size: 1.5rem; line-height: 1; cursor: pointer;
+    }
+    .fld { margin-bottom: 14px; }
+    .fld label { display: block; font-size: 0.78rem; color: var(--muted); margin-bottom: 5px; }
+    .fld input {
+      width: 100%; padding: 11px 12px;
+      background: var(--bg); border: 1px solid var(--bdr);
+      border-radius: 9px; color: var(--text);
+      font-size: 0.95rem; font-family: inherit;
+    }
+    .fld input:focus { outline: none; border-color: var(--amber); }
+
+    .btn-notif {
+      display: block; width: 100%; padding: 11px; margin-bottom: 16px;
+      background: transparent; border: 1px solid var(--bdr);
+      border-radius: 9px; color: var(--text);
+      font-size: 0.85rem; font-family: inherit; cursor: pointer; text-align: center;
+    }
+    .btn-notif.on { border-color: var(--green); color: #6ee7b7; }
+
+    .btn-save {
+      display: block; width: 100%; padding: 13px;
+      background: var(--amber); color: #000;
+      border: none; border-radius: 10px;
+      font-size: 0.95rem; font-weight: 800; font-family: inherit; cursor: pointer;
+    }
+    .btn-save:active { background: var(--ambd); }
+
+    /* ── Day detail ─────── */
+    .dd-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 11px 0; border-bottom: 1px solid var(--bdr);
+    }
+    .dd-item:last-child { border-bottom: none; }
+    .dd-ico  { font-size: 1.3rem; margin-top: 1px; }
+    .dd-name { font-weight: 700; font-size: 0.9rem; }
+    .dd-info { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+    .dd-info .t { color: var(--green); }
+    .dd-none { font-size: 0.78rem; color: #f87171; margin-top: 2px; }
+  </style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-name" id="hdrName">🐾 มอคค่า</div>
+  <div class="hdr-date" id="hdrDate"></div>
+  <div class="hdr-next" id="hdrNext"></div>
+</div>
+
+<!-- Page: Today -->
+<div class="page active" id="page-today">
+  <div class="wrap" id="cards"></div>
+</div>
+
+<!-- Page: Calendar -->
+<div class="page" id="page-calendar">
+  <div class="wrap">
+    <div class="cal-head">
+      <button class="cal-arrow" onclick="calPrev()">‹</button>
+      <span class="cal-title" id="calTitle"></span>
+      <button class="cal-arrow" onclick="calNext()">›</button>
+    </div>
+    <div class="cal-legend">
+      <span><i class="dot d-full"></i>ให้ครบ 3 มื้อ</span>
+      <span><i class="dot d-partial"></i>ให้บางมื้อ</span>
+      <span><i class="dot d-missed"></i>ไม่มีบันทึก</span>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+  </div>
+</div>
+
+<!-- Bottom Nav -->
+<nav class="bot-nav">
+  <button class="ni active" onclick="showPage('today',this)">
+    <span class="ico">🏠</span>วันนี้
+  </button>
+  <button class="ni" onclick="showPage('calendar',this)">
+    <span class="ico">📅</span>ปฏิทิน
+  </button>
+  <a class="ni" href="nutrition.html">
+    <span class="ico">🥗</span>โภชนาการ
+  </a>
+</nav>
+
+<button class="fab" onclick="openSettings()">⚙️</button>
+
+<!-- Feed Modal -->
+<div class="ov" id="ovFeed">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title" id="fmTitle">บันทึกการให้อาหาร</span>
+      <button class="btn-close" onclick="closeFeed()">×</button>
+    </div>
+    <div class="fld">
+      <label>ใครให้อาหาร</label>
+      <input id="fmBy" type="text" placeholder="ชื่อ เช่น หลิว, แม่, พ่อ">
+    </div>
+    <div class="fld">
+      <label>อาหารที่ให้</label>
+      <input id="fmFood" type="text" placeholder="เช่น Royal Canin, Wet food">
+    </div>
+    <button class="btn-save" onclick="confirmFeed()">✓ บันทึก</button>
+  </div>
+</div>
+
+<!-- Day Detail Modal -->
+<div class="ov" id="ovDay">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title" id="dayTitle"></span>
+      <button class="btn-close" onclick="closeDay()">×</button>
+    </div>
+    <div id="dayBody"></div>
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="ov" id="ovSettings">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title">ตั้งค่า</span>
+      <button class="btn-close" onclick="closeSettings()">×</button>
+    </div>
+    <button class="btn-notif" id="notifBtn" onclick="requestNotif()">🔔 เปิดการแจ้งเตือน</button>
+    <div class="fld">
+      <label>ชื่อน้องหมา</label>
+      <input id="cfgName" type="text">
+    </div>
+    <div class="fld"><label>มื้อเช้า</label><input id="cfg0" type="time"></div>
+    <div class="fld"><label>มื้อกลางวัน</label><input id="cfg1" type="time"></div>
+    <div class="fld"><label>มื้อเย็น</label><input id="cfg2" type="time"></div>
+    <button class="btn-save" onclick="saveSettings()">บันทึก</button>
+  </div>
+</div>
+
+<script>
+// ── Constants ───────────────────────────────────────────────────
+const MEALS = [
+  { id: 'morning', label: 'มื้อเช้า',     icon: '🌅' },
+  { id: 'noon',    label: 'มื้อกลางวัน', icon: '☀️' },
+  { id: 'evening', label: 'มื้อเย็น',    icon: '🌙' },
+];
+const DAYS_S  = ['อา','จ','อ','พ','พฤ','ศ','ส'];
+const DAYS_F  = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัส','ศุกร์','เสาร์'];
+const MONTHS  = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const MONTHS_F= ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
+                 'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+
+// ── Storage ─────────────────────────────────────────────────────
+function getCfg() {
+  return JSON.parse(localStorage.getItem('cfg') || 'null') || {
+    name: 'มอคค่า', times: ['07:00','12:00','18:00'],
+  };
+}
+
+function todayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+}
+
+function getLog(k) {
+  const all = JSON.parse(localStorage.getItem('log') || '{}');
+  return all[k || todayKey()] || {};
+}
+
+function writeLog(id, val) {
+  const all = JSON.parse(localStorage.getItem('log') || '{}');
+  const k = todayKey();
+  if (!all[k]) all[k] = {};
+  if (val === null) delete all[k][id]; else all[k][id] = val;
+  const keys = Object.keys(all).sort();
+  while (keys.length > 60) delete all[keys.shift()];
+  localStorage.setItem('log', JSON.stringify(all));
+}
+
+function asFed(v) {
+  if (!v) return null;
+  return typeof v === 'string' ? { time: v, by: '', food: '' } : v;
+}
+
+// ── Header ──────────────────────────────────────────────────────
+function renderHeader() {
+  const cfg = getCfg(), log = getLog(), now = new Date();
+  document.getElementById('hdrName').textContent = `🐾 ${cfg.name}`;
+  document.getElementById('hdrDate').textContent =
+    `${DAYS_F[now.getDay()]}ที่ ${now.getDate()} ${MONTHS[now.getMonth()]} ${now.getFullYear()+543}`;
+
+  let nextMin = Infinity, nextLabel = '';
+  MEALS.forEach((m, i) => {
+    if (log[m.id]) return;
+    const [h,mn] = cfg.times[i].split(':').map(Number);
+    const t = new Date(now); t.setHours(h,mn,0,0);
+    const diff = Math.round((t - now)/60000);
+    if (diff > 0 && diff < nextMin) { nextMin = diff; nextLabel = m.label; }
+  });
+
+  const el = document.getElementById('hdrNext');
+  if (MEALS.every(m => log[m.id])) {
+    el.textContent = '✓ ให้ครบทุกมื้อแล้ววันนี้ 🎉'; el.className = 'hdr-next all';
+  } else if (nextLabel) {
+    const h = Math.floor(nextMin/60), mn = nextMin%60;
+    el.textContent = `${nextLabel} อีก ${h?h+'ชม. ':''}${mn}นาที`;
+    el.className = `hdr-next${nextMin <= 30 ? ' soon' : ''}`;
+  } else { el.textContent = ''; el.className = 'hdr-next'; }
+}
+
+// ── Today ────────────────────────────────────────────────────────
+function renderToday() {
+  const cfg = getCfg(), log = getLog(), now = new Date();
+  const c = document.getElementById('cards');
+  c.innerHTML = '';
+
+  MEALS.forEach((meal, i) => {
+    const t = cfg.times[i];
+    const fed = asFed(log[meal.id]);
+    const [h,mn] = t.split(':').map(Number);
+    const mt = new Date(now); mt.setHours(h,mn,0,0);
+    const overdue = !fed && now > mt;
+
+    const card = document.createElement('div');
+    card.className = `card${fed?' fed':overdue?' overdue':''}`;
+
+    let statusHTML;
+    if (fed) {
+      statusHTML = `
+        <div style="text-align:right">
+          <span class="badge done">✓ ให้แล้ว</span>
+          <div class="fed-meta"><span class="t">${fed.time}</span>${fed.by ? ` • ${fed.by}` : ''}</div>
+          ${fed.food ? `<div class="fed-meta">${fed.food}</div>` : ''}
+        </div>`;
+    } else if (overdue) {
+      statusHTML = `<span class="badge overdue">⚠ เลยเวลา</span>`;
+    } else {
+      statusHTML = `<span class="badge pending">รอ</span>`;
+    }
+
+    card.innerHTML = `
+      <div class="card-top">
+        <div class="meal-row">
+          <span class="meal-ico">${meal.icon}</span>
+          <div>
+            <div class="meal-name">${meal.label}</div>
+            <div class="meal-time">${t} น.</div>
+          </div>
+        </div>
+        ${statusHTML}
+      </div>
+      ${fed
+        ? `<button class="btn-main done">🐾 ให้อาหารแล้ว</button>
+           <button class="btn-ghost" onclick="undo('${meal.id}')">↩ ยกเลิก</button>`
+        : `<button class="btn-main" onclick="openFeed('${meal.id}')">🍖 ให้อาหารแล้ว</button>`
+      }`;
+    c.appendChild(card);
+  });
+}
+
+// ── Feed Modal ──────────────────────────────────────────────────
+let pendingId = null;
+
+function openFeed(id) {
+  pendingId = id;
+  document.getElementById('fmTitle').textContent =
+    `บันทึก: ${MEALS.find(m=>m.id===id).label}`;
+  document.getElementById('fmBy').value   = localStorage.getItem('lastBy')   || '';
+  document.getElementById('fmFood').value = localStorage.getItem('lastFood') || '';
+  document.getElementById('ovFeed').classList.add('open');
+  setTimeout(() => document.getElementById('fmBy').focus(), 120);
+}
+
+function closeFeed() {
+  document.getElementById('ovFeed').classList.remove('open');
+  pendingId = null;
+}
+
+function confirmFeed() {
+  const by   = document.getElementById('fmBy').value.trim();
+  const food = document.getElementById('fmFood').value.trim();
+  if (by)   localStorage.setItem('lastBy', by);
+  if (food) localStorage.setItem('lastFood', food);
+  const now = new Date();
+  const t = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')} น.`;
+  writeLog(pendingId, { time: t, by, food });
+  closeFeed();
+  if (navigator.vibrate) navigator.vibrate(40);
+  renderToday(); renderHeader();
+}
+
+function undo(id) {
+  writeLog(id, null);
+  renderToday(); renderHeader();
+}
+
+// ── Calendar ─────────────────────────────────────────────────────
+let calY = new Date().getFullYear(), calM = new Date().getMonth();
+
+function calPrev() { calM--; if (calM<0){calM=11;calY--;} renderCalendar(); }
+function calNext() {
+  const n = new Date();
+  if (calY > n.getFullYear() || (calY===n.getFullYear() && calM >= n.getMonth())) return;
+  calM++; if (calM>11){calM=0;calY++;} renderCalendar();
+}
+
+function renderCalendar() {
+  document.getElementById('calTitle').textContent = `${MONTHS_F[calM]} ${calY+543}`;
+  const allLog = JSON.parse(localStorage.getItem('log') || '{}');
+  const today  = new Date();
+  const grid   = document.getElementById('calGrid');
+  grid.innerHTML = '';
+
+  DAYS_S.forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'dow'; el.textContent = d; grid.appendChild(el);
+  });
+
+  const firstDow = new Date(calY, calM, 1).getDay();
+  const lastDate = new Date(calY, calM+1, 0).getDate();
+
+  for (let i=0; i<firstDow; i++) {
+    const el = document.createElement('div'); el.className='cday empty'; grid.appendChild(el);
+  }
+
+  for (let d=1; d<=lastDate; d++) {
+    const key = `${calY}-${calM+1}-${d}`;
+    const dl  = allLog[key] || {};
+    const cnt = MEALS.filter(m => dl[m.id]).length;
+    const isToday = new Date(calY,calM,d).toDateString() === today.toDateString();
+    const isPast  = new Date(calY,calM,d) < new Date(today.getFullYear(),today.getMonth(),today.getDate());
+
+    const el = document.createElement('div');
+    el.className = 'cday';
+    el.textContent = d;
+    if (isToday)       el.classList.add('is-today');
+    if (cnt===3)       el.classList.add('full');
+    else if (cnt>0)    el.classList.add('partial');
+    else if (isPast && !isToday) el.classList.add('missed');
+
+    if (cnt > 0 || isToday) el.onclick = () => openDay(key, d);
+    grid.appendChild(el);
+  }
+}
+
+// ── Day Detail ──────────────────────────────────────────────────
+function openDay(key, d) {
+  const allLog = JSON.parse(localStorage.getItem('log') || '{}');
+  const dl = allLog[key] || {};
+  document.getElementById('dayTitle').textContent = `${d} ${MONTHS[calM]} ${calY+543}`;
+  const body = document.getElementById('dayBody');
+  body.innerHTML = '';
+  MEALS.forEach(meal => {
+    const fed = asFed(dl[meal.id]);
+    const el = document.createElement('div');
+    el.className = 'dd-item';
+    el.innerHTML = `
+      <span class="dd-ico">${meal.icon}</span>
+      <div>
+        <div class="dd-name">${meal.label}</div>
+        ${fed
+          ? `<div class="dd-info">
+               <span class="t">${fed.time}</span>
+               ${fed.by   ? ` • โดย ${fed.by}`     : ''}
+               ${fed.food ? ` • ${fed.food}`         : ''}
+             </div>`
+          : `<div class="dd-none">ไม่มีบันทึก</div>`
+        }
+      </div>`;
+    body.appendChild(el);
+  });
+  document.getElementById('ovDay').classList.add('open');
+}
+function closeDay() { document.getElementById('ovDay').classList.remove('open'); }
+
+// ── Settings ─────────────────────────────────────────────────────
+function openSettings() {
+  const cfg = getCfg();
+  document.getElementById('cfgName').value = cfg.name;
+  document.getElementById('cfg0').value = cfg.times[0];
+  document.getElementById('cfg1').value = cfg.times[1];
+  document.getElementById('cfg2').value = cfg.times[2];
+  updateNotifBtn();
+  document.getElementById('ovSettings').classList.add('open');
+}
+function closeSettings() { document.getElementById('ovSettings').classList.remove('open'); }
+function saveSettings() {
+  localStorage.setItem('cfg', JSON.stringify({
+    name:  document.getElementById('cfgName').value.trim() || 'มอคค่า',
+    times: [document.getElementById('cfg0').value,
+            document.getElementById('cfg1').value,
+            document.getElementById('cfg2').value],
+  }));
+  closeSettings(); renderHeader(); renderToday();
+}
+
+// ── Notifications ─────────────────────────────────────────────────
+async function requestNotif() {
+  if (!('Notification' in window)) { alert('เบราว์เซอร์ไม่รองรับ notification'); return; }
+  await Notification.requestPermission();
+  updateNotifBtn();
+}
+function updateNotifBtn() {
+  const ok = 'Notification' in window && Notification.permission === 'granted';
+  const btn = document.getElementById('notifBtn');
+  if (!btn) return;
+  btn.textContent = ok ? '✓ เปิดการแจ้งเตือนแล้ว' : '🔔 เปิดการแจ้งเตือน';
+  btn.className = `btn-notif${ok ? ' on' : ''}`;
+}
+function checkNotif() {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  const cfg = getCfg(), log = getLog(), now = new Date();
+  const nd = JSON.parse(localStorage.getItem('nd') || '{}');
+  MEALS.forEach((meal, i) => {
+    if (log[meal.id]) return;
+    const [h,mn] = cfg.times[i].split(':').map(Number);
+    const mt = new Date(now); mt.setHours(h,mn,0,0);
+    const diff = Math.round((mt - now) / 60000);
+    const k15=`p15-${meal.id}-${todayKey()}`, k0=`p0-${meal.id}-${todayKey()}`;
+    if (diff===15 && !nd[k15]) {
+      new Notification(`อีก 15 นาที — ${meal.label} 🐾`,
+        { body:`เตรียมให้อาหาร ${cfg.name} เวลา ${cfg.times[i]} น.`, icon:'icon.svg', tag:k15 });
+      nd[k15]=true;
+    }
+    if (diff===0 && !nd[k0]) {
+      new Notification(`ถึงเวลา${meal.label}แล้ว! 🍖`,
+        { body:`ให้อาหาร ${cfg.name} ได้เลย`, icon:'icon.svg', tag:k0 });
+      nd[k0]=true;
+    }
+  });
+  localStorage.setItem('nd', JSON.stringify(nd));
+}
+
+// ── Page switch ───────────────────────────────────────────────────
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
+  document.getElementById(`page-${name}`).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'calendar') renderCalendar();
+}
+
+// ── Overlay dismiss ───────────────────────────────────────────────
+[['ovFeed',closeFeed],['ovDay',closeDay],['ovSettings',closeSettings]].forEach(([id,fn])=>{
+  document.getElementById(id).addEventListener('click', e => { if(e.target===e.currentTarget) fn(); });
+});
+
+// ── Service Worker ────────────────────────────────────────────────
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+
+// ── Boot ──────────────────────────────────────────────────────────
+renderHeader();
+renderToday();
+setInterval(() => { renderHeader(); renderToday(); checkNotif(); }, 30000);
+</script>
+</body>
+</html>

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>โภชนาการมอคค่า</title>
+  <meta name="theme-color" content="#f59e0b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --amber:  #f59e0b;
+      --green:  #10b981;
+      --red:    #ef4444;
+      --orange: #f97316;
+      --yellow: #eab308;
+      --bg:     #0f172a;
+      --card:   #1e293b;
+      --bdr:    #334155;
+      --text:   #f1f5f9;
+      --muted:  #94a3b8;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg); color: var(--text);
+      min-height: 100dvh;
+      padding-bottom: 40px;
+    }
+
+    /* ── Top bar ─────────── */
+    .topbar {
+      background: var(--card);
+      border-bottom: 1px solid var(--bdr);
+      padding: 14px 16px;
+      display: flex; align-items: center; gap: 12px;
+      position: sticky; top: 0; z-index: 10;
+    }
+    .back {
+      background: none; border: 1px solid var(--bdr);
+      border-radius: 8px; padding: 6px 12px;
+      color: var(--text); font-size: 0.9rem;
+      text-decoration: none; cursor: pointer;
+    }
+    .topbar-title { font-size: 1rem; font-weight: 800; color: var(--amber); }
+
+    /* ── Hero ───────────── */
+    .hero {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border-bottom: 1px solid var(--bdr);
+      padding: 28px 16px 24px;
+      text-align: center;
+    }
+    .hero-emoji  { font-size: 4rem; line-height: 1; margin-bottom: 10px; }
+    .hero-name   { font-size: 1.5rem; font-weight: 800; color: var(--amber); }
+    .hero-breed  { font-size: 0.88rem; color: var(--muted); margin-top: 4px; }
+    .hero-tags   { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    .tag {
+      padding: 5px 12px; border-radius: 20px;
+      background: var(--bdr); color: var(--text);
+      font-size: 0.75rem; font-weight: 600;
+    }
+    .tag.amber { background: #451a03; color: #fcd34d; }
+    .tag.green { background: #064e3b; color: #6ee7b7; }
+
+    /* ── Content ─────────── */
+    .content { padding: 16px; max-width: 500px; margin: 0 auto; }
+
+    .section-title {
+      font-size: 1rem; font-weight: 800;
+      display: flex; align-items: center; gap: 8px;
+      margin: 22px 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--bdr);
+    }
+
+    /* ── Food Grid ──────── */
+    .food-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    .food-card {
+      background: var(--card); border: 1px solid var(--bdr);
+      border-radius: 12px; padding: 12px 10px;
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .food-card.safe   { border-color: #065f46; }
+    .food-card.danger { border-color: #7f1d1d; }
+    .food-card.warn   { border-color: #78350f; }
+
+    .food-ico   { font-size: 1.5rem; line-height: 1; }
+    .food-name  { font-size: 0.85rem; font-weight: 700; }
+    .food-note  { font-size: 0.72rem; color: var(--muted); line-height: 1.4; }
+
+    /* ── Danger badges ──── */
+    .dbadge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 8px; border-radius: 20px;
+      font-size: 0.68rem; font-weight: 700; width: fit-content;
+    }
+    .dbadge.crit   { background: #450a0a; color: #fca5a5; }
+    .dbadge.high   { background: #451a03; color: #fdba74; }
+    .dbadge.mid    { background: #1c1917; color: var(--muted); border: 1px solid var(--bdr); }
+
+    /* ── Danger list ────── */
+    .danger-list { display: flex; flex-direction: column; gap: 8px; }
+    .danger-item {
+      background: var(--card); border-radius: 12px; padding: 12px 14px;
+      display: flex; align-items: flex-start; gap: 12px;
+    }
+    .danger-item.crit { border-left: 3px solid var(--red); }
+    .danger-item.high { border-left: 3px solid var(--orange); }
+    .danger-item.mid  { border-left: 3px solid #64748b; }
+
+    .di-ico  { font-size: 1.4rem; flex-shrink: 0; }
+    .di-name { font-size: 0.9rem; font-weight: 700; }
+    .di-why  { font-size: 0.75rem; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+
+    /* ── Tips ───────────── */
+    .tips-list { display: flex; flex-direction: column; gap: 8px; }
+    .tip {
+      background: var(--card); border-radius: 12px; padding: 13px 14px;
+      display: flex; align-items: flex-start; gap: 10px;
+    }
+    .tip-ico  { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+    .tip-head { font-size: 0.88rem; font-weight: 700; }
+    .tip-body { font-size: 0.78rem; color: var(--muted); margin-top: 3px; line-height: 1.5; }
+
+    /* ── Emergency box ──── */
+    .emergency {
+      background: #1c0505; border: 2px solid var(--red);
+      border-radius: 14px; padding: 16px;
+      margin-top: 24px; text-align: center;
+    }
+    .emergency h3 { color: #fca5a5; font-size: 0.95rem; margin-bottom: 6px; }
+    .emergency p  { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html" class="back">‹ กลับ</a>
+  <span class="topbar-title">โภชนาการ</span>
+</div>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-emoji">🐩</div>
+  <div class="hero-name">มอคค่า</div>
+  <div class="hero-breed">Toy Poodle • อายุ 1 ปี • Adult</div>
+  <div class="hero-tags">
+    <span class="tag amber">⚖️ น้ำหนักปกติ 2–4 กก.</span>
+    <span class="tag green">🍽️ 2–3 มื้อ/วัน</span>
+    <span class="tag">🔋 ~200–250 kcal/วัน</span>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- Safe foods -->
+  <div class="section-title">
+    <span>✅</span> อาหารที่กินได้
+  </div>
+
+  <div class="food-grid">
+    <div class="food-card safe">
+      <span class="food-ico">🥩</span>
+      <div class="food-name">เนื้อไก่/ปลา/วัว</div>
+      <div class="food-note">ปรุงสุก ไม่ใส่เกลือ เกลือ ไม่มีเครื่องเทศ</div>
+    </div>
+    <div class="food-card safe">
+      <span class="food-ico">🦴</span>
+      <div class="food-name">อาหารเม็ด Adult</div>
+      <div class="food-note">Small breed adult formula เปลี่ยนจาก puppy ได้แล้ว</div>
+    </div>
+    <div class="food-card safe">
+      <span class="food-ico">🥫</span>
+      <div class="food-name">อาหารเปียก</div>
+      <div class="food-note">เป็นส่วนเสริมได้ ไม่ควรให้เป็นหลัก ฟันผุง่าย</div>
+    </div>
+    <div class="food-card safe">
+      <span class="food-ico">🥕</span>
+      <div class="food-name">แครอท</div>
+      <div class="food-note">ดิบหรือต้มสุกก็ได้ ดีต่อฟัน มีเบต้าแคโรทีน</div>
+    </div>
+    <div class="food-card safe">
+      <span class="food-ico">🥒</span>
+      <div class="food-name">แตงกวา</div>
+      <div class="food-note">โแคลอรี่ต่ำ ช่วยดับกระหาย เหมาะเป็น treat</div>
+    </div>
+    <div class="food-card safe">
+      <span class="food-ico">🎃</span>
+      <div class="food-name">ฟักทอง</div>
+      <div class="food-note">ต้มสุก ช่วยระบบย่อยอาหาร มีไฟเบอร์</div>
+    </div>
+    <div class="food-card safe">
+      <span class="food-ico">🫐</span>
+      <div class="food-name">บลูเบอร์รี่</div>
+      <div class="food-note">Antioxidant สูง ให้เป็น treat 2–3 เม็ด</div>
+    </div>
+    <div class="food-card safe">
+      <span class="food-ico">🍎</span>
+      <div class="food-name">แอปเปิ้ล</div>
+      <div class="food-note">ต้องเอาเมล็ดและแกนออก เมล็ดมี cyanide</div>
+    </div>
+    <div class="food-card safe">
+      <span class="food-ico">🍳</span>
+      <div class="food-name">ไข่ต้ม</div>
+      <div class="food-note">โปรตีนสูง ไม่ใส่เกลือ ให้ครั้งละ 1/2 ฟอง</div>
+    </div>
+    <div class="food-card safe">
+      <span class="food-ico">🍚</span>
+      <div class="food-name">ข้าวสุก</div>
+      <div class="food-note">ข้าวขาวหรือข้าวกล้อง ไม่ใส่เครื่องปรุงใดๆ</div>
+    </div>
+  </div>
+
+  <!-- Dangerous foods -->
+  <div class="section-title">
+    <span>🚫</span> อาหารต้องห้าม
+  </div>
+
+  <div class="danger-list">
+
+    <!-- CRITICAL -->
+    <div class="danger-item crit">
+      <span class="di-ico">🍫</span>
+      <div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="di-name">ช็อกโกแลต</span>
+          <span class="dbadge crit">🚨 อันตรายถึงชีวิต</span>
+        </div>
+        <div class="di-why">มี Theobromine ซึ่งสุนัขย่อยสลายไม่ได้ ทำให้ชักและหัวใจวายได้ Dark chocolate อันตรายที่สุด</div>
+      </div>
+    </div>
+
+    <div class="danger-item crit">
+      <span class="di-ico">🍬</span>
+      <div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="di-name">Xylitol (น้ำตาลเทียม)</span>
+          <span class="dbadge crit">🚨 อันตรายถึงชีวิต</span>
+        </div>
+        <div class="di-why">พบในหมากฝรั่ง ขนมไร้น้ำตาล บางยาสีฟัน ทำให้น้ำตาลในเลือดต่ำฉับพลัน และตับวายได้</div>
+      </div>
+    </div>
+
+    <div class="danger-item crit">
+      <span class="di-ico">🍇</span>
+      <div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="di-name">องุ่น & ลูกเกด</span>
+          <span class="dbadge crit">🚨 อันตรายถึงชีวิต</span>
+        </div>
+        <div class="di-why">ยังไม่ทราบสารพิษที่แน่ชัด แต่ทำให้ไตวายเฉียบพลันได้ แม้ปริมาณน้อย</div>
+      </div>
+    </div>
+
+    <div class="danger-item crit">
+      <span class="di-ico">☕</span>
+      <div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="di-name">คาเฟอีน (กาแฟ ชา โกโก้)</span>
+          <span class="dbadge crit">🚨 อันตรายถึงชีวิต</span>
+        </div>
+        <div class="di-why">กระตุ้นระบบประสาทและหัวใจมากเกินไป ทำให้ชัก หัวใจเต้นผิดจังหวะ</div>
+      </div>
+    </div>
+
+    <div class="danger-item crit">
+      <span class="di-ico">🍺</span>
+      <div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="di-name">แอลกอฮอล์</span>
+          <span class="dbadge crit">🚨 อันตรายถึงชีวิต</span>
+        </div>
+        <div class="di-why">ตับสุนัขไม่สามารถประมวลผลแอลกอฮอล์ได้ แม้ปริมาณเล็กน้อยก็อันตราย</div>
+      </div>
+    </div>
+
+    <!-- HIGH -->
+    <div class="danger-item high">
+      <span class="di-ico">🧅</span>
+      <div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="di-name">หัวหอม กระเทียม ต้นหอม</span>
+          <span class="dbadge high">⚠️ อันตรายสูง</span>
+        </div>
+        <div class="di-why">มี thiosulfate ทำลายเม็ดเลือดแดง ทำให้โลหิตจาง ทั้งดิบและปรุงสุก</div>
+      </div>
+    </div>
+
+    <div class="danger-item high">
+      <span class="di-ico">🥑</span>
+      <div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="di-name">อาโวคาโด</span>
+          <span class="dbadge high">⚠️ อันตรายสูง</span>
+        </div>
+        <div class="di-why">มี Persin ทำให้อาเจียน ท้องเสีย และทำลายหัวใจ ทั้งเนื้อ เมล็ด และใบ</div>
+      </div>
+    </div>
+
+    <div class="danger-item high">
+      <span class="di-ico">🌰</span>
+      <div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="di-name">แมคคาเดเมียนัท</span>
+          <span class="dbadge high">⚠️ อันตรายสูง</span>
+        </div>
+        <div class="di-why">ทำให้กล้ามเนื้ออ่อนแรง สั่น อุณหภูมิร่างกายสูง โดยเฉพาะขาหลัง</div>
+      </div>
+    </div>
+
+    <div class="danger-item high">
+      <span class="di-ico">🍖</span>
+      <div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="di-name">กระดูกปรุงสุก</span>
+          <span class="dbadge high">⚠️ อันตรายสูง</span>
+        </div>
+        <div class="di-why">แตกเป็นเสี้ยนแหลม บาดหลอดอาหารและลำไส้ได้ กระดูกดิบยังพอรับได้แต่มีความเสี่ยงแบคทีเรีย</div>
+      </div>
+    </div>
+
+    <!-- MODERATE -->
+    <div class="danger-item mid">
+      <span class="di-ico">🥛</span>
+      <div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="di-name">นม & ผลิตภัณฑ์นม</span>
+          <span class="dbadge mid">ระวัง</span>
+        </div>
+        <div class="di-why">สุนัขส่วนใหญ่แพ้แล็กโตส ทำให้ท้องเสีย ถ้าให้ควรเป็นปริมาณน้อยมาก</div>
+      </div>
+    </div>
+
+    <div class="danger-item mid">
+      <span class="di-ico">🧂</span>
+      <div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="di-name">เกลือ & อาหารรสเค็ม</span>
+          <span class="dbadge mid">ระวัง</span>
+        </div>
+        <div class="di-why">ไตสุนัขทำงานหนักถ้าได้รับโซเดียมมาก ห้ามให้อาหารมนุษย์ที่ปรุงรสแล้ว</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tips -->
+  <div class="section-title">
+    <span>💡</span> คำแนะนำสำหรับมอคค่า
+  </div>
+
+  <div class="tips-list">
+    <div class="tip">
+      <span class="tip-ico">🔄</span>
+      <div>
+        <div class="tip-head">เปลี่ยนจาก Puppy → Adult Formula</div>
+        <div class="tip-body">Toy Poodle อายุ 1 ปีถือว่าโตเป็นผู้ใหญ่แล้ว ควรเปลี่ยนอาหารเป็น Small Breed Adult เพื่อป้องกันน้ำหนักเกิน</div>
+      </div>
+    </div>
+
+    <div class="tip">
+      <span class="tip-ico">⚖️</span>
+      <div>
+        <div class="tip-head">ปริมาณที่แนะนำ</div>
+        <div class="tip-body">น้ำหนัก 2 กก. → ~40–50g/วัน | น้ำหนัก 3 กก. → ~55–65g/วัน<br>แบ่ง 2–3 มื้อ อ่านฉลากอาหารแต่ละยี่ห้อด้วย</div>
+      </div>
+    </div>
+
+    <div class="tip">
+      <span class="tip-ico">💧</span>
+      <div>
+        <div class="tip-head">น้ำสะอาดตลอดเวลา</div>
+        <div class="tip-body">ต้องมีน้ำสดสะอาดให้เสมอ เปลี่ยนน้ำทุกวัน Toy Poodle ตัวเล็ก dehydrate เร็ว</div>
+      </div>
+    </div>
+
+    <div class="tip">
+      <span class="tip-ico">📊</span>
+      <div>
+        <div class="tip-head">ตรวจ Body Condition Score</div>
+        <div class="tip-body">คลำซี่โครงได้แต่ไม่เห็นด้วยตาเปล่า เห็น waist เล็กน้อยเมื่อมองจากด้านบน = น้ำหนักดี</div>
+      </div>
+    </div>
+
+    <div class="tip">
+      <span class="tip-ico">⚡</span>
+      <div>
+        <div class="tip-head">ระวัง Hypoglycemia</div>
+        <div class="tip-body">Toy Poodle ตัวเล็กน้ำตาลในเลือดต่ำง่ายถ้าไม่ได้กินข้าวนาน ควรให้ตรงเวลา ไม่ควรข้ามมื้อ</div>
+      </div>
+    </div>
+
+    <div class="tip">
+      <span class="tip-ico">🦷</span>
+      <div>
+        <div class="tip-head">ดูแลสุขอนามัยช่องปาก</div>
+        <div class="tip-body">Toy Poodle ฟันผุง่าย แนะนำแปรงฟัน 2–3 ครั้ง/สัปดาห์ หรือให้ dental treat หลีกเลี่ยงอาหารเปียกเป็นหลัก</div>
+      </div>
+    </div>
+
+    <div class="tip">
+      <span class="tip-ico">🌾</span>
+      <div>
+        <div class="tip-head">เปลี่ยนอาหารแบบค่อยเป็นค่อยไป</div>
+        <div class="tip-body">ถ้าเปลี่ยนยี่ห้อใหม่ ค่อยๆ ผสมโดยเพิ่มของใหม่ 25% ต่อสัปดาห์ ใน 4 สัปดาห์จะปรับได้เต็มที่</div>
+      </div>
+    </div>
+
+    <div class="tip">
+      <span class="tip-ico">🏥</span>
+      <div>
+        <div class="tip-head">ปรึกษาสัตวแพทย์</div>
+        <div class="tip-body">ข้อมูลนี้เป็นแนวทางทั่วไป ควรปรึกษาสัตวแพทย์สำหรับโปรแกรมโภชนาการที่เหมาะกับมอคค่าโดยเฉพาะ</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Emergency -->
+  <div class="emergency">
+    <h3>🚨 ถ้ามอคค่ากินสิ่งผิด</h3>
+    <p>โทรหาสัตวแพทย์ทันที อย่ารอให้อาการหนัก<br>
+    บอกสิ่งที่กิน ปริมาณโดยประมาณ และเวลาที่กิน<br>
+    <strong style="color:#fca5a5">ห้ามให้อาเจียนเองถ้าไม่ได้รับคำสั่งจากสัตวแพทย์</strong></p>
+  </div>
+
+</div>
+</body>
+</html>
