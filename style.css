@@ -21,12 +21,10 @@
       --r:     16px;
       --navh:  80px;
     }
+    * { scrollbar-width: none !important; }
+    *::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
-      background: var(--bg); color: var(--t1); min-height: 100dvh;
-      scrollbar-width: none; }
-    body::-webkit-scrollbar { display: none; }
-    .page, .nutr-wrap, .modal { scrollbar-width: none; }
-    .page::-webkit-scrollbar, .nutr-wrap::-webkit-scrollbar, .modal::-webkit-scrollbar { display: none; }
+      background: var(--bg); color: var(--t1); min-height: 100dvh; overflow-x: hidden; }
 
     /* ── Header ──────────────────────────────── */
     .hdr {
@@ -73,6 +71,18 @@
       text-transform: uppercase; letter-spacing: .8px;
       margin: 20px 4px 8px;
     }
+    /* collapsible section toggle */
+    .sec-toggle {
+      display: flex; align-items: center; justify-content: space-between;
+      width: 100%; background: none; border: none; font-family: inherit;
+      font-size: .75rem; font-weight: 700; color: var(--t2);
+      text-transform: uppercase; letter-spacing: .8px;
+      margin: 20px 0 8px; cursor: pointer; padding: 0 4px;
+    }
+    .sec-toggle:active { opacity: .7; }
+    .st-arrow { font-size: 1rem; transition: transform .2s; display: inline-block; }
+    .st-arrow.open { transform: rotate(90deg); }
+    .nutr-section { overflow: hidden; }
 
     /* ── Notes card ──────────────────────────── */
     .notes-card {

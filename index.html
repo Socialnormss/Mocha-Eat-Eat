@@ -105,8 +105,8 @@
       </div>
     </div>
 
-    <div class="sec-title">🧮 คำนวณอาหารต่อมื้อ</div>
-    <div class="calc-card" id="calcCard">
+    <button class="sec-toggle" onclick="toggleNutrSection('calcCard',this)">🧮 คำนวณอาหารต่อมื้อ <span class="st-arrow open">›</span></button>
+    <div class="nutr-section" id="calcCard" style="display:block">
       <div class="calc-no-weight" id="calcNoWeight">กรุณากรอกน้ำหนักในโปรไฟล์ก่อน</div>
       <div id="calcBody" style="display:none">
         <div class="calc-label">เป้าหมาย</div>
@@ -144,10 +144,11 @@
       </div>
     </div>
 
-    <div class="sec-title">🛒 อาหารเม็ดแนะนำสำหรับ Toy Poodle</div>
-    <div id="foodProductGrid"></div>
+    <button class="sec-toggle" onclick="toggleNutrSection('foodProductGrid',this)">🛒 อาหารเม็ดแนะนำสำหรับ Toy Poodle <span class="st-arrow">›</span></button>
+    <div class="nutr-section" id="foodProductGrid" style="display:none"></div>
 
-    <div class="sec-title">✅ อาหารที่กินได้</div>
+    <button class="sec-toggle" onclick="toggleNutrSection('nutrCanEat',this)">✅ อาหารที่กินได้ <span class="st-arrow">›</span></button>
+    <div class="nutr-section" id="nutrCanEat" style="display:none">
     <div class="food-group">
       <div class="group-header"><div>
         <div style="display:flex;align-items:center;gap:8px"><span class="group-badge gb-rec">⭐ แนะนำ</span></div>
@@ -186,7 +187,10 @@
       <div class="food-item"><span class="fi-ico">🦷</span><div><div class="fi-name">Dental Treat / กระดูกนิ่ม</div><div class="fi-note">ช่วยขูดหินปูน เลือกขนาดเหมาะกับ Toy Poodle ไม่ให้ทุกวัน (แคลอรี่เพิ่ม)</div></div></div>
     </div>
 
-    <div class="sec-title">🚫 อาหารต้องห้าม</div>
+    </div><!-- /nutrCanEat -->
+
+    <button class="sec-toggle" onclick="toggleNutrSection('nutrDanger',this)">🚫 อาหารต้องห้าม <span class="st-arrow">›</span></button>
+    <div class="nutr-section" id="nutrDanger" style="display:none">
     <div class="danger-group">
       <div style="padding:14px 16px 10px;border-bottom:.5px solid var(--sep)">
         <span style="font-size:.72rem;color:var(--err);font-weight:800;text-transform:uppercase;letter-spacing:.5px">⚠️ อันตรายถึงชีวิต — ห้ามให้เด็ดขาด</span>
@@ -215,7 +219,10 @@
       <div class="danger-item mid"><span class="di-ico">🍬</span><div class="di-right"><div class="di-top"><span class="di-name">อาหารหวานจัด / น้ำตาลมาก</span><span class="di-lv lv-mid">ระวัง</span></div><div class="di-why">ฟันผุ น้ำหนักเกิน และอาจทำให้เป็นเบาหวานระยะยาว</div></div></div>
     </div>
 
-    <div class="sec-title">💡 คำแนะนำการดูแล</div>
+    </div><!-- /nutrDanger -->
+
+    <button class="sec-toggle" onclick="toggleNutrSection('nutrTips',this)">💡 คำแนะนำการดูแล <span class="st-arrow">›</span></button>
+    <div class="nutr-section" id="nutrTips" style="display:none">
     <div class="tips-group">
       <div class="tip-item"><span class="tip-ico">🔄</span><div><div class="tip-head">เปลี่ยนจาก Puppy → Adult Formula</div><div class="tip-body">Toy Poodle อายุ 1 ปีถือเป็นผู้ใหญ่แล้ว ควรเปลี่ยนอาหารเป็น Small Breed Adult เพื่อป้องกันน้ำหนักเกิน โดยค่อยๆ ผสม 25% ต่อสัปดาห์ใน 4 สัปดาห์</div></div></div>
       <div class="tip-item"><span class="tip-ico">⚡</span><div><div class="tip-head">ระวัง Hypoglycemia (น้ำตาลต่ำ)</div><div class="tip-body">Toy Poodle ตัวเล็กมาก น้ำตาลในเลือดต่ำได้ง่ายถ้าอดอาหารนาน ควรให้ตรงเวลาสม่ำเสมอ ไม่ควรข้ามมื้อเกิน 12 ชม.</div></div></div>
@@ -229,6 +236,7 @@
       บอก: สิ่งที่กิน + ปริมาณโดยประมาณ + เวลาที่กิน<br>
       <strong>ห้ามทำให้อาเจียนเองโดยไม่ได้รับคำสั่งจากสัตวแพทย์</strong></p>
     </div>
+    </div><!-- /nutrTips -->
   </div>
 </div>
 
@@ -373,10 +381,6 @@
         <div class="fld"><label>☀️ มื้อกลางวัน</label><input id="cfg1" type="time"></div>
         <div class="fld"><label>🌆 มื้อเย็น</label><input id="cfg2" type="time"></div>
         <div class="fld"><label>🌙 มื้อดึก</label><input id="cfg3" type="time"></div>
-      </div>
-      <div class="fld" style="border-top:.5px solid var(--sep);padding-top:12px;margin-top:4px">
-        <label>🔐 รหัส Admin (แก้ไขบันทึกย้อนหลัง)</label>
-        <input id="cfgPin" type="password" placeholder="ตั้งรหัส 4 หลัก..." maxlength="8">
       </div>
       <button class="btn-edit-profile" onclick="goEditProfile()">👤 แก้ไขข้อมูลโปรไฟล์</button>
       <button class="btn-save" onclick="saveSettings()">บันทึก</button>
@@ -965,7 +969,6 @@ function goEditProfile() {
 
 function openSettings() {
   const cfg=getCfg();
-  document.getElementById('cfgPin').value = localStorage.getItem('adminPin')||'';
   document.getElementById('cfg0').value=cfg.times[0];
   document.getElementById('cfg1').value=cfg.times[1];
   document.getElementById('cfg2').value=cfg.times[2];
@@ -975,8 +978,6 @@ function openSettings() {
 }
 function closeSettings() { document.getElementById('ovSettings').classList.remove('open'); }
 function saveSettings() {
-  const pin = document.getElementById('cfgPin').value.trim();
-  if (pin) localStorage.setItem('adminPin', pin);
   const prev = getCfg();
   const cfg = {
     name: prev.name,
@@ -1259,6 +1260,16 @@ function renderFoodProducts() {
         <div class="fp-note">${p.note}</div>
       </div>`).join('')}
     </div>`).join('');
+}
+
+// ── Nutrition collapsible sections ───────────────────────────────────
+function toggleNutrSection(id, btn) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const isOpen = el.style.display !== 'none';
+  el.style.display = isOpen ? 'none' : 'block';
+  const arrow = btn?.querySelector('.st-arrow');
+  if (arrow) { arrow.classList.toggle('open', !isOpen); }
 }
 
 let collapsibleReady = false;
