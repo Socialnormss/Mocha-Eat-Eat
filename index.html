@@ -5,228 +5,370 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>มอคค่า 🐾</title>
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#f59e0b">
+  <meta name="theme-color" content="#000000">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="มอคค่า">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --amber:  #f59e0b;
-      --ambd:   #d97706;
-      --green:  #10b981;
-      --red:    #ef4444;
-      --orange: #f97316;
-      --bg:     #0f172a;
-      --card:   #1e293b;
-      --bdr:    #334155;
-      --text:   #f1f5f9;
-      --muted:  #94a3b8;
-      --navh:   58px;
+      --bg:    #000;
+      --c1:    #1c1c1e;
+      --c2:    #2c2c2e;
+      --c3:    #3a3a3c;
+      --sep:   rgba(255,255,255,.1);
+      --t1:    #fff;
+      --t2:    rgba(255,255,255,.55);
+      --t3:    rgba(255,255,255,.25);
+      --tint:  #f59e0b;
+      --tintd: #d97706;
+      --ok:    #30d158;
+      --err:   #ff453a;
+      --warn:  #ff9f0a;
+      --r:     16px;
+      --navh:  72px;
     }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+      background: var(--bg); color: var(--t1); min-height: 100dvh; }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100dvh;
-    }
-
-    /* ── Header ─────────── */
+    /* ── Header ──────────────────────────────── */
     .hdr {
-      background: var(--card);
-      border-bottom: 1px solid var(--bdr);
-      padding: 16px 16px 12px;
-      text-align: center;
-      position: sticky; top: 0; z-index: 20;
+      background: rgba(0,0,0,.85); backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: .5px solid var(--sep);
+      padding: 16px 20px 12px; text-align: center;
+      position: sticky; top: 0; z-index: 30;
     }
-    .hdr-name { font-size: 1.4rem; font-weight: 800; color: var(--amber); }
-    .hdr-date { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
-    .hdr-next { font-size: 0.82rem; color: var(--muted); margin-top: 5px; min-height: 1.2em; }
-    .hdr-next.soon { color: var(--orange); font-weight: 700; }
-    .hdr-next.all  { color: var(--green);  font-weight: 700; }
+    .hdr-name { font-size: 1.35rem; font-weight: 800; color: var(--tint); letter-spacing: -.5px; }
+    .hdr-date { font-size: .75rem; color: var(--t2); margin-top: 2px; }
+    .hdr-next { font-size: .8rem; color: var(--t2); margin-top: 5px; min-height: 1.1em; }
+    .hdr-next.soon { color: var(--warn); font-weight: 700; }
+    .hdr-next.all  { color: var(--ok);   font-weight: 700; }
 
-    /* ── Bottom Nav ─────── */
-    .bot-nav {
+    /* ── Tab bar ─────────────────────────────── */
+    .tabbar {
       position: fixed; bottom: 0; left: 0; right: 0;
-      background: var(--card); border-top: 1px solid var(--bdr);
-      display: flex; z-index: 20;
+      background: rgba(28,28,30,.92); backdrop-filter: blur(20px);
+      border-top: .5px solid var(--sep);
+      display: flex; z-index: 30;
       padding-bottom: env(safe-area-inset-bottom, 0px);
     }
-    .ni {
-      flex: 1; display: flex; flex-direction: column;
-      align-items: center; padding: 9px 8px 6px;
-      cursor: pointer; color: var(--muted); text-decoration: none;
-      font-size: 0.68rem; border: none; background: none; font-family: inherit;
+    .tab {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      padding: 10px 4px 8px; cursor: pointer; color: var(--t3);
+      text-decoration: none; font-size: .65rem; letter-spacing: .3px;
+      border: none; background: none; font-family: inherit; transition: color .15s;
     }
-    .ni .ico { font-size: 1.3rem; line-height: 1; margin-bottom: 2px; }
-    .ni.active { color: var(--amber); }
+    .tab .ico { font-size: 1.3rem; line-height: 1; margin-bottom: 3px; }
+    .tab.active { color: var(--tint); }
 
-    /* ── Pages ──────────── */
+    /* ── Pages ───────────────────────────────── */
     .page { display: none; }
     .page.active { display: block; }
     .wrap {
-      padding: 14px 16px;
-      max-width: 500px; margin: 0 auto;
-      padding-bottom: calc(var(--navh) + env(safe-area-inset-bottom,0px) + 80px);
+      padding: 16px 16px;
+      max-width: 480px; margin: 0 auto;
+      padding-bottom: calc(var(--navh) + env(safe-area-inset-bottom,0px) + 16px);
     }
 
-    /* ── Meal Card ──────── */
-    .card {
-      background: var(--card); border: 2px solid var(--bdr);
-      border-radius: 16px; padding: 14px; margin-bottom: 12px;
-      transition: border-color .2s, background .2s;
+    /* ── Section title ───────────────────────── */
+    .sec-title {
+      font-size: .75rem; font-weight: 700; color: var(--t2);
+      text-transform: uppercase; letter-spacing: .8px;
+      margin: 20px 4px 8px;
     }
-    .card.fed     { border-color: var(--green); background: #071e16; }
-    .card.overdue { border-color: var(--red); }
 
-    .card-top {
-      display: flex; justify-content: space-between; align-items: flex-start;
-      margin-bottom: 12px;
+    /* ── Notes card ──────────────────────────── */
+    .notes-card {
+      background: var(--c1); border-radius: var(--r);
+      overflow: hidden; margin-bottom: 8px;
     }
-    .meal-row  { display: flex; align-items: center; gap: 10px; }
-    .meal-ico  { font-size: 1.5rem; }
-    .meal-name { font-weight: 700; font-size: 1rem; }
-    .meal-time { font-size: 0.78rem; color: var(--muted); }
+    .notes-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 16px 10px;
+    }
+    .notes-title { font-size: .95rem; font-weight: 700; }
+    .btn-add-note {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--tint); color: #000;
+      border: none; font-size: 1.1rem; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0;
+    }
+    .notes-list { padding: 0 16px 14px; }
+    .note-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 8px 0; border-top: .5px solid var(--sep);
+    }
+    .note-check {
+      width: 22px; height: 22px; border-radius: 50%;
+      border: 1.5px solid var(--t3); flex-shrink: 0;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: .75rem; transition: all .15s; margin-top: 2px;
+    }
+    .note-check.done { background: var(--ok); border-color: var(--ok); color: #000; }
+    .note-body { flex: 1; min-width: 0; }
+    .note-text { font-size: .88rem; line-height: 1.4; word-break: break-word; }
+    .note-text.done { text-decoration: line-through; color: var(--t2); }
+    .note-meta { font-size: .7rem; color: var(--t3); margin-top: 2px; }
+    .note-edit-btn {
+      background: none; border: none; color: var(--t3);
+      font-size: .75rem; cursor: pointer; padding: 2px 4px;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .note-edit-row { display: flex; gap: 6px; margin-top: 4px; }
+    .note-edit-input {
+      flex: 1; padding: 7px 10px;
+      background: var(--c2); border: 1px solid var(--sep);
+      border-radius: 8px; color: var(--t1);
+      font-size: .88rem; font-family: inherit;
+    }
+    .note-edit-input:focus { outline: none; border-color: var(--tint); }
+    .btn-icon {
+      padding: 7px 10px; background: var(--c2); border: none;
+      border-radius: 8px; color: var(--t1); font-size: .82rem;
+      cursor: pointer; font-family: inherit;
+    }
+    .notes-empty { font-size: .82rem; color: var(--t3); text-align: center; padding: 8px 0; }
 
-    .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; }
-    .badge.pending { background: var(--bdr);  color: var(--muted); }
-    .badge.done    { background: #064e3b; color: #6ee7b7; }
-    .badge.overdue { background: #450a0a; color: #fca5a5; }
+    /* ── Meal cards ──────────────────────────── */
+    .meal-card {
+      background: var(--c1); border-radius: var(--r);
+      padding: 16px; margin-bottom: 10px;
+      border: 1.5px solid transparent; transition: all .2s;
+    }
+    .meal-card.fed     { border-color: rgba(48,209,88,.35); background: rgba(48,209,88,.07); }
+    .meal-card.overdue { border-color: rgba(255,69,58,.35); }
 
-    .fed-meta     { font-size: 0.72rem; color: var(--muted); margin-top: 2px; text-align: right; }
-    .fed-meta .t  { color: var(--green); }
+    .meal-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+    .meal-left { display: flex; align-items: center; gap: 12px; }
+    .meal-ico  { font-size: 1.6rem; }
+    .meal-name { font-size: 1rem; font-weight: 700; }
+    .meal-time { font-size: .75rem; color: var(--t2); margin-top: 2px; }
 
-    .btn-main {
-      display: block; width: 100%; padding: 12px;
-      background: var(--amber); color: #000;
-      border: none; border-radius: 10px;
-      font-size: 0.95rem; font-weight: 700; font-family: inherit; cursor: pointer;
+    .badge { padding: 4px 10px; border-radius: 100px; font-size: .7rem; font-weight: 700; }
+    .badge.pending { background: var(--c2); color: var(--t2); }
+    .badge.done    { background: rgba(48,209,88,.2); color: var(--ok); }
+    .badge.overdue { background: rgba(255,69,58,.15); color: var(--err); }
+
+    .fed-detail { font-size: .72rem; color: var(--t2); margin-top: 3px; text-align: right; line-height: 1.5; }
+    .fed-detail .hi { color: var(--ok); }
+
+    .btn-feed {
+      display: block; width: 100%; padding: 13px;
+      background: var(--tint); color: #000;
+      border: none; border-radius: 12px;
+      font-size: .95rem; font-weight: 700; font-family: inherit; cursor: pointer;
       transition: background .1s, transform .1s;
     }
-    .btn-main:active { background: var(--ambd); transform: scale(.97); }
-    .btn-main.done   { background: var(--bdr); color: var(--muted); cursor: default; }
-
-    .btn-ghost {
+    .btn-feed:active { background: var(--tintd); transform: scale(.97); }
+    .btn-feed.done { background: var(--c2); color: var(--t2); cursor: default; }
+    .btn-undo {
       display: block; width: 100%; padding: 8px; margin-top: 6px;
-      background: transparent; border: 1px solid var(--bdr);
-      border-radius: 9px; color: var(--muted);
-      font-size: 0.78rem; font-family: inherit; cursor: pointer;
+      background: transparent; border: 1px solid var(--sep);
+      border-radius: 10px; color: var(--t2); font-size: .78rem;
+      font-family: inherit; cursor: pointer;
     }
-    .btn-ghost:active { background: rgba(255,255,255,.04); }
 
-    /* ── Calendar ───────── */
-    .cal-head {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 14px;
+    /* ── Calendar ────────────────────────────── */
+    .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .cal-arr {
+      width: 36px; height: 36px; background: var(--c1); border: none;
+      border-radius: 50%; color: var(--t1); font-size: 1.1rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
     }
-    .cal-arrow {
-      background: var(--card); border: 1px solid var(--bdr);
-      border-radius: 8px; padding: 6px 14px;
-      color: var(--text); font-size: 1.1rem; cursor: pointer;
-    }
-    .cal-title { font-size: 1rem; font-weight: 700; }
+    .cal-month { font-size: 1.05rem; font-weight: 800; }
 
     .cal-legend {
       display: flex; gap: 12px; flex-wrap: wrap;
-      font-size: 0.7rem; color: var(--muted); margin-bottom: 12px;
+      font-size: .68rem; color: var(--t2); margin-bottom: 14px;
     }
     .cal-legend span { display: flex; align-items: center; gap: 4px; }
-    .dot {
-      width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0;
-    }
-    .d-full    { background: var(--green); }
-    .d-partial { background: var(--amber); }
-    .d-missed  { background: var(--red); }
+    .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+    .d-full { background: var(--ok); }
+    .d-part { background: var(--tint); }
+    .d-miss { background: var(--err); }
+    .d-note { background: #a78bfa; }
 
-    .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; }
-    .dow {
-      text-align: center; font-size: 0.68rem; color: var(--muted);
-      padding: 4px 0; font-weight: 600;
-    }
+    .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 5px; }
+    .dow { text-align: center; font-size: .68rem; color: var(--t2); padding: 4px 0; font-weight: 600; }
     .cday {
-      aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
-      border-radius: 50%; font-size: 0.82rem; font-weight: 600;
-      cursor: pointer; transition: transform .1s;
+      aspect-ratio: 1; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; border-radius: 50%; font-size: .82rem; font-weight: 600;
+      cursor: pointer; transition: transform .1s; position: relative; color: var(--t2);
     }
-    .cday:active   { transform: scale(.88); }
-    .cday.empty    { cursor: default; }
-    .cday.is-today { box-shadow: 0 0 0 2px var(--amber); color: var(--amber); }
-    .cday.full     { background: #064e3b; color: #6ee7b7; }
-    .cday.partial  { background: #451a03; color: #fcd34d; }
-    .cday.missed   { color: #fca5a5; }
+    .cday:active { transform: scale(.88); }
+    .cday.empty { cursor: default; }
+    .cday.is-today { box-shadow: 0 0 0 1.5px var(--tint); color: var(--tint); }
+    .cday.full    { background: rgba(48,209,88,.2); color: var(--ok); }
+    .cday.partial { background: rgba(245,158,11,.15); color: var(--tint); }
+    .cday.missed  { color: var(--err); }
+    .cday .cnote { width: 4px; height: 4px; border-radius: 50%; background: #a78bfa; position: absolute; bottom: 3px; }
 
-    /* ── FAB ─────────────── */
+    /* ── FAB ─────────────────────────────────── */
     .fab {
       position: fixed;
-      bottom: calc(var(--navh) + env(safe-area-inset-bottom,0px) + 14px);
-      right: 16px;
-      width: 46px; height: 46px;
-      background: var(--card); border: 1px solid var(--bdr);
-      border-radius: 50%; font-size: 1.1rem;
+      bottom: calc(var(--navh) + env(safe-area-inset-bottom,0px) + 12px); right: 16px;
+      width: 44px; height: 44px; background: var(--c1); border: .5px solid var(--sep);
+      border-radius: 50%; font-size: 1.05rem;
       display: flex; align-items: center; justify-content: center;
-      cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,.4); z-index: 10;
+      cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,.6); z-index: 10;
     }
 
-    /* ── Modal base ─────── */
+    /* ── Modal ───────────────────────────────── */
     .ov {
       display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,.65); z-index: 100;
+      background: rgba(0,0,0,.7); z-index: 100;
       align-items: flex-end; justify-content: center;
     }
     .ov.open { display: flex; }
     .modal {
-      background: var(--card); border-radius: 20px 20px 0 0;
-      padding: 20px 18px calc(28px + env(safe-area-inset-bottom,0px));
-      width: 100%; max-width: 500px;
+      background: var(--c1); border-radius: 22px 22px 0 0;
+      width: 100%; max-width: 480px;
+      padding: 0 0 calc(20px + env(safe-area-inset-bottom,0px));
+      max-height: 92dvh; overflow-y: auto;
     }
-    .modal-head {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 18px;
-    }
+    .modal-inner { padding: 20px 18px 0; }
+
+    .modal-drag { width: 36px; height: 4px; background: var(--c3); border-radius: 2px; margin: 10px auto 0; }
+    .modal-head { display: flex; justify-content: space-between; align-items: center; margin: 16px 0 6px; }
     .modal-title { font-size: 1rem; font-weight: 800; }
-    .btn-close {
-      background: none; border: none; color: var(--muted);
-      font-size: 1.5rem; line-height: 1; cursor: pointer;
-    }
-    .fld { margin-bottom: 14px; }
-    .fld label { display: block; font-size: 0.78rem; color: var(--muted); margin-bottom: 5px; }
-    .fld input {
-      width: 100%; padding: 11px 12px;
-      background: var(--bg); border: 1px solid var(--bdr);
-      border-radius: 9px; color: var(--text);
-      font-size: 0.95rem; font-family: inherit;
-    }
-    .fld input:focus { outline: none; border-color: var(--amber); }
+    .btn-close { background: var(--c2); border: none; color: var(--t2); width: 28px; height: 28px;
+      border-radius: 50%; font-size: 1rem; line-height: 1; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; }
 
-    .btn-notif {
-      display: block; width: 100%; padding: 11px; margin-bottom: 16px;
-      background: transparent; border: 1px solid var(--bdr);
-      border-radius: 9px; color: var(--text);
-      font-size: 0.85rem; font-family: inherit; cursor: pointer; text-align: center;
+    /* ── Step indicator ──────────────────────── */
+    .steps { display: flex; align-items: center; justify-content: center; gap: 0; margin: 14px 0 18px; }
+    .si {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--c2); color: var(--t2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .78rem; font-weight: 700; flex-shrink: 0; transition: all .2s;
     }
-    .btn-notif.on { border-color: var(--green); color: #6ee7b7; }
+    .si.active { background: var(--tint); color: #000; }
+    .si.done   { background: var(--ok);   color: #000; }
+    .si-line { flex: 1; height: 2px; background: var(--c2); max-width: 40px; transition: background .2s; }
+    .si-line.done { background: var(--ok); }
 
-    .btn-save {
-      display: block; width: 100%; padding: 13px;
-      background: var(--amber); color: #000;
-      border: none; border-radius: 10px;
-      font-size: 0.95rem; font-weight: 800; font-family: inherit; cursor: pointer;
-    }
-    .btn-save:active { background: var(--ambd); }
+    .step-label { text-align: center; font-size: .78rem; color: var(--t2); margin-bottom: 16px; }
 
-    /* ── Day detail ─────── */
-    .dd-item {
-      display: flex; align-items: flex-start; gap: 10px;
-      padding: 11px 0; border-bottom: 1px solid var(--bdr);
+    /* ── Step 1: Who ──────────────────────────── */
+    .feeder-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 10px; }
+    .feeder-btn {
+      background: var(--c2); border-radius: 12px; padding: 12px 8px;
+      text-align: center; cursor: pointer; border: 1.5px solid transparent;
+      transition: all .15s;
     }
-    .dd-item:last-child { border-bottom: none; }
+    .feeder-btn.sel { background: rgba(245,158,11,.15); border-color: var(--tint); }
+    .feeder-btn.sel .fb-code { color: var(--tint); }
+    .fb-code { font-size: 1.1rem; font-weight: 800; color: var(--t1); }
+    .fb-name { font-size: .7rem; color: var(--t2); margin-top: 3px; }
+    .feeder-other { margin-top: 8px; }
+    .feeder-other input {
+      width: 100%; padding: 12px 14px; background: var(--c2); border: 1.5px solid var(--sep);
+      border-radius: 10px; color: var(--t1); font-size: .92rem; font-family: inherit;
+    }
+    .feeder-other input:focus { outline: none; border-color: var(--tint); }
+
+    /* ── Step 2: Food ─────────────────────────── */
+    .food-list { display: flex; flex-direction: column; gap: 8px; }
+    .food-btn {
+      background: var(--c2); border-radius: 12px; padding: 14px 16px;
+      cursor: pointer; border: 1.5px solid transparent; transition: all .15s;
+      font-size: .9rem; font-weight: 600;
+    }
+    .food-btn .food-sub { font-size: .72rem; color: var(--t2); margin-top: 2px; font-weight: 400; }
+    .food-btn.sel { background: rgba(245,158,11,.12); border-color: var(--tint); color: var(--tint); }
+    .food-btn.sel .food-sub { color: rgba(245,158,11,.7); }
+
+    .sub-sec { margin-top: 14px; }
+    .sub-sec-label { font-size: .72rem; color: var(--t2); font-weight: 600; letter-spacing: .5px; text-transform: uppercase; margin-bottom: 8px; }
+    .chip-wrap { display: flex; flex-wrap: wrap; gap: 7px; }
+    .chip {
+      padding: 7px 13px; background: var(--c2); border-radius: 100px;
+      font-size: .82rem; cursor: pointer; border: 1.5px solid transparent;
+      transition: all .15s; user-select: none;
+    }
+    .chip.sel { background: rgba(245,158,11,.15); border-color: var(--tint); color: var(--tint); }
+
+    /* ── Step 3: Time ─────────────────────────── */
+    .period-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .period-btn {
+      background: var(--c2); border-radius: 14px; padding: 16px 10px;
+      text-align: center; cursor: pointer; border: 1.5px solid transparent; transition: all .15s;
+    }
+    .period-btn.sel { background: rgba(245,158,11,.12); border-color: var(--tint); }
+    .period-btn.sel .pname { color: var(--tint); }
+    .pico   { font-size: 1.8rem; line-height: 1; margin-bottom: 6px; }
+    .pname  { font-size: .9rem; font-weight: 700; }
+    .prange { font-size: .68rem; color: var(--t2); margin-top: 3px; }
+    .period-btn.sel .prange { color: rgba(245,158,11,.6); }
+
+    .or-divider { display: flex; align-items: center; gap: 8px; margin: 10px 0; }
+    .or-line { flex: 1; height: .5px; background: var(--sep); }
+    .or-text { font-size: .72rem; color: var(--t3); }
+
+    .time-input-row { display: flex; align-items: center; gap: 8px; }
+    .time-input-row input[type="time"] {
+      flex: 1; padding: 12px 14px; background: var(--c2);
+      border: 1.5px solid var(--sep); border-radius: 10px;
+      color: var(--t1); font-size: 1rem; font-family: inherit;
+    }
+    .time-input-row input:focus { outline: none; border-color: var(--tint); }
+
+    /* ── Step nav ─────────────────────────────── */
+    .step-nav { display: flex; gap: 8px; margin-top: 20px; padding-top: 14px; border-top: .5px solid var(--sep); }
+    .btn-back {
+      padding: 13px 20px; background: var(--c2); color: var(--t1);
+      border: none; border-radius: 12px; font-size: .9rem; font-weight: 600;
+      font-family: inherit; cursor: pointer;
+    }
+    .btn-next {
+      flex: 1; padding: 13px; background: var(--tint); color: #000;
+      border: none; border-radius: 12px; font-size: .95rem; font-weight: 800;
+      font-family: inherit; cursor: pointer; transition: background .1s;
+    }
+    .btn-next:active { background: var(--tintd); }
+
+    /* ── Day detail ──────────────────────────── */
+    .dd-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-top: .5px solid var(--sep); }
     .dd-ico  { font-size: 1.3rem; margin-top: 1px; }
-    .dd-name { font-weight: 700; font-size: 0.9rem; }
-    .dd-info { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
-    .dd-info .t { color: var(--green); }
-    .dd-none { font-size: 0.78rem; color: #f87171; margin-top: 2px; }
+    .dd-name { font-size: .9rem; font-weight: 700; }
+    .dd-info { font-size: .75rem; color: var(--t2); margin-top: 3px; line-height: 1.5; }
+    .dd-info .hi { color: var(--ok); }
+    .dd-none { font-size: .75rem; color: var(--err); margin-top: 3px; }
+    .dd-note-item { padding: 8px 0; border-top: .5px solid var(--sep); font-size: .82rem; line-height: 1.5; }
+    .dd-note-time { font-size: .7rem; color: var(--t2); margin-top: 2px; }
+    .dd-note-item.done .dd-note-text { text-decoration: line-through; color: var(--t2); }
+
+    /* ── Settings fields ─────────────────────── */
+    .fld { margin-bottom: 12px; }
+    .fld label { display: block; font-size: .75rem; color: var(--t2); margin-bottom: 5px; font-weight: 600; }
+    .fld input {
+      width: 100%; padding: 12px 14px; background: var(--c2); border: 1.5px solid var(--sep);
+      border-radius: 10px; color: var(--t1); font-size: .92rem; font-family: inherit;
+    }
+    .fld input:focus { outline: none; border-color: var(--tint); }
+    .btn-notif {
+      display: block; width: 100%; padding: 12px; margin-bottom: 14px;
+      background: transparent; border: 1px solid var(--sep);
+      border-radius: 10px; color: var(--t1); font-size: .85rem;
+      font-family: inherit; cursor: pointer; text-align: center;
+    }
+    .btn-notif.on { border-color: var(--ok); color: var(--ok); }
+    .btn-save {
+      display: block; width: 100%; padding: 14px;
+      background: var(--tint); color: #000; border: none; border-radius: 12px;
+      font-size: .95rem; font-weight: 800; font-family: inherit; cursor: pointer;
+    }
+
+    /* ── Note add modal ──────────────────────── */
+    #noteTextInput {
+      width: 100%; padding: 12px 14px;
+      background: var(--c2); border: 1.5px solid var(--sep);
+      border-radius: 10px; color: var(--t1); font-size: .92rem; font-family: inherit;
+      resize: none; min-height: 90px; margin-bottom: 12px;
+    }
+    #noteTextInput:focus { outline: none; border-color: var(--tint); }
   </style>
 </head>
 <body>
@@ -239,405 +381,658 @@
 
 <!-- Page: Today -->
 <div class="page active" id="page-today">
-  <div class="wrap" id="cards"></div>
+  <div class="wrap">
+    <div class="sec-title">📋 บันทึก / แจ้งเรื่อง</div>
+    <div class="notes-card">
+      <div class="notes-header">
+        <span class="notes-title">วันนี้</span>
+        <button class="btn-add-note" onclick="openNoteModal()">+</button>
+      </div>
+      <div class="notes-list" id="notesList"></div>
+    </div>
+    <div class="sec-title">🍖 การให้อาหาร</div>
+    <div id="cards"></div>
+  </div>
 </div>
 
 <!-- Page: Calendar -->
 <div class="page" id="page-calendar">
   <div class="wrap">
-    <div class="cal-head">
-      <button class="cal-arrow" onclick="calPrev()">‹</button>
-      <span class="cal-title" id="calTitle"></span>
-      <button class="cal-arrow" onclick="calNext()">›</button>
+    <div class="cal-nav">
+      <button class="cal-arr" onclick="calPrev()">‹</button>
+      <span class="cal-month" id="calTitle"></span>
+      <button class="cal-arr" onclick="calNext()">›</button>
     </div>
     <div class="cal-legend">
-      <span><i class="dot d-full"></i>ให้ครบ 3 มื้อ</span>
-      <span><i class="dot d-partial"></i>ให้บางมื้อ</span>
-      <span><i class="dot d-missed"></i>ไม่มีบันทึก</span>
+      <span><i class="dot d-full"></i>ครบ 3 มื้อ</span>
+      <span><i class="dot d-part"></i>บางมื้อ</span>
+      <span><i class="dot d-miss"></i>ไม่มีบันทึก</span>
+      <span><i class="dot d-note"></i>มีบันทึก</span>
     </div>
     <div class="cal-grid" id="calGrid"></div>
   </div>
 </div>
 
-<!-- Bottom Nav -->
-<nav class="bot-nav">
-  <button class="ni active" onclick="showPage('today',this)">
+<!-- Tab bar -->
+<nav class="tabbar">
+  <button class="tab active" onclick="showPage('today',this)">
     <span class="ico">🏠</span>วันนี้
   </button>
-  <button class="ni" onclick="showPage('calendar',this)">
+  <button class="tab" onclick="showPage('calendar',this)">
     <span class="ico">📅</span>ปฏิทิน
   </button>
-  <a class="ni" href="nutrition.html">
+  <a class="tab" href="nutrition.html">
     <span class="ico">🥗</span>โภชนาการ
   </a>
 </nav>
 
 <button class="fab" onclick="openSettings()">⚙️</button>
 
-<!-- Feed Modal -->
+<!-- ═══ Feed Modal (3 steps) ═══ -->
 <div class="ov" id="ovFeed">
   <div class="modal">
-    <div class="modal-head">
-      <span class="modal-title" id="fmTitle">บันทึกการให้อาหาร</span>
-      <button class="btn-close" onclick="closeFeed()">×</button>
-    </div>
-    <div class="fld">
-      <label>ใครให้อาหาร</label>
-      <input id="fmBy" type="text" placeholder="ชื่อ เช่น หลิว, แม่, พ่อ">
-    </div>
-    <div class="fld">
-      <label>อาหารที่ให้</label>
-      <input id="fmFood" type="text" placeholder="เช่น Royal Canin, Wet food">
-    </div>
-    <button class="btn-save" onclick="confirmFeed()">✓ บันทึก</button>
+    <div class="modal-drag"></div>
+    <div class="modal-inner">
+      <div class="modal-head">
+        <span class="modal-title" id="fmMealLabel">บันทึกการให้อาหาร</span>
+        <button class="btn-close" onclick="closeFeed()">✕</button>
+      </div>
+
+      <!-- Step indicator -->
+      <div class="steps">
+        <div class="si active" id="si1">1</div>
+        <div class="si-line" id="sl1"></div>
+        <div class="si" id="si2">2</div>
+        <div class="si-line" id="sl2"></div>
+        <div class="si" id="si3">3</div>
+      </div>
+      <div class="step-label" id="stepLabel">เลือกผู้ให้อาหาร</div>
+
+      <!-- Step 1: Who -->
+      <div id="fmS1">
+        <div class="feeder-grid" id="feederGrid"></div>
+        <div class="feeder-other" id="feederOther" style="display:none">
+          <input id="customFeederTxt" type="text" placeholder="พิมพ์ชื่อ...">
+        </div>
+      </div>
+
+      <!-- Step 2: Food -->
+      <div id="fmS2" style="display:none">
+        <div class="food-list" id="foodList"></div>
+        <div id="subMeat" style="display:none">
+          <div class="sub-sec">
+            <div class="sub-sec-label">เลือกเนื้อสัตว์ (เลือกได้หลายอย่าง)</div>
+            <div class="chip-wrap" id="meatChips"></div>
+          </div>
+        </div>
+        <div id="subVeg" style="display:none">
+          <div class="sub-sec">
+            <div class="sub-sec-label">เลือกผัก (เลือกได้หลายอย่าง)</div>
+            <div class="chip-wrap" id="vegChips"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Time -->
+      <div id="fmS3" style="display:none">
+        <div class="period-grid" id="periodGrid"></div>
+        <div class="or-divider"><div class="or-line"></div><span class="or-text">หรือระบุเวลาจริง</span><div class="or-line"></div></div>
+        <div class="time-input-row">
+          <input type="time" id="customTime" onchange="onCustomTime()">
+        </div>
+      </div>
+
+      <!-- Nav buttons -->
+      <div class="step-nav">
+        <button class="btn-back" id="btnBack" style="display:none" onclick="prevStep()">‹ ย้อนกลับ</button>
+        <button class="btn-next" id="btnNext" onclick="nextStep()">ถัดไป ›</button>
+      </div>
+    </div><!-- /modal-inner -->
   </div>
 </div>
 
-<!-- Day Detail Modal -->
+<!-- ═══ Note Add Modal ═══ -->
+<div class="ov" id="ovNote">
+  <div class="modal">
+    <div class="modal-drag"></div>
+    <div class="modal-inner">
+      <div class="modal-head">
+        <span class="modal-title">เพิ่มบันทึก</span>
+        <button class="btn-close" onclick="closeNoteModal()">✕</button>
+      </div>
+      <textarea id="noteTextInput" placeholder="เช่น: มอคค่าไม่กินข้าวเช้า, ให้ยาพยาธิแล้ว..."></textarea>
+      <button class="btn-save" onclick="saveNote()">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ Day Detail Modal ═══ -->
 <div class="ov" id="ovDay">
   <div class="modal">
-    <div class="modal-head">
-      <span class="modal-title" id="dayTitle"></span>
-      <button class="btn-close" onclick="closeDay()">×</button>
+    <div class="modal-drag"></div>
+    <div class="modal-inner">
+      <div class="modal-head">
+        <span class="modal-title" id="dayTitle"></span>
+        <button class="btn-close" onclick="closeDay()">✕</button>
+      </div>
+      <div id="dayBody"></div>
     </div>
-    <div id="dayBody"></div>
   </div>
 </div>
 
-<!-- Settings Modal -->
+<!-- ═══ Settings Modal ═══ -->
 <div class="ov" id="ovSettings">
   <div class="modal">
-    <div class="modal-head">
-      <span class="modal-title">ตั้งค่า</span>
-      <button class="btn-close" onclick="closeSettings()">×</button>
+    <div class="modal-drag"></div>
+    <div class="modal-inner">
+      <div class="modal-head">
+        <span class="modal-title">ตั้งค่า</span>
+        <button class="btn-close" onclick="closeSettings()">✕</button>
+      </div>
+      <button class="btn-notif" id="notifBtn" onclick="reqNotif()">🔔 เปิดการแจ้งเตือน</button>
+      <div class="fld"><label>ชื่อน้องหมา</label><input id="cfgName" type="text"></div>
+      <div class="fld"><label>มื้อเช้า</label><input id="cfg0" type="time"></div>
+      <div class="fld"><label>มื้อกลางวัน</label><input id="cfg1" type="time"></div>
+      <div class="fld"><label>มื้อเย็น</label><input id="cfg2" type="time"></div>
+      <button class="btn-save" onclick="saveSettings()">บันทึก</button>
     </div>
-    <button class="btn-notif" id="notifBtn" onclick="requestNotif()">🔔 เปิดการแจ้งเตือน</button>
-    <div class="fld">
-      <label>ชื่อน้องหมา</label>
-      <input id="cfgName" type="text">
-    </div>
-    <div class="fld"><label>มื้อเช้า</label><input id="cfg0" type="time"></div>
-    <div class="fld"><label>มื้อกลางวัน</label><input id="cfg1" type="time"></div>
-    <div class="fld"><label>มื้อเย็น</label><input id="cfg2" type="time"></div>
-    <button class="btn-save" onclick="saveSettings()">บันทึก</button>
   </div>
 </div>
 
 <script>
-// ── Constants ───────────────────────────────────────────────────
+// ── Constants ────────────────────────────────────────────────────────
 const MEALS = [
-  { id: 'morning', label: 'มื้อเช้า',     icon: '🌅' },
-  { id: 'noon',    label: 'มื้อกลางวัน', icon: '☀️' },
-  { id: 'evening', label: 'มื้อเย็น',    icon: '🌙' },
+  { id:'morning', label:'มื้อเช้า',    icon:'🌅' },
+  { id:'noon',    label:'มื้อกลางวัน',icon:'☀️' },
+  { id:'evening', label:'มื้อเย็น',   icon:'🌙' },
 ];
-const DAYS_S  = ['อา','จ','อ','พ','พฤ','ศ','ส'];
-const DAYS_F  = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัส','ศุกร์','เสาร์'];
-const MONTHS  = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-const MONTHS_F= ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
-                 'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const FEEDERS = [
+  { code:'PP', name:'ปาป๊า'  },
+  { code:'MM', name:'มาม๊า'  },
+  { code:'N',  name:'เจ้นัท' },
+  { code:'L',  name:'เฮียหลิว' },
+  { code:'NT', name:'น้องธิป' },
+  { code:'JK', name:'เจ้กุง' },
+];
+const FOOD_TYPES = [
+  { id:'dry',          label:'อาหารเม็ดอย่างเดียว',                   meat:false, veg:false },
+  { id:'dry+meat',     label:'อาหารเม็ดผสมเนื้อสัตว์',               meat:true,  veg:false },
+  { id:'dry+meat+veg', label:'อาหารเม็ดผสมเนื้อสัตว์และผัก',         meat:true,  veg:true  },
+  { id:'dry+wet',      label:'อาหารเม็ดผสมอาหารเปียก',               meat:false, veg:false },
+  { id:'wet',          label:'อาหารเปียกอย่างเดียว',                  meat:false, veg:false },
+];
+const MEATS = ['🐷 หมู','🐔 ไก่','🐟 ปลา','🐊 จรเข้','🥚 ไข่ไก่'];
+const VEGS  = ['🥬 ผักกาดขาว','🥕 แครอท','🥦 กะหล่ำปลี','🫛 หัวไช้เท้า','🥦 บรอคเคอลี่'];
+const PERIODS = [
+  { id:'morning',  icon:'🌅', name:'ช่วงเช้า',    range:'5:00 – 12:00',  h:[5,12]  },
+  { id:'noon',     icon:'☀️', name:'ช่วงกลางวัน', range:'12:00 – 17:00', h:[12,17] },
+  { id:'evening',  icon:'🌆', name:'ช่วงค่ำ',      range:'17:00 – 24:00', h:[17,24] },
+  { id:'midnight', icon:'🌙', name:'ช่วงเที่ยงคืน',range:'0:00 – 5:00',   h:[0,5]   },
+];
+const DAYS_S   = ['อา','จ','อ','พ','พฤ','ศ','ส'];
+const DAYS_F   = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัส','ศุกร์','เสาร์'];
+const MONTHS_S = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const MONTHS_F = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
+                  'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
 
-// ── Storage ─────────────────────────────────────────────────────
+// ── Storage ──────────────────────────────────────────────────────────
 function getCfg() {
-  return JSON.parse(localStorage.getItem('cfg') || 'null') || {
-    name: 'มอคค่า', times: ['07:00','12:00','18:00'],
-  };
+  return JSON.parse(localStorage.getItem('cfg')||'null') || { name:'มอคค่า', times:['07:00','12:00','18:00'] };
 }
-
-function todayKey() {
-  const d = new Date();
-  return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
-}
-
-function getLog(k) {
-  const all = JSON.parse(localStorage.getItem('log') || '{}');
-  return all[k || todayKey()] || {};
-}
-
+function todayKey() { const d=new Date(); return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; }
+function getLog(k) { return (JSON.parse(localStorage.getItem('log')||'{}')||{})[k||todayKey()]||{}; }
 function writeLog(id, val) {
-  const all = JSON.parse(localStorage.getItem('log') || '{}');
-  const k = todayKey();
-  if (!all[k]) all[k] = {};
-  if (val === null) delete all[k][id]; else all[k][id] = val;
-  const keys = Object.keys(all).sort();
-  while (keys.length > 60) delete all[keys.shift()];
+  const all = JSON.parse(localStorage.getItem('log')||'{}'), k = todayKey();
+  if (!all[k]) all[k]={};
+  if (val===null) delete all[k][id]; else all[k][id]=val;
+  const ks=Object.keys(all).sort(); while(ks.length>60) delete all[ks.shift()];
   localStorage.setItem('log', JSON.stringify(all));
 }
-
-function asFed(v) {
-  if (!v) return null;
-  return typeof v === 'string' ? { time: v, by: '', food: '' } : v;
+function getNotes(k) { return (JSON.parse(localStorage.getItem('notes')||'{}')||{})[k||todayKey()]||[]; }
+function saveNotes(arr, k) {
+  const all = JSON.parse(localStorage.getItem('notes')||'{}');
+  all[k||todayKey()] = arr;
+  const ks=Object.keys(all).sort(); while(ks.length>60) delete all[ks.shift()];
+  localStorage.setItem('notes', JSON.stringify(all));
 }
+function asFed(v) { if (!v) return null; return typeof v==='string' ? {time:v,by:'',food:''} : v; }
 
-// ── Header ──────────────────────────────────────────────────────
+// ── Header ───────────────────────────────────────────────────────────
 function renderHeader() {
-  const cfg = getCfg(), log = getLog(), now = new Date();
+  const cfg=getCfg(), log=getLog(), now=new Date();
   document.getElementById('hdrName').textContent = `🐾 ${cfg.name}`;
   document.getElementById('hdrDate').textContent =
-    `${DAYS_F[now.getDay()]}ที่ ${now.getDate()} ${MONTHS[now.getMonth()]} ${now.getFullYear()+543}`;
+    `${DAYS_F[now.getDay()]}ที่ ${now.getDate()} ${MONTHS_S[now.getMonth()]} ${now.getFullYear()+543}`;
 
-  let nextMin = Infinity, nextLabel = '';
-  MEALS.forEach((m, i) => {
+  let nextMin=Infinity, nextLabel='';
+  MEALS.forEach((m,i) => {
     if (log[m.id]) return;
-    const [h,mn] = cfg.times[i].split(':').map(Number);
-    const t = new Date(now); t.setHours(h,mn,0,0);
-    const diff = Math.round((t - now)/60000);
-    if (diff > 0 && diff < nextMin) { nextMin = diff; nextLabel = m.label; }
+    const [h,mn]=cfg.times[i].split(':').map(Number);
+    const t=new Date(now); t.setHours(h,mn,0,0);
+    const diff=Math.round((t-now)/60000);
+    if (diff>0 && diff<nextMin) { nextMin=diff; nextLabel=m.label; }
   });
-
-  const el = document.getElementById('hdrNext');
-  if (MEALS.every(m => log[m.id])) {
-    el.textContent = '✓ ให้ครบทุกมื้อแล้ววันนี้ 🎉'; el.className = 'hdr-next all';
-  } else if (nextLabel) {
-    const h = Math.floor(nextMin/60), mn = nextMin%60;
-    el.textContent = `${nextLabel} อีก ${h?h+'ชม. ':''}${mn}นาที`;
-    el.className = `hdr-next${nextMin <= 30 ? ' soon' : ''}`;
-  } else { el.textContent = ''; el.className = 'hdr-next'; }
+  const el=document.getElementById('hdrNext');
+  if (MEALS.every(m=>log[m.id])) { el.textContent='✓ ให้ครบทุกมื้อแล้ววันนี้ 🎉'; el.className='hdr-next all'; }
+  else if (nextLabel) {
+    const h=Math.floor(nextMin/60), mn=nextMin%60;
+    el.textContent=`${nextLabel} อีก ${h?h+'ชม. ':''}${mn}นาที`;
+    el.className=`hdr-next${nextMin<=30?' soon':''}`;
+  } else { el.textContent=''; el.className='hdr-next'; }
 }
 
-// ── Today ────────────────────────────────────────────────────────
+// ── Notes ────────────────────────────────────────────────────────────
+function renderNotes() {
+  const list = document.getElementById('notesList');
+  const notes = getNotes();
+  if (!notes.length) { list.innerHTML='<div class="notes-empty">ยังไม่มีบันทึกวันนี้</div>'; return; }
+  list.innerHTML = notes.map(n => `
+    <div class="note-item" id="note-${n.id}">
+      <div class="note-check${n.done?' done':''}" onclick="toggleNoteDone(${n.id})">${n.done?'✓':''}</div>
+      <div class="note-body">
+        <div class="note-text${n.done?' done':''}">${escHtml(n.text)}</div>
+        <div class="note-meta">${n.time}${n.by?' • '+n.by:''}</div>
+      </div>
+      <button class="note-edit-btn" onclick="startEditNote(${n.id})">✏️</button>
+    </div>
+  `).join('');
+}
+
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function openNoteModal() { document.getElementById('noteTextInput').value=''; document.getElementById('ovNote').classList.add('open'); setTimeout(()=>document.getElementById('noteTextInput').focus(),120); }
+function closeNoteModal() { document.getElementById('ovNote').classList.remove('open'); }
+
+function saveNote() {
+  const text = document.getElementById('noteTextInput').value.trim();
+  if (!text) return;
+  const now=new Date();
+  const time=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  const notes=getNotes(); notes.push({ id:Date.now(), text, time, done:false, by:'' });
+  saveNotes(notes); closeNoteModal(); renderNotes();
+}
+
+function toggleNoteDone(id) {
+  const notes=getNotes();
+  const n=notes.find(x=>x.id===id); if (n) n.done=!n.done;
+  saveNotes(notes); renderNotes();
+}
+
+function startEditNote(id) {
+  const notes=getNotes(), n=notes.find(x=>x.id===id); if (!n) return;
+  const el=document.getElementById(`note-${id}`);
+  el.innerHTML=`
+    <div class="note-body" style="flex:1">
+      <div class="note-edit-row">
+        <input class="note-edit-input" id="edit-${id}" value="${escHtml(n.text)}">
+        <button class="btn-icon" onclick="saveEditNote(${id})">✓</button>
+        <button class="btn-icon" onclick="renderNotes()">✕</button>
+      </div>
+    </div>`;
+  document.getElementById(`edit-${id}`).focus();
+}
+
+function saveEditNote(id) {
+  const val=document.getElementById(`edit-${id}`).value.trim(); if (!val) return;
+  const notes=getNotes(), n=notes.find(x=>x.id===id); if (n) n.text=val;
+  saveNotes(notes); renderNotes();
+}
+
+// ── Today ────────────────────────────────────────────────────────────
 function renderToday() {
-  const cfg = getCfg(), log = getLog(), now = new Date();
-  const c = document.getElementById('cards');
-  c.innerHTML = '';
+  const cfg=getCfg(), log=getLog(), now=new Date(), c=document.getElementById('cards');
+  c.innerHTML='';
+  MEALS.forEach((meal,i) => {
+    const t=cfg.times[i], fed=asFed(log[meal.id]);
+    const [h,mn]=t.split(':').map(Number);
+    const mt=new Date(now); mt.setHours(h,mn,0,0);
+    const overdue=!fed && now>mt;
+    const card=document.createElement('div');
+    card.className=`meal-card${fed?' fed':overdue?' overdue':''}`;
 
-  MEALS.forEach((meal, i) => {
-    const t = cfg.times[i];
-    const fed = asFed(log[meal.id]);
-    const [h,mn] = t.split(':').map(Number);
-    const mt = new Date(now); mt.setHours(h,mn,0,0);
-    const overdue = !fed && now > mt;
-
-    const card = document.createElement('div');
-    card.className = `card${fed?' fed':overdue?' overdue':''}`;
-
-    let statusHTML;
+    let status;
     if (fed) {
-      statusHTML = `
-        <div style="text-align:right">
-          <span class="badge done">✓ ให้แล้ว</span>
-          <div class="fed-meta"><span class="t">${fed.time}</span>${fed.by ? ` • ${fed.by}` : ''}</div>
-          ${fed.food ? `<div class="fed-meta">${fed.food}</div>` : ''}
-        </div>`;
+      let desc = `<span class="hi">${fed.time}</span>`;
+      if (fed.by)   desc += ` • ${fed.by}`;
+      if (fed.food) desc += `<br>${fed.food}`;
+      status = `<div style="text-align:right"><span class="badge done">✓ ให้แล้ว</span><div class="fed-detail">${desc}</div></div>`;
     } else if (overdue) {
-      statusHTML = `<span class="badge overdue">⚠ เลยเวลา</span>`;
+      status = `<span class="badge overdue">⚠ เลยเวลา</span>`;
     } else {
-      statusHTML = `<span class="badge pending">รอ</span>`;
+      status = `<span class="badge pending">รอ</span>`;
     }
 
-    card.innerHTML = `
-      <div class="card-top">
-        <div class="meal-row">
+    card.innerHTML=`
+      <div class="meal-top">
+        <div class="meal-left">
           <span class="meal-ico">${meal.icon}</span>
-          <div>
-            <div class="meal-name">${meal.label}</div>
-            <div class="meal-time">${t} น.</div>
-          </div>
+          <div><div class="meal-name">${meal.label}</div><div class="meal-time">${t} น.</div></div>
         </div>
-        ${statusHTML}
+        ${status}
       </div>
       ${fed
-        ? `<button class="btn-main done">🐾 ให้อาหารแล้ว</button>
-           <button class="btn-ghost" onclick="undo('${meal.id}')">↩ ยกเลิก</button>`
-        : `<button class="btn-main" onclick="openFeed('${meal.id}')">🍖 ให้อาหารแล้ว</button>`
+        ?`<button class="btn-feed done">🐾 ให้อาหารแล้ว</button>
+          <button class="btn-undo" onclick="undoFeed('${meal.id}')">↩ ยกเลิก</button>`
+        :`<button class="btn-feed" onclick="openFeed('${meal.id}')">🍖 ให้อาหารแล้ว</button>`
       }`;
     c.appendChild(card);
   });
 }
 
-// ── Feed Modal ──────────────────────────────────────────────────
-let pendingId = null;
+function undoFeed(id) { writeLog(id,null); renderToday(); renderHeader(); }
+
+// ── Feed Modal ───────────────────────────────────────────────────────
+let pendingId=null, feedStep=1;
+let selFeeder=null, customFeederVal='';
+let selFoodType=null;
+let selMeats=new Set(), selVegs=new Set();
+let selPeriod=null, selCustomTime='';
 
 function openFeed(id) {
-  pendingId = id;
-  document.getElementById('fmTitle').textContent =
-    `บันทึก: ${MEALS.find(m=>m.id===id).label}`;
-  document.getElementById('fmBy').value   = localStorage.getItem('lastBy')   || '';
-  document.getElementById('fmFood').value = localStorage.getItem('lastFood') || '';
+  pendingId=id; feedStep=1;
+  selFeeder=localStorage.getItem('lastFeeder')||null;
+  selFoodType=localStorage.getItem('lastFoodType')||null;
+  selMeats=new Set(JSON.parse(localStorage.getItem('lastMeats')||'[]'));
+  selVegs=new Set(JSON.parse(localStorage.getItem('lastVegs')||'[]'));
+  selPeriod=autoDetectPeriod(); selCustomTime='';
+
+  document.getElementById('fmMealLabel').textContent = `บันทึก: ${MEALS.find(m=>m.id===id).label}`;
+  buildFeederGrid(); buildFoodList(); buildPeriodGrid(); buildChips();
+  setStep(1);
   document.getElementById('ovFeed').classList.add('open');
-  setTimeout(() => document.getElementById('fmBy').focus(), 120);
 }
 
-function closeFeed() {
-  document.getElementById('ovFeed').classList.remove('open');
-  pendingId = null;
+function closeFeed() { document.getElementById('ovFeed').classList.remove('open'); pendingId=null; }
+
+function autoDetectPeriod() {
+  const h=new Date().getHours();
+  if (h>=5&&h<12) return 'morning';
+  if (h>=12&&h<17) return 'noon';
+  if (h>=17) return 'evening';
+  return 'midnight';
 }
+
+function buildFeederGrid() {
+  const g=document.getElementById('feederGrid');
+  g.innerHTML = FEEDERS.map(f=>`
+    <div class="feeder-btn${selFeeder===f.code?' sel':''}" id="fb-${f.code}" onclick="pickFeeder('${f.code}')">
+      <div class="fb-code">${f.code}</div>
+      <div class="fb-name">${f.name}</div>
+    </div>`).join('') +
+    `<div class="feeder-btn${selFeeder==='other'?' sel':''}" id="fb-other" onclick="pickFeeder('other')">
+      <div class="fb-code" style="font-size:.85rem">อื่นๆ</div>
+      <div class="fb-name">ระบุชื่อ</div>
+    </div>`;
+  document.getElementById('feederOther').style.display = selFeeder==='other'?'block':'none';
+}
+
+function pickFeeder(code) {
+  selFeeder=code;
+  document.querySelectorAll('.feeder-btn').forEach(b=>b.classList.remove('sel'));
+  document.getElementById(`fb-${code}`)?.classList.add('sel');
+  document.getElementById('feederOther').style.display = code==='other'?'block':'none';
+  if (code!=='other') document.getElementById('customFeederTxt').value='';
+}
+
+function buildFoodList() {
+  document.getElementById('foodList').innerHTML = FOOD_TYPES.map(f=>`
+    <div class="food-btn${selFoodType===f.id?' sel':''}" id="ft-${f.id}" onclick="pickFoodType('${f.id}')">
+      ${f.label}
+    </div>`).join('');
+  updateSubOptions();
+}
+
+function pickFoodType(id) {
+  selFoodType=id;
+  document.querySelectorAll('.food-btn').forEach(b=>b.classList.remove('sel'));
+  document.getElementById(`ft-${id}`)?.classList.add('sel');
+  const ft=FOOD_TYPES.find(f=>f.id===id);
+  if (!ft.meat) selMeats=new Set();
+  if (!ft.veg)  selVegs=new Set();
+  updateSubOptions();
+}
+
+function updateSubOptions() {
+  const ft=FOOD_TYPES.find(f=>f.id===selFoodType)||{meat:false,veg:false};
+  document.getElementById('subMeat').style.display = ft.meat ? 'block' : 'none';
+  document.getElementById('subVeg').style.display  = ft.veg  ? 'block' : 'none';
+}
+
+function buildChips() {
+  document.getElementById('meatChips').innerHTML = MEATS.map(m=>`
+    <span class="chip${selMeats.has(m)?' sel':''}" onclick="toggleChip('meat','${m}')">${m}</span>`).join('');
+  document.getElementById('vegChips').innerHTML = VEGS.map(v=>`
+    <span class="chip${selVegs.has(v)?' sel':''}" onclick="toggleChip('veg','${v}')">${v}</span>`).join('');
+}
+
+function toggleChip(type, val) {
+  const set = type==='meat' ? selMeats : selVegs;
+  set.has(val) ? set.delete(val) : set.add(val);
+  buildChips();
+}
+
+function buildPeriodGrid() {
+  document.getElementById('periodGrid').innerHTML = PERIODS.map(p=>`
+    <div class="period-btn${selPeriod===p.id?' sel':''}" id="pp-${p.id}" onclick="pickPeriod('${p.id}')">
+      <div class="pico">${p.icon}</div>
+      <div class="pname">${p.name}</div>
+      <div class="prange">${p.range}</div>
+    </div>`).join('');
+  const now=new Date();
+  document.getElementById('customTime').value =
+    `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+}
+
+function pickPeriod(id) {
+  selPeriod=id; selCustomTime='';
+  document.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('sel'));
+  document.getElementById(`pp-${id}`)?.classList.add('sel');
+}
+
+function onCustomTime() {
+  selCustomTime=document.getElementById('customTime').value;
+  selPeriod='custom';
+  document.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('sel'));
+}
+
+// Steps
+const STEP_LABELS=['เลือกผู้ให้อาหาร','เลือกประเภทอาหาร','เวลาที่ให้'];
+function setStep(n) {
+  feedStep=n;
+  ['fmS1','fmS2','fmS3'].forEach((id,i) => {
+    document.getElementById(id).style.display = i+1===n ? 'block' : 'none';
+  });
+  ['si1','si2','si3'].forEach((id,i) => {
+    const el=document.getElementById(id);
+    el.className = i+1<n ? 'si done' : i+1===n ? 'si active' : 'si';
+    el.textContent = i+1<n ? '✓' : i+1;
+  });
+  ['sl1','sl2'].forEach((id,i) => {
+    document.getElementById(id).className = n>i+2 ? 'si-line done' : 'si-line';
+  });
+  document.getElementById('stepLabel').textContent = STEP_LABELS[n-1];
+  document.getElementById('btnBack').style.display = n>1 ? 'block' : 'none';
+  document.getElementById('btnNext').textContent = n===3 ? '✓ บันทึก' : 'ถัดไป ›';
+}
+
+function nextStep() {
+  if (feedStep===1) {
+    if (!selFeeder) { alert('กรุณาเลือกผู้ให้อาหาร'); return; }
+    if (selFeeder==='other' && !document.getElementById('customFeederTxt').value.trim()) {
+      alert('กรุณาพิมพ์ชื่อ'); return;
+    }
+    setStep(2);
+  } else if (feedStep===2) {
+    if (!selFoodType) { alert('กรุณาเลือกประเภทอาหาร'); return; }
+    setStep(3);
+  } else {
+    confirmFeed();
+  }
+}
+function prevStep() { if (feedStep>1) setStep(feedStep-1); }
 
 function confirmFeed() {
-  const by   = document.getElementById('fmBy').value.trim();
-  const food = document.getElementById('fmFood').value.trim();
-  if (by)   localStorage.setItem('lastBy', by);
-  if (food) localStorage.setItem('lastFood', food);
-  const now = new Date();
-  const t = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')} น.`;
-  writeLog(pendingId, { time: t, by, food });
+  const feederName = selFeeder==='other'
+    ? (document.getElementById('customFeederTxt').value.trim()||'อื่นๆ')
+    : (FEEDERS.find(f=>f.code===selFeeder)?.name||selFeeder);
+  const ft=FOOD_TYPES.find(f=>f.id===selFoodType);
+  let foodLabel=ft?.label||'';
+  if (ft?.meat && selMeats.size) foodLabel+=` (${[...selMeats].map(m=>m.split(' ')[1]).join(', ')})`;
+  if (ft?.veg && selVegs.size) foodLabel+=` + ${[...selVegs].map(v=>v.split(' ')[1]).join(', ')}`;
+
+  const timeLabel = selCustomTime
+    ? `${selCustomTime} น.`
+    : (PERIODS.find(p=>p.id===selPeriod)?.name || '');
+
+  writeLog(pendingId, { time:timeLabel, by:feederName, food:foodLabel });
+
+  localStorage.setItem('lastFeeder', selFeeder);
+  localStorage.setItem('lastFoodType', selFoodType);
+  localStorage.setItem('lastMeats', JSON.stringify([...selMeats]));
+  localStorage.setItem('lastVegs', JSON.stringify([...selVegs]));
+
   closeFeed();
-  if (navigator.vibrate) navigator.vibrate(40);
+  if (navigator.vibrate) navigator.vibrate([30,10,30]);
   renderToday(); renderHeader();
 }
 
-function undo(id) {
-  writeLog(id, null);
-  renderToday(); renderHeader();
-}
+// ── Calendar ─────────────────────────────────────────────────────────
+let calY=new Date().getFullYear(), calM=new Date().getMonth();
 
-// ── Calendar ─────────────────────────────────────────────────────
-let calY = new Date().getFullYear(), calM = new Date().getMonth();
-
-function calPrev() { calM--; if (calM<0){calM=11;calY--;} renderCalendar(); }
+function calPrev() { calM--; if(calM<0){calM=11;calY--;} renderCalendar(); }
 function calNext() {
-  const n = new Date();
-  if (calY > n.getFullYear() || (calY===n.getFullYear() && calM >= n.getMonth())) return;
-  calM++; if (calM>11){calM=0;calY++;} renderCalendar();
+  const n=new Date();
+  if (calY>n.getFullYear()||(calY===n.getFullYear()&&calM>=n.getMonth())) return;
+  calM++; if(calM>11){calM=0;calY++;} renderCalendar();
 }
 
 function renderCalendar() {
-  document.getElementById('calTitle').textContent = `${MONTHS_F[calM]} ${calY+543}`;
-  const allLog = JSON.parse(localStorage.getItem('log') || '{}');
-  const today  = new Date();
-  const grid   = document.getElementById('calGrid');
-  grid.innerHTML = '';
-
-  DAYS_S.forEach(d => {
-    const el = document.createElement('div');
-    el.className = 'dow'; el.textContent = d; grid.appendChild(el);
-  });
-
-  const firstDow = new Date(calY, calM, 1).getDay();
-  const lastDate = new Date(calY, calM+1, 0).getDate();
-
-  for (let i=0; i<firstDow; i++) {
-    const el = document.createElement('div'); el.className='cday empty'; grid.appendChild(el);
-  }
-
-  for (let d=1; d<=lastDate; d++) {
-    const key = `${calY}-${calM+1}-${d}`;
-    const dl  = allLog[key] || {};
-    const cnt = MEALS.filter(m => dl[m.id]).length;
-    const isToday = new Date(calY,calM,d).toDateString() === today.toDateString();
-    const isPast  = new Date(calY,calM,d) < new Date(today.getFullYear(),today.getMonth(),today.getDate());
-
-    const el = document.createElement('div');
-    el.className = 'cday';
-    el.textContent = d;
-    if (isToday)       el.classList.add('is-today');
-    if (cnt===3)       el.classList.add('full');
-    else if (cnt>0)    el.classList.add('partial');
-    else if (isPast && !isToday) el.classList.add('missed');
-
-    if (cnt > 0 || isToday) el.onclick = () => openDay(key, d);
+  document.getElementById('calTitle').textContent=`${MONTHS_F[calM]} ${calY+543}`;
+  const allLog=JSON.parse(localStorage.getItem('log')||'{}');
+  const allNotes=JSON.parse(localStorage.getItem('notes')||'{}');
+  const today=new Date(), grid=document.getElementById('calGrid');
+  grid.innerHTML='';
+  DAYS_S.forEach(d=>{const el=document.createElement('div');el.className='dow';el.textContent=d;grid.appendChild(el);});
+  const firstDow=new Date(calY,calM,1).getDay();
+  const lastDate=new Date(calY,calM+1,0).getDate();
+  for(let i=0;i<firstDow;i++){const el=document.createElement('div');el.className='cday empty';grid.appendChild(el);}
+  for(let d=1;d<=lastDate;d++){
+    const key=`${calY}-${calM+1}-${d}`;
+    const dl=allLog[key]||{}, cnt=MEALS.filter(m=>dl[m.id]).length;
+    const notes=(allNotes[key]||[]).length>0;
+    const isToday=new Date(calY,calM,d).toDateString()===today.toDateString();
+    const isPast=new Date(calY,calM,d)<new Date(today.getFullYear(),today.getMonth(),today.getDate());
+    const el=document.createElement('div');
+    el.className='cday'; el.textContent=d;
+    if(isToday) el.classList.add('is-today');
+    if(cnt===3) el.classList.add('full');
+    else if(cnt>0) el.classList.add('partial');
+    else if(isPast&&!isToday) el.classList.add('missed');
+    if(notes){const dot=document.createElement('div');dot.className='cnote';el.appendChild(dot);}
+    if(cnt>0||notes||isToday) el.onclick=()=>openDay(key,d);
     grid.appendChild(el);
   }
 }
 
-// ── Day Detail ──────────────────────────────────────────────────
+// ── Day detail ────────────────────────────────────────────────────────
 function openDay(key, d) {
-  const allLog = JSON.parse(localStorage.getItem('log') || '{}');
-  const dl = allLog[key] || {};
-  document.getElementById('dayTitle').textContent = `${d} ${MONTHS[calM]} ${calY+543}`;
-  const body = document.getElementById('dayBody');
-  body.innerHTML = '';
-  MEALS.forEach(meal => {
-    const fed = asFed(dl[meal.id]);
-    const el = document.createElement('div');
-    el.className = 'dd-item';
-    el.innerHTML = `
-      <span class="dd-ico">${meal.icon}</span>
-      <div>
-        <div class="dd-name">${meal.label}</div>
-        ${fed
-          ? `<div class="dd-info">
-               <span class="t">${fed.time}</span>
-               ${fed.by   ? ` • โดย ${fed.by}`     : ''}
-               ${fed.food ? ` • ${fed.food}`         : ''}
-             </div>`
-          : `<div class="dd-none">ไม่มีบันทึก</div>`
-        }
-      </div>`;
+  const allLog=JSON.parse(localStorage.getItem('log')||'{}');
+  const allNotes=JSON.parse(localStorage.getItem('notes')||'{}');
+  const dl=allLog[key]||{}, dayNotes=allNotes[key]||[];
+  document.getElementById('dayTitle').textContent=`${d} ${MONTHS_S[calM]} ${calY+543}`;
+  const body=document.getElementById('dayBody');
+  body.innerHTML='';
+  MEALS.forEach(meal=>{
+    const fed=asFed(dl[meal.id]);
+    const el=document.createElement('div'); el.className='dd-item';
+    el.innerHTML=`<span class="dd-ico">${meal.icon}</span><div>
+      <div class="dd-name">${meal.label}</div>
+      ${fed
+        ?`<div class="dd-info"><span class="hi">${fed.time}</span>${fed.by?` • ${fed.by}`:''}${fed.food?`<br>${fed.food}`:''}</div>`
+        :`<div class="dd-none">ไม่มีบันทึก</div>`}
+    </div>`;
     body.appendChild(el);
   });
+  if(dayNotes.length){
+    const h=document.createElement('div');
+    h.style.cssText='font-size:.72rem;color:var(--t2);font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-top:14px;margin-bottom:4px';
+    h.textContent='📋 บันทึก';
+    body.appendChild(h);
+    dayNotes.forEach(n=>{
+      const el=document.createElement('div');
+      el.className=`dd-note-item${n.done?' done':''}`;
+      el.innerHTML=`<div class="dd-note-text">${escHtml(n.text)}</div><div class="dd-note-time">${n.time}${n.by?' • '+n.by:''}</div>`;
+      body.appendChild(el);
+    });
+  }
   document.getElementById('ovDay').classList.add('open');
 }
 function closeDay() { document.getElementById('ovDay').classList.remove('open'); }
 
-// ── Settings ─────────────────────────────────────────────────────
+// ── Settings ──────────────────────────────────────────────────────────
 function openSettings() {
-  const cfg = getCfg();
-  document.getElementById('cfgName').value = cfg.name;
-  document.getElementById('cfg0').value = cfg.times[0];
-  document.getElementById('cfg1').value = cfg.times[1];
-  document.getElementById('cfg2').value = cfg.times[2];
+  const cfg=getCfg();
+  document.getElementById('cfgName').value=cfg.name;
+  document.getElementById('cfg0').value=cfg.times[0];
+  document.getElementById('cfg1').value=cfg.times[1];
+  document.getElementById('cfg2').value=cfg.times[2];
   updateNotifBtn();
   document.getElementById('ovSettings').classList.add('open');
 }
 function closeSettings() { document.getElementById('ovSettings').classList.remove('open'); }
 function saveSettings() {
   localStorage.setItem('cfg', JSON.stringify({
-    name:  document.getElementById('cfgName').value.trim() || 'มอคค่า',
-    times: [document.getElementById('cfg0').value,
-            document.getElementById('cfg1').value,
-            document.getElementById('cfg2').value],
+    name: document.getElementById('cfgName').value.trim()||'มอคค่า',
+    times:[document.getElementById('cfg0').value,document.getElementById('cfg1').value,document.getElementById('cfg2').value],
   }));
   closeSettings(); renderHeader(); renderToday();
 }
 
-// ── Notifications ─────────────────────────────────────────────────
-async function requestNotif() {
-  if (!('Notification' in window)) { alert('เบราว์เซอร์ไม่รองรับ notification'); return; }
-  await Notification.requestPermission();
-  updateNotifBtn();
+// ── Notifications ─────────────────────────────────────────────────────
+async function reqNotif() {
+  if (!('Notification' in window)){alert('เบราว์เซอร์ไม่รองรับ');return;}
+  await Notification.requestPermission(); updateNotifBtn();
 }
 function updateNotifBtn() {
-  const ok = 'Notification' in window && Notification.permission === 'granted';
-  const btn = document.getElementById('notifBtn');
-  if (!btn) return;
-  btn.textContent = ok ? '✓ เปิดการแจ้งเตือนแล้ว' : '🔔 เปิดการแจ้งเตือน';
-  btn.className = `btn-notif${ok ? ' on' : ''}`;
+  const ok='Notification' in window && Notification.permission==='granted';
+  const b=document.getElementById('notifBtn'); if(!b) return;
+  b.textContent=ok?'✓ เปิดการแจ้งเตือนแล้ว':'🔔 เปิดการแจ้งเตือน';
+  b.className=`btn-notif${ok?' on':''}`;
 }
 function checkNotif() {
-  if (!('Notification' in window) || Notification.permission !== 'granted') return;
-  const cfg = getCfg(), log = getLog(), now = new Date();
-  const nd = JSON.parse(localStorage.getItem('nd') || '{}');
-  MEALS.forEach((meal, i) => {
-    if (log[meal.id]) return;
-    const [h,mn] = cfg.times[i].split(':').map(Number);
-    const mt = new Date(now); mt.setHours(h,mn,0,0);
-    const diff = Math.round((mt - now) / 60000);
-    const k15=`p15-${meal.id}-${todayKey()}`, k0=`p0-${meal.id}-${todayKey()}`;
-    if (diff===15 && !nd[k15]) {
-      new Notification(`อีก 15 นาที — ${meal.label} 🐾`,
-        { body:`เตรียมให้อาหาร ${cfg.name} เวลา ${cfg.times[i]} น.`, icon:'icon.svg', tag:k15 });
-      nd[k15]=true;
-    }
-    if (diff===0 && !nd[k0]) {
-      new Notification(`ถึงเวลา${meal.label}แล้ว! 🍖`,
-        { body:`ให้อาหาร ${cfg.name} ได้เลย`, icon:'icon.svg', tag:k0 });
-      nd[k0]=true;
-    }
+  if(!('Notification' in window)||Notification.permission!=='granted') return;
+  const cfg=getCfg(),log=getLog(),now=new Date();
+  const nd=JSON.parse(localStorage.getItem('nd')||'{}');
+  MEALS.forEach((meal,i)=>{
+    if(log[meal.id]) return;
+    const [h,mn]=cfg.times[i].split(':').map(Number);
+    const mt=new Date(now); mt.setHours(h,mn,0,0);
+    const diff=Math.round((mt-now)/60000);
+    const k15=`p-${meal.id}-${todayKey()}`, k0=`n-${meal.id}-${todayKey()}`;
+    if(diff===15&&!nd[k15]){new Notification(`อีก 15 นาที — ${meal.label} 🐾`,{body:`เตรียมให้อาหาร ${cfg.name}`,icon:'icon.svg',tag:k15});nd[k15]=true;}
+    if(diff===0&&!nd[k0]){new Notification(`ถึงเวลา${meal.label}! 🍖`,{body:`ให้อาหาร ${cfg.name} ได้เลย`,icon:'icon.svg',tag:k0});nd[k0]=true;}
   });
-  localStorage.setItem('nd', JSON.stringify(nd));
+  localStorage.setItem('nd',JSON.stringify(nd));
 }
 
-// ── Page switch ───────────────────────────────────────────────────
+// ── Nav ───────────────────────────────────────────────────────────────
 function showPage(name, btn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById(`page-${name}`).classList.add('active');
   btn.classList.add('active');
-  if (name === 'calendar') renderCalendar();
+  if(name==='calendar') renderCalendar();
 }
 
-// ── Overlay dismiss ───────────────────────────────────────────────
-[['ovFeed',closeFeed],['ovDay',closeDay],['ovSettings',closeSettings]].forEach(([id,fn])=>{
-  document.getElementById(id).addEventListener('click', e => { if(e.target===e.currentTarget) fn(); });
+// ── Overlay dismiss ────────────────────────────────────────────────────
+[['ovFeed',closeFeed],['ovNote',closeNoteModal],['ovDay',closeDay],['ovSettings',closeSettings]].forEach(([id,fn])=>{
+  document.getElementById(id).addEventListener('click',e=>{if(e.target===e.currentTarget) fn();});
 });
 
-// ── Service Worker ────────────────────────────────────────────────
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
-
-// ── Boot ──────────────────────────────────────────────────────────
-renderHeader();
-renderToday();
-setInterval(() => { renderHeader(); renderToday(); checkNotif(); }, 30000);
+// ── SW + Boot ──────────────────────────────────────────────────────────
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+renderHeader(); renderToday(); renderNotes();
+setInterval(()=>{renderHeader();renderToday();checkNotif();},30000);
 </script>
 </body>
 </html>

@@ -4,427 +4,354 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>โภชนาการมอคค่า</title>
-  <meta name="theme-color" content="#f59e0b">
+  <meta name="theme-color" content="#000000">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --amber:  #f59e0b;
-      --green:  #10b981;
-      --red:    #ef4444;
-      --orange: #f97316;
-      --yellow: #eab308;
-      --bg:     #0f172a;
-      --card:   #1e293b;
-      --bdr:    #334155;
-      --text:   #f1f5f9;
-      --muted:  #94a3b8;
+      --bg:   #000;
+      --c1:   #1c1c1e;
+      --c2:   #2c2c2e;
+      --sep:  rgba(255,255,255,.1);
+      --t1:   #fff;
+      --t2:   rgba(255,255,255,.55);
+      --t3:   rgba(255,255,255,.25);
+      --tint: #f59e0b;
+      --ok:   #30d158;
+      --err:  #ff453a;
+      --warn: #ff9f0a;
+      --r:    16px;
     }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+      background: var(--bg); color: var(--t1); min-height: 100dvh; padding-bottom: 48px; }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--bg); color: var(--text);
-      min-height: 100dvh;
-      padding-bottom: 40px;
-    }
-
-    /* ── Top bar ─────────── */
+    /* ── Top bar ──────────────────────────── */
     .topbar {
-      background: var(--card);
-      border-bottom: 1px solid var(--bdr);
-      padding: 14px 16px;
-      display: flex; align-items: center; gap: 12px;
-      position: sticky; top: 0; z-index: 10;
+      background: rgba(0,0,0,.85); backdrop-filter: blur(20px);
+      border-bottom: .5px solid var(--sep);
+      padding: 14px 16px; position: sticky; top: 0; z-index: 10;
+      display: flex; align-items: center; gap: 10px;
     }
     .back {
-      background: none; border: 1px solid var(--bdr);
-      border-radius: 8px; padding: 6px 12px;
-      color: var(--text); font-size: 0.9rem;
-      text-decoration: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px; background: var(--c2); border-radius: 50%;
+      color: var(--t1); text-decoration: none; font-size: 1.1rem; font-weight: 600;
+      flex-shrink: 0;
     }
-    .topbar-title { font-size: 1rem; font-weight: 800; color: var(--amber); }
+    .topbar-title { font-size: 1rem; font-weight: 800; color: var(--tint); flex: 1; }
+    .btn-edit-cfg {
+      background: var(--c2); border: none; border-radius: 8px;
+      padding: 7px 12px; color: var(--t2); font-size: .78rem;
+      font-family: inherit; cursor: pointer;
+    }
+    .btn-edit-cfg.editing { color: var(--tint); border: 1px solid var(--tint); background: rgba(245,158,11,.1); }
 
-    /* ── Hero ───────────── */
+    /* ── Hero ─────────────────────────────── */
     .hero {
-      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-      border-bottom: 1px solid var(--bdr);
-      padding: 28px 16px 24px;
-      text-align: center;
+      padding: 28px 20px 22px; text-align: center;
+      background: linear-gradient(180deg, var(--c1) 0%, var(--bg) 100%);
+      position: relative; overflow: hidden;
     }
-    .hero-emoji  { font-size: 4rem; line-height: 1; margin-bottom: 10px; }
-    .hero-name   { font-size: 1.5rem; font-weight: 800; color: var(--amber); }
-    .hero-breed  { font-size: 0.88rem; color: var(--muted); margin-top: 4px; }
-    .hero-tags   { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
-    .tag {
-      padding: 5px 12px; border-radius: 20px;
-      background: var(--bdr); color: var(--text);
-      font-size: 0.75rem; font-weight: 600;
+    .hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(245,158,11,.15) 0%, transparent 70%);
+      pointer-events: none;
     }
-    .tag.amber { background: #451a03; color: #fcd34d; }
-    .tag.green { background: #064e3b; color: #6ee7b7; }
+    .hero-avatar {
+      width: 88px; height: 88px; border-radius: 50%; margin: 0 auto 14px;
+      background: var(--c2); display: flex; align-items: center; justify-content: center;
+      font-size: 3rem; box-shadow: 0 0 0 3px rgba(245,158,11,.4), 0 8px 24px rgba(0,0,0,.5);
+    }
+    .hero-name  { font-size: 1.6rem; font-weight: 900; letter-spacing: -.5px; }
+    .hero-breed { font-size: .82rem; color: var(--t2); margin-top: 4px; }
 
-    /* ── Content ─────────── */
-    .content { padding: 16px; max-width: 500px; margin: 0 auto; }
+    /* ── Dog info card (editable) ─────────── */
+    .info-card { background: var(--c1); border-radius: var(--r); margin: 16px; overflow: hidden; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+    .info-cell {
+      padding: 14px 16px; border-right: .5px solid var(--sep); border-bottom: .5px solid var(--sep);
+    }
+    .info-cell:nth-child(even) { border-right: none; }
+    .info-cell:nth-last-child(-n+2) { border-bottom: none; }
+    .ic-label { font-size: .68rem; color: var(--t2); font-weight: 700; letter-spacing: .5px; text-transform: uppercase; margin-bottom: 4px; }
+    .ic-val   { font-size: 1rem; font-weight: 800; color: var(--tint); }
+    .ic-input {
+      font-size: 1rem; font-weight: 800; color: var(--tint);
+      background: none; border: none; border-bottom: 1.5px solid var(--tint);
+      width: 100%; font-family: inherit; outline: none;
+    }
+    .ic-unit  { font-size: .72rem; color: var(--t2); margin-top: 2px; }
 
-    .section-title {
-      font-size: 1rem; font-weight: 800;
-      display: flex; align-items: center; gap: 8px;
-      margin: 22px 0 12px;
-      padding-bottom: 8px;
-      border-bottom: 2px solid var(--bdr);
+    .info-save-row { padding: 12px 16px; border-top: .5px solid var(--sep); display: none; }
+    .btn-save-info {
+      width: 100%; padding: 12px; background: var(--tint); color: #000;
+      border: none; border-radius: 10px; font-size: .9rem; font-weight: 800;
+      font-family: inherit; cursor: pointer;
     }
 
-    /* ── Food Grid ──────── */
-    .food-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    /* ── Content ──────────────────────────── */
+    .content { padding: 0 16px; }
 
-    .food-card {
-      background: var(--card); border: 1px solid var(--bdr);
-      border-radius: 12px; padding: 12px 10px;
-      display: flex; flex-direction: column; gap: 4px;
+    .sec-title {
+      font-size: .72rem; font-weight: 700; color: var(--t2);
+      text-transform: uppercase; letter-spacing: .8px;
+      margin: 20px 4px 10px;
     }
-    .food-card.safe   { border-color: #065f46; }
-    .food-card.danger { border-color: #7f1d1d; }
-    .food-card.warn   { border-color: #78350f; }
 
-    .food-ico   { font-size: 1.5rem; line-height: 1; }
-    .food-name  { font-size: 0.85rem; font-weight: 700; }
-    .food-note  { font-size: 0.72rem; color: var(--muted); line-height: 1.4; }
+    /* ── Food card groups ─────────────────── */
+    .food-group { background: var(--c1); border-radius: var(--r); overflow: hidden; margin-bottom: 14px; }
 
-    /* ── Danger badges ──── */
-    .dbadge {
-      display: inline-flex; align-items: center; gap: 4px;
-      padding: 3px 8px; border-radius: 20px;
-      font-size: 0.68rem; font-weight: 700; width: fit-content;
+    .group-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 16px 10px;
     }
-    .dbadge.crit   { background: #450a0a; color: #fca5a5; }
-    .dbadge.high   { background: #451a03; color: #fdba74; }
-    .dbadge.mid    { background: #1c1917; color: var(--muted); border: 1px solid var(--bdr); }
+    .group-badge {
+      padding: 4px 10px; border-radius: 100px; font-size: .7rem; font-weight: 800;
+    }
+    .gb-rec  { background: rgba(48,209,88,.2);  color: var(--ok); }
+    .gb-gen  { background: rgba(245,158,11,.15); color: var(--tint); }
+    .gb-supp { background: rgba(120,120,128,.2); color: #aeaeb2; }
+    .group-title { font-size: .9rem; font-weight: 800; }
+    .group-desc  { font-size: .72rem; color: var(--t2); margin-top: 1px; }
 
-    /* ── Danger list ────── */
-    .danger-list { display: flex; flex-direction: column; gap: 8px; }
-    .danger-item {
-      background: var(--card); border-radius: 12px; padding: 12px 14px;
+    .food-item {
       display: flex; align-items: flex-start; gap: 12px;
+      padding: 11px 16px; border-top: .5px solid var(--sep);
     }
-    .danger-item.crit { border-left: 3px solid var(--red); }
-    .danger-item.high { border-left: 3px solid var(--orange); }
-    .danger-item.mid  { border-left: 3px solid #64748b; }
+    .fi-ico  { font-size: 1.4rem; flex-shrink: 0; }
+    .fi-name { font-size: .88rem; font-weight: 700; }
+    .fi-note { font-size: .73rem; color: var(--t2); margin-top: 2px; line-height: 1.4; }
 
+    /* ── Danger section ───────────────────── */
+    .danger-group { background: var(--c1); border-radius: var(--r); overflow: hidden; margin-bottom: 14px; }
+    .danger-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 13px 16px; border-top: .5px solid var(--sep);
+    }
+    .danger-item.crit { border-left: 3px solid var(--err); }
+    .danger-item.high { border-left: 3px solid var(--warn); }
+    .danger-item.mid  { border-left: 3px solid #636366; }
     .di-ico  { font-size: 1.4rem; flex-shrink: 0; }
-    .di-name { font-size: 0.9rem; font-weight: 700; }
-    .di-why  { font-size: 0.75rem; color: var(--muted); margin-top: 3px; line-height: 1.4; }
-
-    /* ── Tips ───────────── */
-    .tips-list { display: flex; flex-direction: column; gap: 8px; }
-    .tip {
-      background: var(--card); border-radius: 12px; padding: 13px 14px;
-      display: flex; align-items: flex-start; gap: 10px;
+    .di-right { flex: 1; }
+    .di-top  { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+    .di-name { font-size: .88rem; font-weight: 700; }
+    .di-lv {
+      padding: 2px 8px; border-radius: 100px; font-size: .65rem; font-weight: 800; white-space: nowrap;
     }
-    .tip-ico  { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
-    .tip-head { font-size: 0.88rem; font-weight: 700; }
-    .tip-body { font-size: 0.78rem; color: var(--muted); margin-top: 3px; line-height: 1.5; }
+    .lv-crit { background: rgba(255,69,58,.2);  color: var(--err); }
+    .lv-high { background: rgba(255,159,10,.15); color: var(--warn); }
+    .lv-mid  { background: var(--c2); color: var(--t2); }
+    .di-why  { font-size: .73rem; color: var(--t2); line-height: 1.4; }
 
-    /* ── Emergency box ──── */
+    /* ── Tips ─────────────────────────────── */
+    .tips-group { background: var(--c1); border-radius: var(--r); overflow: hidden; margin-bottom: 14px; }
+    .tip-item  { display: flex; align-items: flex-start; gap: 12px; padding: 13px 16px; border-top: .5px solid var(--sep); }
+    .tip-ico   { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+    .tip-head  { font-size: .88rem; font-weight: 700; }
+    .tip-body  { font-size: .75rem; color: var(--t2); margin-top: 3px; line-height: 1.5; }
+
+    /* ── Emergency ────────────────────────── */
     .emergency {
-      background: #1c0505; border: 2px solid var(--red);
-      border-radius: 14px; padding: 16px;
-      margin-top: 24px; text-align: center;
+      background: rgba(255,69,58,.1); border: 1px solid rgba(255,69,58,.3);
+      border-radius: var(--r); padding: 18px 16px; margin-bottom: 14px; text-align: center;
     }
-    .emergency h3 { color: #fca5a5; font-size: 0.95rem; margin-bottom: 6px; }
-    .emergency p  { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
+    .emergency h3 { color: var(--err); font-size: .9rem; margin-bottom: 6px; }
+    .emergency p  { font-size: .78rem; color: var(--t2); line-height: 1.6; }
+    .emergency strong { color: #ff6b6b; }
   </style>
 </head>
 <body>
 
 <div class="topbar">
-  <a href="index.html" class="back">‹ กลับ</a>
-  <span class="topbar-title">โภชนาการ</span>
+  <a href="index.html" class="back">‹</a>
+  <span class="topbar-title">โภชนาการมอคค่า</span>
+  <button class="btn-edit-cfg" id="editCfgBtn" onclick="toggleEdit()">✏️ แก้ไข</button>
 </div>
 
 <!-- Hero -->
 <div class="hero">
-  <div class="hero-emoji">🐩</div>
-  <div class="hero-name">มอคค่า</div>
-  <div class="hero-breed">Toy Poodle • อายุ 1 ปี • Adult</div>
-  <div class="hero-tags">
-    <span class="tag amber">⚖️ น้ำหนักปกติ 2–4 กก.</span>
-    <span class="tag green">🍽️ 2–3 มื้อ/วัน</span>
-    <span class="tag">🔋 ~200–250 kcal/วัน</span>
+  <div class="hero-avatar">🐩</div>
+  <div class="hero-name" id="heroName">มอคค่า</div>
+  <div class="hero-breed">Toy Poodle</div>
+</div>
+
+<!-- Info Card (editable) -->
+<div class="info-card">
+  <div class="info-grid" id="infoGrid">
+    <!-- rendered by JS -->
+  </div>
+  <div class="info-save-row" id="infoSaveRow">
+    <button class="btn-save-info" onclick="saveDogInfo()">บันทึกข้อมูล</button>
   </div>
 </div>
 
 <div class="content">
 
-  <!-- Safe foods -->
-  <div class="section-title">
-    <span>✅</span> อาหารที่กินได้
+  <!-- ══ กินได้ ══ -->
+  <div class="sec-title">✅ อาหารที่กินได้</div>
+
+  <!-- แนะนำ -->
+  <div class="food-group">
+    <div class="group-header">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="group-badge gb-rec">⭐ แนะนำ</span>
+        </div>
+        <div class="group-title" style="margin-top:6px">อาหารหลักที่ควรให้</div>
+        <div class="group-desc">เหมาะสำหรับ Toy Poodle อายุ 1 ปี ให้เป็นประจำได้</div>
+      </div>
+    </div>
+    <div class="food-item"><span class="fi-ico">🥩</span><div><div class="fi-name">อาหารเม็ด Small Breed Adult</div><div class="fi-note">เลือก formula สำหรับสุนัขโตพันธุ์เล็ก เช่น Royal Canin Toy Poodle, Hill's Science Diet เปลี่ยนจาก Puppy formula ได้แล้ว</div></div></div>
+    <div class="food-item"><span class="fi-ico">🐔</span><div><div class="fi-name">เนื้อไก่ (ปรุงสุก)</div><div class="fi-note">ต้มหรืออบ ไม่มีเกลือ ไม่มีเครื่องเทศ แยกกระดูกออกให้หมด แหล่งโปรตีนที่ดีที่สุด</div></div></div>
+    <div class="food-item"><span class="fi-ico">🐟</span><div><div class="fi-name">ปลาแซลมอน / ปลาทู (ปรุงสุก)</div><div class="fi-note">มี Omega-3 ดีต่อผิวหนังและขน ต้มหรืออบ ไม่ผัดน้ำมัน ระวังก้างชิ้นเล็ก</div></div></div>
+    <div class="food-item"><span class="fi-ico">🥕</span><div><div class="fi-name">แครอท</div><div class="fi-note">ดิบหรือต้มสุกก็ได้ ดีต่อฟัน มีเบต้าแคโรทีนสูง เหมาะเป็น treat แทนขนม</div></div></div>
+    <div class="food-item"><span class="fi-ico">💧</span><div><div class="fi-name">น้ำสะอาดตลอดวัน</div><div class="fi-note">เปลี่ยนน้ำทุกวัน Toy Poodle ตัวเล็กมาก dehydrate ได้เร็ว ควรมีชามน้ำ 2 จุดในบ้าน</div></div></div>
   </div>
 
-  <div class="food-grid">
-    <div class="food-card safe">
-      <span class="food-ico">🥩</span>
-      <div class="food-name">เนื้อไก่/ปลา/วัว</div>
-      <div class="food-note">ปรุงสุก ไม่ใส่เกลือ เกลือ ไม่มีเครื่องเทศ</div>
+  <!-- กินทั่วไป -->
+  <div class="food-group">
+    <div class="group-header">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="group-badge gb-gen">👍 กินทั่วไป</span>
+        </div>
+        <div class="group-title" style="margin-top:6px">อาหารที่กินได้ตามปกติ</div>
+        <div class="group-desc">ให้ได้แต่ไม่ต้องให้ทุกวัน</div>
+      </div>
     </div>
-    <div class="food-card safe">
-      <span class="food-ico">🦴</span>
-      <div class="food-name">อาหารเม็ด Adult</div>
-      <div class="food-note">Small breed adult formula เปลี่ยนจาก puppy ได้แล้ว</div>
-    </div>
-    <div class="food-card safe">
-      <span class="food-ico">🥫</span>
-      <div class="food-name">อาหารเปียก</div>
-      <div class="food-note">เป็นส่วนเสริมได้ ไม่ควรให้เป็นหลัก ฟันผุง่าย</div>
-    </div>
-    <div class="food-card safe">
-      <span class="food-ico">🥕</span>
-      <div class="food-name">แครอท</div>
-      <div class="food-note">ดิบหรือต้มสุกก็ได้ ดีต่อฟัน มีเบต้าแคโรทีน</div>
-    </div>
-    <div class="food-card safe">
-      <span class="food-ico">🥒</span>
-      <div class="food-name">แตงกวา</div>
-      <div class="food-note">โแคลอรี่ต่ำ ช่วยดับกระหาย เหมาะเป็น treat</div>
-    </div>
-    <div class="food-card safe">
-      <span class="food-ico">🎃</span>
-      <div class="food-name">ฟักทอง</div>
-      <div class="food-note">ต้มสุก ช่วยระบบย่อยอาหาร มีไฟเบอร์</div>
-    </div>
-    <div class="food-card safe">
-      <span class="food-ico">🫐</span>
-      <div class="food-name">บลูเบอร์รี่</div>
-      <div class="food-note">Antioxidant สูง ให้เป็น treat 2–3 เม็ด</div>
-    </div>
-    <div class="food-card safe">
-      <span class="food-ico">🍎</span>
-      <div class="food-name">แอปเปิ้ล</div>
-      <div class="food-note">ต้องเอาเมล็ดและแกนออก เมล็ดมี cyanide</div>
-    </div>
-    <div class="food-card safe">
-      <span class="food-ico">🍳</span>
-      <div class="food-name">ไข่ต้ม</div>
-      <div class="food-note">โปรตีนสูง ไม่ใส่เกลือ ให้ครั้งละ 1/2 ฟอง</div>
-    </div>
-    <div class="food-card safe">
-      <span class="food-ico">🍚</span>
-      <div class="food-name">ข้าวสุก</div>
-      <div class="food-note">ข้าวขาวหรือข้าวกล้อง ไม่ใส่เครื่องปรุงใดๆ</div>
-    </div>
+    <div class="food-item"><span class="fi-ico">🥦</span><div><div class="fi-name">บรอคเคอลี / กะหล่ำปลี</div><div class="fi-note">ต้มนิ่ม ให้เป็นส่วนน้อย (ไม่เกิน 10% ของมื้อ) ช่วยระบบย่อย</div></div></div>
+    <div class="food-item"><span class="fi-ico">🥒</span><div><div class="fi-name">แตงกวา / บวบ</div><div class="fi-note">โแคลอรี่ต่ำมาก เหมาะเป็น treat สำหรับสุนัขที่ต้องควบคุมน้ำหนัก</div></div></div>
+    <div class="food-item"><span class="fi-ico">🍎</span><div><div class="fi-name">แอปเปิ้ล (ไม่มีเมล็ด)</div><div class="fi-note">ต้องเอาเมล็ดและแกนออกทุกครั้ง เมล็ดมี amygdalin ซึ่งเป็นพิษ ให้เป็น treat</div></div></div>
+    <div class="food-item"><span class="fi-ico">🫐</span><div><div class="fi-name">บลูเบอร์รี่</div><div class="fi-note">Antioxidant สูง ให้ 3–5 เม็ด/ครั้ง ไม่ควรให้มาก</div></div></div>
+    <div class="food-item"><span class="fi-ico">🍚</span><div><div class="fi-name">ข้าวสุก (ข้าวกล้อง/ข้าวขาว)</div><div class="fi-note">ไม่ใส่เครื่องปรุงใดๆ ให้เป็นส่วนเสริม ไม่ใช่อาหารหลัก แหล่งคาร์บโอเฮย์เดรต</div></div></div>
+    <div class="food-item"><span class="fi-ico">🥩</span><div><div class="fi-name">เนื้อวัว / เนื้อหมู (ปรุงสุก)</div><div class="fi-note">ต้มหรืออบ ไม่มีเกลือ ตัดมันออก ให้น้อยกว่าไก่ เนื่องจากไขมันสูงกว่า</div></div></div>
   </div>
 
-  <!-- Dangerous foods -->
-  <div class="section-title">
-    <span>🚫</span> อาหารต้องห้าม
+  <!-- อาหารเสริม -->
+  <div class="food-group">
+    <div class="group-header">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="group-badge gb-supp">💊 อาหารเสริม</span>
+        </div>
+        <div class="group-title" style="margin-top:6px">ให้เสริมได้ แต่ไม่ใช่อาหารหลัก</div>
+        <div class="group-desc">ให้ปริมาณน้อย เป็นครั้งคราว หรือตามคำแนะนำสัตวแพทย์</div>
+      </div>
+    </div>
+    <div class="food-item"><span class="fi-ico">🍳</span><div><div class="fi-name">ไข่ต้ม</div><div class="fi-note">โปรตีนสูง ให้ไม่เกิน 1/2 ฟอง 2–3 ครั้ง/สัปดาห์ ไข่ขาวดิบย่อยยาก ต้องต้มเสมอ</div></div></div>
+    <div class="food-item"><span class="fi-ico">🎃</span><div><div class="fi-name">ฟักทอง (ต้มสุก)</div><div class="fi-note">ไฟเบอร์สูง ช่วยระบบย่อยเมื่อท้องเสียหรือท้องผูก ให้ 1–2 ช้อนชา/มื้อ</div></div></div>
+    <div class="food-item"><span class="fi-ico">🫙</span><div><div class="fi-name">น้ำมันมะพร้าว</div><div class="fi-note">ช่วยขนและผิวหนัง ให้ 1/4 ช้อนชา/วัน ถ้าให้มากเกินอาจท้องเสีย</div></div></div>
+    <div class="food-item"><span class="fi-ico">🐟</span><div><div class="fi-name">น้ำมันปลา (Fish Oil)</div><div class="fi-note">Omega-3 ดีต่อขนและสมอง ให้ตามคำแนะนำบนฉลาก ไม่ควรให้เกินขนาด</div></div></div>
+    <div class="food-item"><span class="fi-ico">🦷</span><div><div class="fi-name">Dental Treat / กระดูกนิ่ม</div><div class="fi-note">ช่วยขูดหินปูน เลือกขนาดเหมาะกับ Toy Poodle ไม่ให้ทุกวัน (แคลอรี่เพิ่ม)</div></div></div>
   </div>
 
-  <div class="danger-list">
+  <!-- ══ ห้ามกิน ══ -->
+  <div class="sec-title">🚫 อาหารต้องห้าม</div>
 
-    <!-- CRITICAL -->
-    <div class="danger-item crit">
-      <span class="di-ico">🍫</span>
-      <div>
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
-          <span class="di-name">ช็อกโกแลต</span>
-          <span class="dbadge crit">🚨 อันตรายถึงชีวิต</span>
-        </div>
-        <div class="di-why">มี Theobromine ซึ่งสุนัขย่อยสลายไม่ได้ ทำให้ชักและหัวใจวายได้ Dark chocolate อันตรายที่สุด</div>
-      </div>
+  <div class="danger-group">
+    <!-- Header -->
+    <div style="padding:14px 16px 10px;border-bottom:.5px solid var(--sep)">
+      <span style="font-size:.72rem;color:var(--err);font-weight:800;text-transform:uppercase;letter-spacing:.5px">⚠️ อันตรายถึงชีวิต — ห้ามให้เด็ดขาด</span>
     </div>
-
-    <div class="danger-item crit">
-      <span class="di-ico">🍬</span>
-      <div>
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
-          <span class="di-name">Xylitol (น้ำตาลเทียม)</span>
-          <span class="dbadge crit">🚨 อันตรายถึงชีวิต</span>
-        </div>
-        <div class="di-why">พบในหมากฝรั่ง ขนมไร้น้ำตาล บางยาสีฟัน ทำให้น้ำตาลในเลือดต่ำฉับพลัน และตับวายได้</div>
-      </div>
-    </div>
-
-    <div class="danger-item crit">
-      <span class="di-ico">🍇</span>
-      <div>
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
-          <span class="di-name">องุ่น & ลูกเกด</span>
-          <span class="dbadge crit">🚨 อันตรายถึงชีวิต</span>
-        </div>
-        <div class="di-why">ยังไม่ทราบสารพิษที่แน่ชัด แต่ทำให้ไตวายเฉียบพลันได้ แม้ปริมาณน้อย</div>
-      </div>
-    </div>
-
-    <div class="danger-item crit">
-      <span class="di-ico">☕</span>
-      <div>
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
-          <span class="di-name">คาเฟอีน (กาแฟ ชา โกโก้)</span>
-          <span class="dbadge crit">🚨 อันตรายถึงชีวิต</span>
-        </div>
-        <div class="di-why">กระตุ้นระบบประสาทและหัวใจมากเกินไป ทำให้ชัก หัวใจเต้นผิดจังหวะ</div>
-      </div>
-    </div>
-
-    <div class="danger-item crit">
-      <span class="di-ico">🍺</span>
-      <div>
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
-          <span class="di-name">แอลกอฮอล์</span>
-          <span class="dbadge crit">🚨 อันตรายถึงชีวิต</span>
-        </div>
-        <div class="di-why">ตับสุนัขไม่สามารถประมวลผลแอลกอฮอล์ได้ แม้ปริมาณเล็กน้อยก็อันตราย</div>
-      </div>
-    </div>
-
-    <!-- HIGH -->
-    <div class="danger-item high">
-      <span class="di-ico">🧅</span>
-      <div>
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
-          <span class="di-name">หัวหอม กระเทียม ต้นหอม</span>
-          <span class="dbadge high">⚠️ อันตรายสูง</span>
-        </div>
-        <div class="di-why">มี thiosulfate ทำลายเม็ดเลือดแดง ทำให้โลหิตจาง ทั้งดิบและปรุงสุก</div>
-      </div>
-    </div>
-
-    <div class="danger-item high">
-      <span class="di-ico">🥑</span>
-      <div>
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
-          <span class="di-name">อาโวคาโด</span>
-          <span class="dbadge high">⚠️ อันตรายสูง</span>
-        </div>
-        <div class="di-why">มี Persin ทำให้อาเจียน ท้องเสีย และทำลายหัวใจ ทั้งเนื้อ เมล็ด และใบ</div>
-      </div>
-    </div>
-
-    <div class="danger-item high">
-      <span class="di-ico">🌰</span>
-      <div>
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
-          <span class="di-name">แมคคาเดเมียนัท</span>
-          <span class="dbadge high">⚠️ อันตรายสูง</span>
-        </div>
-        <div class="di-why">ทำให้กล้ามเนื้ออ่อนแรง สั่น อุณหภูมิร่างกายสูง โดยเฉพาะขาหลัง</div>
-      </div>
-    </div>
-
-    <div class="danger-item high">
-      <span class="di-ico">🍖</span>
-      <div>
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
-          <span class="di-name">กระดูกปรุงสุก</span>
-          <span class="dbadge high">⚠️ อันตรายสูง</span>
-        </div>
-        <div class="di-why">แตกเป็นเสี้ยนแหลม บาดหลอดอาหารและลำไส้ได้ กระดูกดิบยังพอรับได้แต่มีความเสี่ยงแบคทีเรีย</div>
-      </div>
-    </div>
-
-    <!-- MODERATE -->
-    <div class="danger-item mid">
-      <span class="di-ico">🥛</span>
-      <div>
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
-          <span class="di-name">นม & ผลิตภัณฑ์นม</span>
-          <span class="dbadge mid">ระวัง</span>
-        </div>
-        <div class="di-why">สุนัขส่วนใหญ่แพ้แล็กโตส ทำให้ท้องเสีย ถ้าให้ควรเป็นปริมาณน้อยมาก</div>
-      </div>
-    </div>
-
-    <div class="danger-item mid">
-      <span class="di-ico">🧂</span>
-      <div>
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
-          <span class="di-name">เกลือ & อาหารรสเค็ม</span>
-          <span class="dbadge mid">ระวัง</span>
-        </div>
-        <div class="di-why">ไตสุนัขทำงานหนักถ้าได้รับโซเดียมมาก ห้ามให้อาหารมนุษย์ที่ปรุงรสแล้ว</div>
-      </div>
-    </div>
+    <div class="danger-item crit"><span class="di-ico">🍫</span><div class="di-right"><div class="di-top"><span class="di-name">ช็อกโกแลต</span><span class="di-lv lv-crit">🚨 ร้ายแรงมาก</span></div><div class="di-why">มี Theobromine ย่อยสลายไม่ได้ ทำให้ชัก หัวใจเต้นผิดจังหวะ อาจเสียชีวิต Dark chocolate อันตรายสูงสุด</div></div></div>
+    <div class="danger-item crit"><span class="di-ico">🍬</span><div class="di-right"><div class="di-top"><span class="di-name">Xylitol (น้ำตาลเทียม)</span><span class="di-lv lv-crit">🚨 ร้ายแรงมาก</span></div><div class="di-why">พบในหมากฝรั่ง ขนมไร้น้ำตาล ยาสีฟันบางยี่ห้อ ทำให้น้ำตาลในเลือดต่ำฉับพลันและตับวาย</div></div></div>
+    <div class="danger-item crit"><span class="di-ico">🍇</span><div class="di-right"><div class="di-top"><span class="di-name">องุ่น & ลูกเกด</span><span class="di-lv lv-crit">🚨 ร้ายแรงมาก</span></div><div class="di-why">ทำให้ไตวายเฉียบพลัน แม้ปริมาณน้อยมากก็อันตราย ยังไม่ทราบสารพิษที่แน่ชัด</div></div></div>
+    <div class="danger-item crit"><span class="di-ico">☕</span><div class="di-right"><div class="di-top"><span class="di-name">คาเฟอีน (กาแฟ ชา โกโก้)</span><span class="di-lv lv-crit">🚨 ร้ายแรงมาก</span></div><div class="di-why">กระตุ้นระบบประสาทและหัวใจมากเกินไป ทำให้ชัก หัวใจวาย</div></div></div>
+    <div class="danger-item crit"><span class="di-ico">🍺</span><div class="di-right"><div class="di-top"><span class="di-name">แอลกอฮอล์ทุกชนิด</span><span class="di-lv lv-crit">🚨 ร้ายแรงมาก</span></div><div class="di-why">ตับสุนัขย่อยสลายแอลกอฮอล์ไม่ได้ แม้ปริมาณเล็กน้อยก็เป็นพิษ</div></div></div>
   </div>
 
-  <!-- Tips -->
-  <div class="section-title">
-    <span>💡</span> คำแนะนำสำหรับมอคค่า
+  <div class="danger-group">
+    <div style="padding:14px 16px 10px;border-bottom:.5px solid var(--sep)">
+      <span style="font-size:.72rem;color:var(--warn);font-weight:800;text-transform:uppercase;letter-spacing:.5px">⚠️ อันตรายสูง</span>
+    </div>
+    <div class="danger-item high"><span class="di-ico">🧅</span><div class="di-right"><div class="di-top"><span class="di-name">หัวหอม กระเทียม ต้นหอม</span><span class="di-lv lv-high">อันตรายสูง</span></div><div class="di-why">มี thiosulfate ทำลายเม็ดเลือดแดง ทำให้โลหิตจาง ทั้งดิบและปรุงสุก ทั้งในอาหารมนุษย์</div></div></div>
+    <div class="danger-item high"><span class="di-ico">🥑</span><div class="di-right"><div class="di-top"><span class="di-name">อาโวคาโด</span><span class="di-lv lv-high">อันตรายสูง</span></div><div class="di-why">มี Persin ทำให้อาเจียน ท้องเสีย ส่งผลต่อหัวใจ ทั้งเนื้อ เมล็ด และใบ</div></div></div>
+    <div class="danger-item high"><span class="di-ico">🌰</span><div class="di-right"><div class="di-top"><span class="di-name">แมคคาเดเมียนัท</span><span class="di-lv lv-high">อันตรายสูง</span></div><div class="di-why">ทำให้กล้ามเนื้ออ่อนแรง สั่น อุณหภูมิร่างกายสูง โดยเฉพาะขาหลัง</div></div></div>
+    <div class="danger-item high"><span class="di-ico">🦴</span><div class="di-right"><div class="di-top"><span class="di-name">กระดูกปรุงสุก</span><span class="di-lv lv-high">อันตรายสูง</span></div><div class="di-why">แตกเป็นเสี้ยนแหลมบาดหลอดอาหาร/ลำไส้ได้ กระดูกดิบรับได้แต่มีความเสี่ยงแบคทีเรีย</div></div></div>
   </div>
 
-  <div class="tips-list">
-    <div class="tip">
-      <span class="tip-ico">🔄</span>
-      <div>
-        <div class="tip-head">เปลี่ยนจาก Puppy → Adult Formula</div>
-        <div class="tip-body">Toy Poodle อายุ 1 ปีถือว่าโตเป็นผู้ใหญ่แล้ว ควรเปลี่ยนอาหารเป็น Small Breed Adult เพื่อป้องกันน้ำหนักเกิน</div>
-      </div>
+  <div class="danger-group">
+    <div style="padding:14px 16px 10px;border-bottom:.5px solid var(--sep)">
+      <span style="font-size:.72rem;color:#aeaeb2;font-weight:800;text-transform:uppercase;letter-spacing:.5px">ควรระวัง</span>
     </div>
+    <div class="danger-item mid"><span class="di-ico">🥛</span><div class="di-right"><div class="di-top"><span class="di-name">นม & ผลิตภัณฑ์นม</span><span class="di-lv lv-mid">ระวัง</span></div><div class="di-why">สุนัขส่วนใหญ่แพ้แล็กโตส ทำให้ท้องเสีย ถ้าให้ต้องปริมาณน้อยมาก</div></div></div>
+    <div class="danger-item mid"><span class="di-ico">🧂</span><div class="di-right"><div class="di-top"><span class="di-name">เกลือ & อาหารรสเค็ม</span><span class="di-lv lv-mid">ระวัง</span></div><div class="di-why">ไตสุนัขรับโซเดียมได้น้อยมาก ห้ามให้อาหารมนุษย์ที่ปรุงรสแล้วโดยตรง</div></div></div>
+    <div class="danger-item mid"><span class="di-ico">🍬</span><div class="di-right"><div class="di-top"><span class="di-name">อาหารหวานจัด / น้ำตาลมาก</span><span class="di-lv lv-mid">ระวัง</span></div><div class="di-why">ฟันผุ น้ำหนักเกิน และอาจทำให้เป็นเบาหวานระยะยาว</div></div></div>
+  </div>
 
-    <div class="tip">
-      <span class="tip-ico">⚖️</span>
-      <div>
-        <div class="tip-head">ปริมาณที่แนะนำ</div>
-        <div class="tip-body">น้ำหนัก 2 กก. → ~40–50g/วัน | น้ำหนัก 3 กก. → ~55–65g/วัน<br>แบ่ง 2–3 มื้อ อ่านฉลากอาหารแต่ละยี่ห้อด้วย</div>
-      </div>
-    </div>
+  <!-- ══ คำแนะนำ ══ -->
+  <div class="sec-title">💡 คำแนะนำการดูแล</div>
 
-    <div class="tip">
-      <span class="tip-ico">💧</span>
-      <div>
-        <div class="tip-head">น้ำสะอาดตลอดเวลา</div>
-        <div class="tip-body">ต้องมีน้ำสดสะอาดให้เสมอ เปลี่ยนน้ำทุกวัน Toy Poodle ตัวเล็ก dehydrate เร็ว</div>
-      </div>
-    </div>
-
-    <div class="tip">
-      <span class="tip-ico">📊</span>
-      <div>
-        <div class="tip-head">ตรวจ Body Condition Score</div>
-        <div class="tip-body">คลำซี่โครงได้แต่ไม่เห็นด้วยตาเปล่า เห็น waist เล็กน้อยเมื่อมองจากด้านบน = น้ำหนักดี</div>
-      </div>
-    </div>
-
-    <div class="tip">
-      <span class="tip-ico">⚡</span>
-      <div>
-        <div class="tip-head">ระวัง Hypoglycemia</div>
-        <div class="tip-body">Toy Poodle ตัวเล็กน้ำตาลในเลือดต่ำง่ายถ้าไม่ได้กินข้าวนาน ควรให้ตรงเวลา ไม่ควรข้ามมื้อ</div>
-      </div>
-    </div>
-
-    <div class="tip">
-      <span class="tip-ico">🦷</span>
-      <div>
-        <div class="tip-head">ดูแลสุขอนามัยช่องปาก</div>
-        <div class="tip-body">Toy Poodle ฟันผุง่าย แนะนำแปรงฟัน 2–3 ครั้ง/สัปดาห์ หรือให้ dental treat หลีกเลี่ยงอาหารเปียกเป็นหลัก</div>
-      </div>
-    </div>
-
-    <div class="tip">
-      <span class="tip-ico">🌾</span>
-      <div>
-        <div class="tip-head">เปลี่ยนอาหารแบบค่อยเป็นค่อยไป</div>
-        <div class="tip-body">ถ้าเปลี่ยนยี่ห้อใหม่ ค่อยๆ ผสมโดยเพิ่มของใหม่ 25% ต่อสัปดาห์ ใน 4 สัปดาห์จะปรับได้เต็มที่</div>
-      </div>
-    </div>
-
-    <div class="tip">
-      <span class="tip-ico">🏥</span>
-      <div>
-        <div class="tip-head">ปรึกษาสัตวแพทย์</div>
-        <div class="tip-body">ข้อมูลนี้เป็นแนวทางทั่วไป ควรปรึกษาสัตวแพทย์สำหรับโปรแกรมโภชนาการที่เหมาะกับมอคค่าโดยเฉพาะ</div>
-      </div>
-    </div>
+  <div class="tips-group">
+    <div class="tip-item"><span class="tip-ico">🔄</span><div><div class="tip-head">เปลี่ยนจาก Puppy → Adult Formula</div><div class="tip-body">Toy Poodle อายุ 1 ปีถือเป็นผู้ใหญ่แล้ว ควรเปลี่ยนอาหารเป็น Small Breed Adult เพื่อป้องกันน้ำหนักเกิน โดยค่อยๆ ผสม 25% ต่อสัปดาห์ใน 4 สัปดาห์</div></div></div>
+    <div class="tip-item"><span class="tip-ico">⚡</span><div><div class="tip-head">ระวัง Hypoglycemia (น้ำตาลต่ำ)</div><div class="tip-body">Toy Poodle ตัวเล็กมาก น้ำตาลในเลือดต่ำได้ง่ายถ้าอดอาหารนาน ควรให้ตรงเวลาสม่ำเสมอ ไม่ควรข้ามมื้อเกิน 12 ชม.</div></div></div>
+    <div class="tip-item"><span class="tip-ico">📊</span><div><div class="tip-head">ตรวจ Body Condition Score</div><div class="tip-body">คลำซี่โครงได้แต่ไม่เห็นด้วยตา เห็น waist เล็กน้อยเมื่อมองจากด้านบน = น้ำหนักดี ชั่งน้ำหนักทุกเดือน</div></div></div>
+    <div class="tip-item"><span class="tip-ico">🦷</span><div><div class="tip-head">ดูแลช่องปาก</div><div class="tip-body">Toy Poodle ฟันผุและหินปูนง่ายมาก แนะนำแปรงฟัน 2–3 ครั้ง/สัปดาห์ด้วยยาสีฟันสัตว์ หรือให้ dental treat สม่ำเสมอ</div></div></div>
+    <div class="tip-item"><span class="tip-ico">🏥</span><div><div class="tip-head">ปรึกษาสัตวแพทย์เป็นประจำ</div><div class="tip-body">ตรวจสุขภาพปีละ 1–2 ครั้ง ข้อมูลนี้เป็นแนวทางทั่วไป ควรปรึกษาสัตวแพทย์สำหรับโปรแกรมโภชนาการที่เหมาะกับมอคค่าโดยเฉพาะ</div></div></div>
   </div>
 
   <!-- Emergency -->
   <div class="emergency">
-    <h3>🚨 ถ้ามอคค่ากินสิ่งผิด</h3>
-    <p>โทรหาสัตวแพทย์ทันที อย่ารอให้อาการหนัก<br>
-    บอกสิ่งที่กิน ปริมาณโดยประมาณ และเวลาที่กิน<br>
-    <strong style="color:#fca5a5">ห้ามให้อาเจียนเองถ้าไม่ได้รับคำสั่งจากสัตวแพทย์</strong></p>
+    <h3>🚨 มอคค่ากินของผิดต้องทำอย่างไร?</h3>
+    <p>โทรหาสัตวแพทย์ทันที อย่ารอให้มีอาการ<br>
+    บอก: สิ่งที่กิน + ปริมาณโดยประมาณ + เวลาที่กิน<br>
+    <strong>ห้ามทำให้อาเจียนเองโดยไม่ได้รับคำสั่งจากสัตวแพทย์</strong></p>
   </div>
 
-</div>
+</div><!-- /content -->
+
+<script>
+const INFO_DEFAULTS = { name:'มอคค่า', age:'1 ปี', weight:'', calories:'' };
+let isEditing = false;
+
+function getDogInfo() {
+  return JSON.parse(localStorage.getItem('dogInfo')||'null') || { ...INFO_DEFAULTS };
+}
+
+function saveDogInfo() {
+  const info = {
+    name:     document.getElementById('ei-name').value.trim()    || INFO_DEFAULTS.name,
+    age:      document.getElementById('ei-age').value.trim()     || INFO_DEFAULTS.age,
+    weight:   document.getElementById('ei-weight').value.trim()  || '',
+    calories: document.getElementById('ei-cal').value.trim()     || '',
+  };
+  localStorage.setItem('dogInfo', JSON.stringify(info));
+  toggleEdit();
+  renderInfo();
+}
+
+function renderInfo() {
+  const info = getDogInfo();
+  document.getElementById('heroName').textContent = info.name;
+  const grid = document.getElementById('infoGrid');
+  if (isEditing) {
+    grid.innerHTML = `
+      <div class="info-cell"><div class="ic-label">ชื่อ</div><input class="ic-input" id="ei-name" value="${escHtml(info.name)}"></div>
+      <div class="info-cell"><div class="ic-label">อายุ</div><input class="ic-input" id="ei-age" value="${escHtml(info.age)}" placeholder="เช่น 1 ปี"></div>
+      <div class="info-cell"><div class="ic-label">น้ำหนัก</div><input class="ic-input" id="ei-weight" value="${escHtml(info.weight)}" placeholder="กก."><div class="ic-unit">กิโลกรัม</div></div>
+      <div class="info-cell"><div class="ic-label">แคลอรี่ต่อวัน</div><input class="ic-input" id="ei-cal" value="${escHtml(info.calories)}" placeholder="kcal"><div class="ic-unit">kcal/วัน</div></div>`;
+    document.getElementById('infoSaveRow').style.display = 'block';
+  } else {
+    grid.innerHTML = `
+      <div class="info-cell"><div class="ic-label">ชื่อ</div><div class="ic-val">${escHtml(info.name)}</div></div>
+      <div class="info-cell"><div class="ic-label">อายุ</div><div class="ic-val">${escHtml(info.age||'—')}</div></div>
+      <div class="info-cell"><div class="ic-label">น้ำหนัก</div><div class="ic-val">${escHtml(info.weight||'—')}</div><div class="ic-unit">กิโลกรัม</div></div>
+      <div class="info-cell"><div class="ic-label">แคลอรี่/วัน</div><div class="ic-val">${escHtml(info.calories||'—')}</div><div class="ic-unit">kcal</div></div>`;
+    document.getElementById('infoSaveRow').style.display = 'none';
+  }
+}
+
+function toggleEdit() {
+  isEditing = !isEditing;
+  const btn = document.getElementById('editCfgBtn');
+  btn.textContent = isEditing ? '✕ ยกเลิก' : '✏️ แก้ไข';
+  btn.className = isEditing ? 'btn-edit-cfg editing' : 'btn-edit-cfg';
+  renderInfo();
+}
+
+function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+renderInfo();
+</script>
 </body>
 </html>
