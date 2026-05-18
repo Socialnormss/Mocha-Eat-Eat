@@ -388,6 +388,7 @@
   <div class="hdr-name" id="hdrName">🐾 มอคค่า</div>
   <div class="hdr-date" id="hdrDate"></div>
   <div class="hdr-next" id="hdrNext"></div>
+  <div id="syncStatus" style="font-size:.68rem;color:var(--t3);margin-top:3px">⏳ กำลังเชื่อมต่อ…</div>
 </div>
 
 <!-- Page: Today -->
@@ -599,14 +600,17 @@ function writeLog(id, val) {
   const ks=Object.keys(all).sort(); while(ks.length>60) delete all[ks.shift()];
   localStorage.setItem('log', JSON.stringify(all));
   // ── Firebase sync ──
-  const ref = db.collection('logs').doc(k);
-  if (val===null) {
-    const u={}; u[id]=firebase.firestore.FieldValue.delete();
-    ref.update(u).catch(()=>ref.set({}));
-  } else {
-    const s={}; s[id]=val;
-    ref.set(s, { merge:true });
-  }
+  if (!window.db) return;
+  try {
+    const ref = window.db.collection('logs').doc(k);
+    if (val===null) {
+      const u={}; u[id]=firebase.firestore.FieldValue.delete();
+      ref.update(u).catch(()=>{});
+    } else {
+      const s={}; s[id]=val;
+      ref.set(s, { merge:true });
+    }
+  } catch(e) { console.warn('writeLog Firebase error:', e); }
 }
 function getNotes(k) { return (JSON.parse(localStorage.getItem('notes')||'{}')||{})[k||todayKey()]||[]; }
 function saveNotes(arr, k) {
@@ -616,7 +620,9 @@ function saveNotes(arr, k) {
   const ks=Object.keys(all).sort(); while(ks.length>60) delete all[ks.shift()];
   localStorage.setItem('notes', JSON.stringify(all));
   // ── Firebase sync ──
-  db.collection('notes').doc(key).set({ items: arr });
+  if (!window.db) return;
+  try { window.db.collection('notes').doc(key).set({ items: arr }); }
+  catch(e) { console.warn('saveNotes Firebase error:', e); }
 }
 function asFed(v) { if (!v) return null; return typeof v==='string' ? {time:v,by:'',food:''} : v; }
 
@@ -1010,7 +1016,7 @@ function saveSettings() {
   };
   localStorage.setItem('cfg', JSON.stringify(cfg));
   // ── Firebase sync ──
-  db.collection('config').doc('dog').set(cfg);
+  if (window.db) try { window.db.collection('config').doc('dog').set(cfg); } catch(e){}
   closeSettings(); renderHeader(); renderToday();
 }
 
@@ -1056,45 +1062,57 @@ function showPage(name, btn) {
 });
 
 // ── Firebase real-time sync ────────────────────────────────────────────
+function setSyncStatus(state) {
+  const el = document.getElementById('syncStatus');
+  if (!el) return;
+  if (state === 'ok')      el.textContent = '🟢 sync แล้ว';
+  else if (state === 'off') el.textContent = '🔴 ไม่ได้ sync — ข้อมูลอยู่แค่เครื่องนี้';
+  else                      el.textContent = '⏳ กำลังเชื่อมต่อ…';
+  el.style.color = state==='ok' ? 'rgba(48,209,88,.7)' : state==='off' ? 'rgba(255,69,58,.7)' : 'var(--t3)';
+}
+
 function startSync() {
+  if (!window.db) { setSyncStatus('off'); return; }
+
   const k = todayKey();
 
-  // Listen: feeding log (วันนี้) — อัปเดตทุกเครื่องทันที
-  db.collection('logs').doc(k).onSnapshot(snap => {
+  // Listen: feeding log วันนี้
+  window.db.collection('logs').doc(k).onSnapshot(snap => {
+    setSyncStatus('ok');
     const data = snap.data() || {};
     const all = JSON.parse(localStorage.getItem('log')||'{}');
-    if (JSON.stringify(all[k]) === JSON.stringify(data)) return; // no change
+    if (JSON.stringify(all[k]) === JSON.stringify(data)) return;
     all[k] = data;
     localStorage.setItem('log', JSON.stringify(all));
     renderToday(); renderHeader();
-  });
+  }, err => { console.warn('log snapshot error:', err); setSyncStatus('off'); });
 
-  // Listen: notes (วันนี้)
-  db.collection('notes').doc(k).onSnapshot(snap => {
+  // Listen: notes วันนี้
+  window.db.collection('notes').doc(k).onSnapshot(snap => {
     const items = (snap.data()||{}).items || [];
     const all = JSON.parse(localStorage.getItem('notes')||'{}');
     if (JSON.stringify(all[k]) === JSON.stringify(items)) return;
     all[k] = items;
     localStorage.setItem('notes', JSON.stringify(all));
     renderNotes();
-  });
+  }, err => console.warn('notes snapshot error:', err));
 
-  // Listen: dog config (ตั้งค่า + ชื่อ)
-  db.collection('config').doc('dog').onSnapshot(snap => {
+  // Listen: dog config
+  window.db.collection('config').doc('dog').onSnapshot(snap => {
     const data = snap.data();
     if (!data) return;
     if (localStorage.getItem('cfg') === JSON.stringify(data)) return;
     localStorage.setItem('cfg', JSON.stringify(data));
     renderHeader(); renderToday();
-  });
+  }, err => console.warn('config snapshot error:', err));
 
-  // Load: ประวัติ 60 วัน (สำหรับ calendar)
-  db.collection('logs').get().then(snap => {
+  // โหลดประวัติทั้งหมด (calendar)
+  window.db.collection('logs').get().then(snap => {
     const all = JSON.parse(localStorage.getItem('log')||'{}');
     snap.forEach(d => { all[d.id] = d.data(); });
     localStorage.setItem('log', JSON.stringify(all));
   });
-  db.collection('notes').get().then(snap => {
+  window.db.collection('notes').get().then(snap => {
     const all = JSON.parse(localStorage.getItem('notes')||'{}');
     snap.forEach(d => { all[d.id] = (d.data().items||[]); });
     localStorage.setItem('notes', JSON.stringify(all));

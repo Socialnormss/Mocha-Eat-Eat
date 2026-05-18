@@ -328,15 +328,16 @@ function saveDogInfo() {
   };
   localStorage.setItem('dogInfo', JSON.stringify(info));
   // ── Firebase sync ──
-  db.collection('config').doc('profile').set(info);
-  // sync ชื่อไปที่ config/dog ด้วย (ใช้ใน index.html)
-  if (info.name) db.collection('config').doc('dog').set({ name: info.name }, { merge: true });
+  if (window.db) {
+    window.db.collection('config').doc('profile').set(info);
+    if (info.name) window.db.collection('config').doc('dog').set({ name: info.name }, { merge: true });
+  }
   toggleEdit();
   renderInfo();
 }
 
 // Listen: sync profile จาก device อื่น
-db.collection('config').doc('profile').onSnapshot(snap => {
+if (window.db) window.db.collection('config').doc('profile').onSnapshot(snap => {
   const data = snap.data();
   if (!data) return;
   if (localStorage.getItem('dogInfo') === JSON.stringify(data)) return;
