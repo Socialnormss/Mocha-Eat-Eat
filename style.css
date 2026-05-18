@@ -1,6 +1,6 @@
-    html { font-size: 19px; overflow-x: hidden; }
+    html { font-size: 16px; overflow-x: hidden; }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    input, textarea, select { font-size: 17px !important; }
+    input, textarea, select { font-size: 16px !important; }
     button, a { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     * { -webkit-user-select: none; user-select: none; }
     input, textarea { -webkit-user-select: text; user-select: text; }
@@ -192,38 +192,11 @@
     html.dark .meal-sq.overdue { border-color: rgba(255,69,58,.35); }
     html.dark .sq-fed-time { color: #6ee7b7; }
 
-    /* ── Meal cards (legacy, kept for reference) ── */
-    .meal-card {
-      background: var(--c1); border-radius: var(--r);
-      padding: 16px; margin-bottom: 10px;
-      border: 1.5px solid transparent; transition: all .2s;
-    }
-    .meal-card.fed     { border-color: rgba(48,209,88,.35); background: rgba(48,209,88,.07); }
-    .meal-card.overdue { border-color: rgba(255,69,58,.35); }
-
-    .meal-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
-    .meal-left { display: flex; align-items: center; gap: 12px; }
-    .meal-ico  { font-size: 1.6rem; }
-    .meal-name { font-size: 1rem; font-weight: 700; }
-    .meal-time { font-size: .75rem; color: var(--t2); margin-top: 2px; }
-
     .badge { padding: 4px 10px; border-radius: 100px; font-size: .7rem; font-weight: 700; }
     .badge.pending { background: var(--c2); color: var(--t2); }
     .badge.done    { background: rgba(48,209,88,.2); color: var(--ok); }
     .badge.overdue { background: rgba(255,69,58,.15); color: var(--err); }
 
-    .fed-detail { font-size: .72rem; color: var(--t2); margin-top: 3px; text-align: right; line-height: 1.5; }
-    .fed-detail .hi { color: var(--ok); }
-
-    .btn-feed {
-      display: block; width: 100%; padding: 13px;
-      background: var(--tint); color: #000;
-      border: none; border-radius: 12px;
-      font-size: .95rem; font-weight: 700; font-family: inherit; cursor: pointer;
-      transition: background .1s, transform .1s;
-    }
-    .btn-feed:active { background: var(--tintd); transform: scale(.97); }
-    .btn-feed.done { background: var(--c2); color: var(--t2); cursor: default; }
     .btn-undo {
       display: block; width: 100%; padding: 8px; margin-top: 6px;
       background: transparent; border: 1px solid var(--sep);
@@ -436,7 +409,7 @@
     .hdr  { background: rgba(250,245,238,.96); }
     .tabbar { background: rgba(255,255,255,.96); }
     .fab  { background: var(--c1); box-shadow: 0 2px 12px rgba(44,24,16,.12); }
-    .card, .meal-card, .notes-card, .modal { box-shadow: 0 1px 10px rgba(44,24,16,.07); }
+    .card, .notes-card, .modal { box-shadow: 0 1px 10px rgba(44,24,16,.07); }
     .btn-main  { color: #fff; }
     .btn-feed  { color: #fff; }
     .btn-save  { color: #fff; }
@@ -472,9 +445,7 @@
     html.dark .hdr   { background: rgba(0,0,0,.9); }
     html.dark .tabbar { background: rgba(28,28,30,.95); }
     html.dark .fab   { background: #1c1c1e; box-shadow: 0 2px 10px rgba(0,0,0,.5); }
-    html.dark .card, html.dark .meal-card, html.dark .notes-card, html.dark .modal { box-shadow: none; }
-    html.dark .meal-card.fed     { background: rgba(48,209,88,.07); border-color: rgba(48,209,88,.35); }
-    html.dark .meal-card.overdue { border-color: rgba(255,69,58,.35); }
+    html.dark .card, html.dark .notes-card, html.dark .modal { box-shadow: none; }
     html.dark .badge.done    { background: rgba(48,209,88,.2);  color: #6ee7b7; }
     html.dark .badge.overdue { background: rgba(255,69,58,.15); color: #fca5a5; }
     html.dark .badge.pending { background: #2c2c2e; color: rgba(255,255,255,.55); }
@@ -660,9 +631,9 @@
     html.dark .danger-item.mid  { border-left-color: rgba(255,255,255,.2); }
 
     /* ── Settings compact ───────────────────── */
-    .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; overflow: hidden; width: 100%; }
-    .time-grid .fld { margin-bottom: 0; min-width: 0; overflow: hidden; }
-    .time-grid .fld input { padding: 10px 6px; font-size: .85rem !important; text-align: center; width: 100%; min-width: 0; box-sizing: border-box; }
+    .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; overflow: clip; width: 100%; max-width: 100%; }
+    .time-grid .fld { margin-bottom: 0; min-width: 0; overflow: clip; max-width: 100%; }
+    .time-grid .fld input { padding: 10px 4px; font-size: .82rem !important; text-align: center; width: 100%; min-width: 0; max-width: 100%; box-sizing: border-box; }
     .btn-edit-profile {
       display: block; width: 100%; padding: 12px; margin-bottom: 10px;
       background: var(--c2); border: 1.5px solid var(--tint);
