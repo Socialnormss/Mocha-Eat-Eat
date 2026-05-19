@@ -744,22 +744,31 @@ function bindOverlayDismiss() {
 }
 
 // ── Firebase real-time sync ──────────────────────────────────────────
+let _syncTimer = null;
 function setSyncStatus(state, detail) {
-  const bar=document.getElementById('syncBar');
-  const dot=document.getElementById('dcDot');
-  const txt=document.getElementById('dcSyncTxt');
+  const bar = document.getElementById('syncBar');
+  const dot = document.getElementById('dcDot');
+  const txt = document.getElementById('dcSyncTxt');
+  const row = document.getElementById('syncRow');
   if (state==='ok') {
     if (bar) bar.style.display='none';
-    if (dot) dot.style.background='var(--ok)';
+    if (dot) dot.style.background='var(--c-sage,var(--ok))';
     if (txt) txt.textContent='เชื่อมต่อแล้ว';
+    if (row) {
+      row.hidden = false;
+      clearTimeout(_syncTimer);
+      _syncTimer = setTimeout(() => { row.hidden = true; }, 1800);
+    }
   } else if (state==='off') {
     if (bar) { bar.style.display='block'; bar.style.color='var(--err)'; bar.innerHTML='🔴 ออฟไลน์ — <span style="text-decoration:underline;cursor:pointer" onclick="location.reload()">แตะเพื่อ refresh</span>'; }
-    if (dot) dot.style.background='var(--err)';
+    if (dot) dot.style.background='var(--c-rust,var(--err))';
     if (txt) txt.textContent='ออฟไลน์';
+    if (row) { clearTimeout(_syncTimer); row.hidden = false; }
   } else {
     if (bar) { bar.style.display='block'; bar.style.color='var(--t3)'; bar.textContent='⏳ กำลังเชื่อมต่อ…'; }
-    if (dot) dot.style.background='var(--t3)';
+    if (dot) dot.style.background='var(--c-muted,var(--t3))';
     if (txt) txt.textContent='กำลังเชื่อมต่อ…';
+    if (row) { clearTimeout(_syncTimer); row.hidden = false; }
   }
   if (detail) console.warn('[Sync]', detail);
 }
@@ -890,7 +899,7 @@ function renderInfo() {
     grid.innerHTML = `
       <div class="info-cell"><div class="ic-label">ชื่อ</div><div class="ic-val">${escHtml(info.name)}</div></div>
       <div class="info-cell"><div class="ic-label">อายุ</div><div class="ic-val">${escHtml(info.age||'—')}</div></div>
-      <div class="info-cell"><div class="ic-label">น้ำหนัก</div><div class="ic-val">${escHtml(info.weight||'—')}</div><div class="ic-unit">กิโลกรัม</div></div>
+      <div class="info-cell"><div class="ic-label">น้ำหนัก</div><div class="ic-val">${escHtml(info.weight||'—')}</div><span class="ic-unit">kg</span></div>
       <div class="info-cell"><div class="ic-label">แคลอรี่/วัน</div><div class="ic-val">${escHtml(kcalDisplay)}</div>${kcalNote}</div>`;
     document.getElementById('infoSaveRow').style.display = 'none';
   }
@@ -1208,7 +1217,7 @@ function renderDash() {
       </div>
       <div class="db-bar-wrap"><div class="db-bar" style="width:${Math.min(100,Math.round(kcalDone/kcalTarget*100))}%"></div></div>` : '';
     el.innerHTML = `<div class="db-dots">${dots}</div>
-      <div class="db-summary">${fed === total ? '🎉 ครบทุกมื้อแล้ววันนี้!' : `ให้แล้ว <strong>${fed}/${total}</strong> มื้อ`}</div>
+      <div class="db-summary"><strong>${fed}/${total}</strong></div>
       ${kcalBar}`;
 
   } else if (dashMode === 'week') {
