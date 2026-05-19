@@ -1,5 +1,5 @@
-const CACHE = 'dog-feeder-v6';
-const ASSETS = ['./index.html', './style.css', './data.js', './app.js', './manifest.json', './icon.png', './firebase-config.js'];
+const CACHE = 'dog-feeder-v7-cozy';
+const ASSETS = ['./index.html', './style.css', './mocha-cozy.css', './data.js', './app.js', './manifest.json', './icon.png', './firebase-config.js'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));

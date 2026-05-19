@@ -70,12 +70,17 @@ function renderDateCard() {
   });
   const el=document.getElementById('dcNext');
   if (!el) return;
-  if (MEALS.every(m=>log[m.id])) { el.textContent='✓ ครบทุกมื้อแล้ว'; el.className='dc-next all'; }
-  else if (nextLabel) {
+  el.classList.remove('dc-next','all','soon');
+  if (MEALS.every(m=>log[m.id])) {
+    el.textContent='✓ ครบทุกมื้อแล้ว';
+    el.classList.add('all');
+  } else if (nextLabel) {
     const h=Math.floor(nextMin/60), mn=nextMin%60;
     el.textContent=`${nextLabel} อีก ${h?h+'ชม. ':''}${mn}น.`;
-    el.className=`dc-next${nextMin<=30?' soon':''}`;
-  } else { el.textContent=''; el.className='dc-next'; }
+    if (nextMin<=30) el.classList.add('soon');
+  } else {
+    el.textContent='';
+  }
 }
 
 function tickClock() {
@@ -83,8 +88,7 @@ function tickClock() {
   if (el) el.textContent=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
 }
 
-// ── Skip-meal banner (v2) ────────────────────────────────────────────
-// ขึ้นเมื่อมีมื้อที่ skip แต่ note ของมื้อนั้นว่างหรือสั้นเกินไป (< 3 ตัว)
+// ── Skip-meal banner (Cozy v3) ───────────────────────────────────────
 function renderSkipBanner() {
   const log = getLog();
   const skipped = MEALS.filter(m => {
@@ -95,32 +99,42 @@ function renderSkipBanner() {
   if (!bar) return;
   if (!skipped.length) { bar.style.display='none'; return; }
   const labels = skipped.map(m => m.label).join(', ');
-  bar.innerHTML = `⚠️ มอคค่าไม่กิน <strong>${labels}</strong> — แตะเพื่อจดเหตุผล`;
-  bar.style.display = 'block';
+  bar.innerHTML = `
+    <div class="banner__icon" aria-hidden="true">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M12 8v5m0 3v.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+        <path d="M3 19h18L12 3 3 19z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="banner__body">
+      <div class="banner__title">มอคค่าไม่กิน ${escHtml(labels)}</div>
+      <p>แตะเพื่อจดเหตุผล — จะได้ดูย้อนหลังได้</p>
+    </div>`;
+  bar.style.display = '';
   bar.onclick = () => openSkipNote(skipped[0].id, skipped[0].label);
 }
 
-// ── Notes ────────────────────────────────────────────────────────────
+// ── Notes (Cozy v3) ──────────────────────────────────────────────────
 function renderNotes() {
   const list = document.getElementById('notesList');
   const notes = getNotes();
   const active = notes.filter(n => !n.deleted);
-  if (!active.length) { list.innerHTML='<div class="notes-empty">ยังไม่มีบันทึกวันนี้</div>'; return; }
+  if (!active.length) { list.innerHTML='<div class="note-empty" style="padding:18px 14px;color:var(--c-muted);font-size:13px;text-align:center">ยังไม่มีบันทึกวันนี้</div>'; return; }
   const PRI = { high:0, mid:1, low:2 };
   const sorted = [...active].sort((a,b) => (PRI[a.priority||'mid']||1) - (PRI[b.priority||'mid']||1));
-  list.innerHTML = sorted.map(n => {
-    const dotClass = `pri-dot pri-dot-${n.priority||'mid'}`;
-    return `
-    <div class="note-item" id="note-${n.id}">
-      <div class="${dotClass}"></div>
+  const DOT = { high:'rust', mid:'caramel', low:'sage' };
+  list.innerHTML = sorted.map((n,i) => {
+    const dotColor = DOT[n.priority||'mid'];
+    const divider = i > 0 ? '<hr class="notes__divider">' : '';
+    return `${divider}
+    <div class="note" id="note-${n.id}">
+      <span class="note__dot note__dot--${dotColor}" aria-hidden="true"></span>
       <div class="note-check${n.done?' done':''}" onclick="toggleNoteDone(${n.id})">${n.done?'✓':''}</div>
-      <div class="note-body">
-        <div class="note-text-row">
-          <span class="note-text${n.done?' done':''}" onclick="startEditNote(${n.id})">${escHtml(n.text)}</span>
-          <button class="note-del-x" onclick="deleteNote(${n.id})">×</button>
-        </div>
-        <div class="note-meta">${n.time}${n.by?' • '+n.by:''}</div>
+      <div class="flex-1">
+        <p class="note__text${n.done?' done':''}" onclick="startEditNote(${n.id})">${escHtml(n.text)}</p>
+        <time class="note__time">${n.time}${n.by?' • '+n.by:''}</time>
       </div>
+      <button class="note-del-x" onclick="deleteNote(${n.id})" aria-label="ลบ">×</button>
     </div>`;
   }).join('');
 }
@@ -217,68 +231,88 @@ function deleteNote(id) {
   }, '🗑', 'ลบ', true);
 }
 
-// ── Today cards ──────────────────────────────────────────────────────
+// ── Today cards (Cozy v3) ────────────────────────────────────────────
+// Map meal id → time-of-day asset key (assumes 4 meals in order)
+const TIME_ASSET = ['morning','noon','evening','night'];
+
 function renderToday() {
   const cfg=getCfg(), log=getLog(), now=new Date(), c=document.getElementById('cards');
   if (!c) return;
   const frag=document.createDocumentFragment();
+  let fedCount = 0;
   MEALS.forEach((meal,i) => {
+    if (log[meal.id]) fedCount++;
     const t=cfg.times?.[i] || '00:00', fed=asFed(log[meal.id]);
     const parts=t.split(':'), h=Number(parts[0])||0, mn=Number(parts[1])||0;
     const mt=new Date(now); mt.setHours(h,mn,0,0);
     const overdue=!fed && now>mt;
-    const card=document.createElement('div');
+    const card=document.createElement('article');
+    const timeIcon = `<div class="meal__icon" aria-hidden="true"><img src="img/time-${TIME_ASSET[i]||'morning'}.png" alt="" width="22" height="22"></div>`;
 
-    // 3 สถานะ: fed / skipped / pending
     if (fed && fed.skipped) {
-      card.className = 'meal-sq skipped';
-      const reason = fed.skipReason ? `<div class="sq-info">${escHtml(fed.skipReason)}</div>` : '';
+      const reason = fed.skipReason ? `<div class="meal__detail"><div class="meal__foods" style="color:var(--c-rust)">${escHtml(fed.skipReason)}</div></div>` : '';
       const needNote = !fed.skipReason || fed.skipReason.trim().length < 3;
+      card.className = 'meal meal--skipped';
       card.innerHTML=`
-        <div class="sq-top">
-          <span class="sq-ico">${meal.icon}</span>
-          <span class="badge skipped">💤</span>
+        <div class="meal__head">
+          ${timeIcon}
+          <span class="meal__status-empty" style="background:var(--c-rust);color:#fff" aria-label="ไม่กิน">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+          </span>
         </div>
-        <div class="sq-name">${meal.label}</div>
-        <div class="sq-time">${t} น.</div>
-        <div class="sq-fed-time">ไม่กิน · ${fed.time||''}</div>
+        <div class="meal__label">${meal.label}</div>
+        <div class="meal__time">${t} · ไม่กิน${fed.time?' '+fed.time:''}</div>
         ${reason}
-        ${needNote ? `<button class="sq-feed sq-reason" onclick="openSkipNote('${meal.id}','${meal.label}')">+ เพิ่มเหตุผล</button>` : ''}
-        <button class="sq-undo" onclick="event.stopPropagation();undoFeed('${meal.id}')">↩ ยกเลิก</button>`;
+        <div class="meal__actions">
+          ${needNote ? `<button class="btn btn--ghost" onclick="openSkipNote('${meal.id}','${meal.label}')">+ เหตุผล</button>` : ''}
+          <button class="btn btn--ghost" onclick="event.stopPropagation();undoFeed('${meal.id}')">↩ ยกเลิก</button>
+        </div>`;
     } else if (fed) {
       const info = [fed.by, fed.food].filter(Boolean).join(' · ');
-      card.className = 'meal-sq fed';
+      card.className = 'meal meal--done';
+      card.onclick = () => openMealDetail(meal.id, meal.label, i);
       card.innerHTML=`
-        <div class="sq-top" onclick="openMealDetail('${meal.id}','${meal.label}',${i})">
-          <span class="sq-ico">${meal.icon}</span>
-          <span class="badge done">✓</span>
+        <div class="meal__head">
+          ${timeIcon}
+          <span class="meal__status-done" aria-label="กินแล้ว">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
         </div>
-        <div class="sq-name" onclick="openMealDetail('${meal.id}','${meal.label}',${i})">${meal.label}</div>
-        <div class="sq-time" onclick="openMealDetail('${meal.id}','${meal.label}',${i})">${t} น.</div>
-        ${fed.time ? `<div class="sq-fed-time" onclick="openMealDetail('${meal.id}','${meal.label}',${i})">${fed.time}</div>` : ''}
-        ${info ? `<div class="sq-info" onclick="openMealDetail('${meal.id}','${meal.label}',${i})">${info}</div>` : ''}
-        <button class="sq-undo" onclick="event.stopPropagation();undoFeed('${meal.id}')">↩ ยกเลิก</button>`;
+        <div class="meal__label">${meal.label}</div>
+        <div class="meal__time">${t}${fed.time?' · '+fed.time:''}</div>
+        ${info ? `<div class="meal__detail"><div class="meal__foods">${escHtml(info)}</div></div>` : ''}
+        <button class="meal__undo-mini" onclick="event.stopPropagation();undoFeed('${meal.id}')" aria-label="ยกเลิก">↩</button>`;
     } else {
-      const badge = overdue
-        ? `<span class="badge overdue">⚠</span>`
-        : `<span class="badge pending">รอ</span>`;
-      card.className = `meal-sq${overdue?' overdue':''}`;
+      card.className = `meal${overdue?' meal--overdue':''}`;
       card.innerHTML=`
-        <div class="sq-top">
-          <span class="sq-ico">${meal.icon}</span>
-          ${badge}
+        <div class="meal__head">
+          ${timeIcon}
+          <span class="meal__status-empty">
+            ${overdue
+              ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 9v4m0 3v.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/></svg>`
+              : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`}
+          </span>
         </div>
-        <div class="sq-name">${meal.label}</div>
-        <div class="sq-time">${t} น.</div>
-        <div class="sq-actions">
-          <button class="sq-feed" onclick="openFeed('${meal.id}')">ให้อาหาร</button>
-          <button class="sq-skip" onclick="markSkip('${meal.id}','${meal.label}')">ไม่กิน</button>
+        <div class="meal__label">${meal.label}</div>
+        <div class="meal__time">${t}</div>
+        <div class="meal__actions">
+          <button class="btn btn--primary" onclick="openFeed('${meal.id}')" data-action="log-meal">ให้อาหาร</button>
+          <button class="btn btn--ghost" onclick="markSkip('${meal.id}','${meal.label}')" data-action="skip-meal">ไม่กิน</button>
         </div>`;
     }
     frag.appendChild(card);
   });
   c.innerHTML='';
   c.appendChild(frag);
+
+  // Update hero count + dots
+  const total = MEALS.length;
+  const countEl = document.getElementById('dcCount');
+  if (countEl) countEl.textContent = fedCount;
+  const dotsEl = document.getElementById('dcDots');
+  if (dotsEl) dotsEl.innerHTML = Array.from({length: total}, (_,i) =>
+    `<i${i < fedCount ? ' class="is-on"' : ''}></i>`
+  ).join('');
 }
 
 function undoFeed(id) { writeLog(id,null); renderToday(); renderHeader(); renderSkipBanner(); }

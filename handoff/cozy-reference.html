@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Mocha · Soft Cozy v3 — HTML reference</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#9B6B45">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="stylesheet" href="mocha-cozy.css">
+</head>
+<body>
+
+<!--
+============================================================
+  Mocha Dog Feeder · HTML reference
+  Each <section data-page> represents a tab page. Engineer adapts
+  to existing JS routing; switching shown here uses display:none.
+  Asset placeholders: replace src="…" with sprite cuts from
+  Magnific sheets — see HANDOFF.md.
+============================================================
+-->
+
+<div class="app">
+
+  <!-- ============================================================
+       PAGE · TODAY
+       ============================================================ -->
+  <section data-page="today" aria-label="วันนี้">
+
+    <!-- HEADER · mascot + name + actions -->
+    <header class="topbar">
+      <div class="topbar__id">
+        <div class="avatar">
+          <!-- swap for cut from Mascot sheet (mocha-sit-32.png or paw glyph) -->
+          <img src="img/mocha-avatar.png" alt="" width="38" height="38">
+        </div>
+        <div class="topbar__title">
+          <span class="name">มอคค่า</span>
+          <span class="breed">Toy Poodle · 1 ปี</span>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <button class="icon-btn" aria-label="ตั้งค่า">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="app__scroll">
+
+      <!-- HERO · date / countdown / mascot peek -->
+      <article class="hero">
+        <img class="hero__mascot anim-breath" src="img/mocha-peek.png" alt="">
+
+        <div class="hero__row">
+          <div>
+            <div class="hero__weekday">วันอังคาร</div>
+            <div class="hero__date">19 พ.ค.</div>
+            <div class="hero__greet">อรุณสวัสดิ์, มอคค่า</div>
+          </div>
+
+          <div class="hero__count">
+            <div class="hero__count-label">มื้อวันนี้</div>
+            <div class="hero__count-value">2<sub>/4</sub></div>
+            <div class="hero__dots" aria-hidden="true">
+              <i class="is-on"></i><i class="is-on"></i><i></i><i></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero__next">
+          <div>
+            <div class="hero__next-label">มื้อถัดไป</div>
+            <div class="hero__next-time">เย็น · 17:30</div>
+          </div>
+          <div class="hero__next-eta">อีก 2 ชม. 8 นาที</div>
+        </div>
+      </article>
+
+      <!-- SKIP-MEAL WARNING BANNER · shown when a meal is skipped (warn state) -->
+      <aside class="banner banner--alert" role="alert">
+        <div class="banner__icon" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M12 8v5m0 3v.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+            <path d="M3 19h18L12 3 3 19z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="banner__body">
+          <div class="banner__title">มื้อกลางวันถูกข้าม — ระวัง Hypoglycemia</div>
+          <p>มอคค่าตัวเล็ก ไม่ควรเว้นช่วงการกินเกิน 12 ชม.</p>
+        </div>
+      </aside>
+
+      <!-- MEAL GRID · 2×2 · done + pending states -->
+      <section class="section">
+        <header class="section__head">
+          <h2 class="section__title">การให้อาหาร</h2>
+          <span class="section__meta">240 / 480 kcal</span>
+        </header>
+
+        <div class="meal-grid">
+
+          <!-- meal · done -->
+          <article class="meal meal--done">
+            <div class="meal__head">
+              <div class="meal__icon" aria-hidden="true">
+                <!-- Time sheet: morning glyph -->
+                <img src="img/time-morning.svg" alt="" width="22" height="22">
+              </div>
+              <span class="meal__status-done" aria-label="กินแล้ว">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+            </div>
+            <div class="meal__label">มื้อเช้า</div>
+            <div class="meal__time">07:30</div>
+            <div class="meal__detail">
+              <div class="meal__foods">อาหารเม็ด + ไก่</div>
+              <div class="meal__kcal-row">
+                <span class="meal__by">โดย แม่</span>
+                <span class="meal__kcal">120 <small>kcal</small></span>
+              </div>
+            </div>
+          </article>
+
+          <!-- meal · done (variant) -->
+          <article class="meal meal--done">
+            <div class="meal__head">
+              <div class="meal__icon" aria-hidden="true">
+                <img src="img/time-noon.svg" alt="" width="22" height="22">
+              </div>
+              <span class="meal__status-done">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+            </div>
+            <div class="meal__label">มื้อกลางวัน</div>
+            <div class="meal__time">12:00</div>
+            <div class="meal__detail">
+              <div class="meal__foods">อาหารเม็ด</div>
+              <div class="meal__kcal-row">
+                <span class="meal__by">โดย พ่อ</span>
+                <span class="meal__kcal">120 <small>kcal</small></span>
+              </div>
+            </div>
+          </article>
+
+          <!-- meal · pending (open log sheet on tap; skip with secondary button) -->
+          <article class="meal">
+            <div class="meal__head">
+              <div class="meal__icon" aria-hidden="true">
+                <img src="img/time-evening.svg" alt="" width="22" height="22">
+              </div>
+              <span class="meal__status-empty">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+              </span>
+            </div>
+            <div class="meal__label">มื้อเย็น</div>
+            <div class="meal__time">17:30</div>
+            <div class="meal__actions">
+              <button class="btn btn--primary" data-action="log-meal">ให้อาหาร</button>
+              <button class="btn btn--ghost"   data-action="skip-meal">ไม่กิน</button>
+            </div>
+          </article>
+
+          <!-- meal · pending (late) -->
+          <article class="meal">
+            <div class="meal__head">
+              <div class="meal__icon" aria-hidden="true">
+                <img src="img/time-night.svg" alt="" width="22" height="22">
+              </div>
+              <span class="meal__status-empty">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+              </span>
+            </div>
+            <div class="meal__label">มื้อดึก</div>
+            <div class="meal__time">21:00</div>
+            <div class="meal__actions">
+              <button class="btn btn--primary" data-action="log-meal">ให้อาหาร</button>
+              <button class="btn btn--ghost"   data-action="skip-meal">ไม่กิน</button>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- STREAK · mascot trotting -->
+      <article class="streak" aria-label="สถิติการให้อาหารต่อเนื่อง">
+        <img class="streak__mascot anim-bob" src="img/mocha-trot.png" alt="">
+
+        <div class="streak__icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M12 3s4 4 4 8a4 4 0 01-8 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-4-1-5 0-1 1-2 1-2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="M7 15a5 5 0 0010 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <div class="streak__main">
+          <div>
+            <span class="streak__count">12</span>
+            <span class="streak__count-label">วันติดต่อกัน</span>
+          </div>
+          <div class="streak__quote">กินครบ 4 มื้อ · เก่งมากมอคค่า</div>
+        </div>
+      </article>
+
+      <!-- NOTES · checklist style -->
+      <section class="section">
+        <header class="section__head">
+          <h2 class="section__title">บันทึก</h2>
+          <button class="btn btn--add" data-action="add-note">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            เพิ่ม
+          </button>
+        </header>
+
+        <div class="notes">
+          <div class="note">
+            <span class="note__dot note__dot--caramel" aria-hidden="true"></span>
+            <div class="flex-1">
+              <p class="note__text">กินไก่ต้มแล้วท้องไม่เสีย ลองให้อีก</p>
+              <time class="note__time">เมื่อวาน · 19:42 · แม่</time>
+            </div>
+          </div>
+
+          <hr class="notes__divider">
+
+          <div class="note">
+            <span class="note__dot note__dot--sage" aria-hidden="true"></span>
+            <div class="flex-1">
+              <p class="note__text">นัดสัตวแพทย์ฉีดวัคซีน 22 พ.ค.</p>
+              <time class="note__time">3 วันก่อน · pinned</time>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </section>
+
+
+  <!-- ============================================================
+       PAGE · CALENDAR
+       ============================================================ -->
+  <section data-page="calendar" aria-label="ปฏิทิน" hidden>
+
+    <header class="topbar">
+      <div class="topbar__id">
+        <div class="avatar"><img src="img/mocha-avatar.png" alt="" width="38" height="38"></div>
+        <div class="topbar__title">
+          <span class="name">ปฏิทิน</span>
+          <span class="breed">ภาพรวม · พฤษภาคม</span>
+        </div>
+      </div>
+      <button class="icon-btn" aria-label="ตั้งค่า">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </header>
+
+    <main class="app__scroll">
+
+      <!-- MONTH GRID -->
+      <article class="cal-card">
+        <div class="cal-head">
+          <button class="cal-nav" aria-label="เดือนก่อน">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <h2>พฤษภาคม <span class="year">2569</span></h2>
+          <button class="cal-nav" aria-label="เดือนถัดไป">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+
+        <div class="weekdays" aria-hidden="true">
+          <span>อา</span><span>จ</span><span>อ</span><span>พ</span><span>พฤ</span><span>ศ</span><span>ส</span>
+        </div>
+
+        <div class="cal-grid" role="grid">
+          <!-- 5 empty leading cells (May 2026 starts Friday) -->
+          <div></div><div></div><div></div><div></div><div></div>
+
+          <button class="day" role="gridcell"><span class="day__n">1</span><span class="day__dot day__dot--complete"></span></button>
+          <button class="day" role="gridcell"><span class="day__n">2</span><span class="day__dot day__dot--complete"></span></button>
+          <!-- … days 3–18 use the same pattern, with the appropriate dot class … -->
+          <button class="day" role="gridcell"><span class="day__n">3</span><span class="day__dot day__dot--complete"></span></button>
+          <button class="day" role="gridcell"><span class="day__n">4</span><span class="day__dot day__dot--complete"></span></button>
+          <button class="day" role="gridcell"><span class="day__n">5</span><span class="day__dot day__dot--complete"></span></button>
+          <button class="day" role="gridcell"><span class="day__n">6</span><span class="day__dot day__dot--partial"></span></button>
+          <button class="day" role="gridcell"><span class="day__n">7</span><span class="day__dot day__dot--partial"></span></button>
+          <button class="day" role="gridcell"><span class="day__n">8</span><span class="day__dot day__dot--partial"></span></button>
+          <button class="day" role="gridcell"><span class="day__n">9</span><span class="day__dot day__dot--complete"></span></button>
+          <button class="day" role="gridcell"><span class="day__n">10</span><span class="day__dot day__dot--complete"></span></button>
+          <button class="day" role="gridcell"><span class="day__n">11</span><span class="day__dot day__dot--complete"></span></button>
+          <button class="day" role="gridcell"><span class="day__n">12</span><span class="day__dot day__dot--skip"></span></button>
+          <button class="day" role="gridcell"><span class="day__n">13</span><span class="day__dot day__dot--complete"></span></button>
+          <button class="day" role="gridcell"><span class="day__n">14</span><span class="day__dot day__dot--complete"></span></button>
+          <button class="day" role="gridcell"><span class="day__n">15</span><span class="day__dot day__dot--note"></span></button>
+          <button class="day" role="gridcell"><span class="day__n">16</span><span class="day__dot day__dot--note"></span></button>
+          <button class="day" role="gridcell"><span class="day__n">17</span><span class="day__dot day__dot--note"></span></button>
+          <button class="day" role="gridcell"><span class="day__n">18</span><span class="day__dot day__dot--complete"></span></button>
+
+          <!-- TODAY -->
+          <button class="day day--today" role="gridcell" aria-current="date">
+            <span class="day__n">19</span>
+            <span class="day__dot" aria-hidden="true"></span>
+          </button>
+
+          <!-- future / faded -->
+          <button class="day day--faded" role="gridcell"><span class="day__n">20</span></button>
+          <button class="day day--faded" role="gridcell"><span class="day__n">21</span></button>
+          <!-- … 22–31 … -->
+        </div>
+      </article>
+
+      <!-- LEGEND -->
+      <div class="legend" aria-label="คำอธิบายสี">
+        <span class="legend__item"><i style="background: var(--c-sage)"></i><span>ครบ 4 มื้อ</span></span>
+        <span class="legend__item"><i style="background: var(--c-caramel)"></i><span>บางมื้อ</span></span>
+        <span class="legend__item"><i style="background: var(--c-latte)"></i><span>ไม่มีบันทึก</span></span>
+        <span class="legend__item"><i style="background: var(--c-blush)"></i><span>มีบันทึก</span></span>
+        <span class="legend__item"><i style="background: var(--c-rust)"></i><span>ไม่กิน</span></span>
+      </div>
+
+      <!-- PERIOD TOGGLE -->
+      <div class="period" role="tablist">
+        <button class="period__btn period__btn--active" role="tab" aria-selected="true">วันนี้</button>
+        <button class="period__btn" role="tab">สัปดาห์</button>
+        <button class="period__btn" role="tab">เดือน</button>
+      </div>
+
+      <!-- DAY DASHBOARD -->
+      <article class="dash">
+        <div class="dash__head">
+          <div>
+            <h3>วันนี้ · <span class="day-ref">19 พ.ค.</span></h3>
+            <div class="dash__sub">กินครบ 2 มื้อแล้ว</div>
+          </div>
+        </div>
+
+        <div class="dash__slots">
+          <div class="slot slot--done">
+            <div class="slot__icon"><img src="img/time-morning.svg" alt="" width="22" height="22"></div>
+            <span class="slot__label">เช้า</span>
+            <span class="slot__kcal">120</span>
+          </div>
+          <div class="slot slot--done">
+            <div class="slot__icon"><img src="img/time-noon.svg" alt="" width="22" height="22"></div>
+            <span class="slot__label">กลางวัน</span>
+            <span class="slot__kcal">120</span>
+          </div>
+          <div class="slot">
+            <div class="slot__icon"><img src="img/time-evening.svg" alt="" width="22" height="22"></div>
+            <span class="slot__label">เย็น</span>
+            <span class="slot__kcal">—</span>
+          </div>
+          <div class="slot">
+            <div class="slot__icon"><img src="img/time-night.svg" alt="" width="22" height="22"></div>
+            <span class="slot__label">ดึก</span>
+            <span class="slot__kcal">—</span>
+          </div>
+        </div>
+
+        <div class="dash__total">
+          <div class="dash__total-row">
+            <span class="label">แคลอรี่</span>
+            <span>
+              <span class="num">240</span>
+              <span class="of">/ 480 kcal</span>
+            </span>
+          </div>
+          <div class="dash__progress"><i style="width: 50%"></i></div>
+        </div>
+      </article>
+
+      <!-- WEEKLY STREAK -->
+      <article class="week-streak">
+        <div class="week-streak__head">
+          <div>
+            <div class="label">7 วันที่ผ่านมา</div>
+            <div>
+              <span class="big">6/7</span>
+              <span class="sub">วันครบมื้อ</span>
+            </div>
+          </div>
+          <span class="streak-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+              <path d="M12 3s4 4 4 8a4 4 0 01-8 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-4-1-5 0-1 1-2 1-2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            </svg>
+            12 STREAK
+          </span>
+        </div>
+
+        <div class="week-row">
+          <div class="week-cell"><div class="week-pill week-pill--complete">✓</div><span class="week-cell__lbl">พ</span></div>
+          <div class="week-cell"><div class="week-pill week-pill--complete">✓</div><span class="week-cell__lbl">พฤ</span></div>
+          <div class="week-cell"><div class="week-pill week-pill--complete">✓</div><span class="week-cell__lbl">ศ</span></div>
+          <div class="week-cell"><div class="week-pill week-pill--partial">3/4</div><span class="week-cell__lbl">ส</span></div>
+          <div class="week-cell"><div class="week-pill week-pill--complete">✓</div><span class="week-cell__lbl">อา</span></div>
+          <div class="week-cell"><div class="week-pill week-pill--complete">✓</div><span class="week-cell__lbl">จ</span></div>
+          <div class="week-cell"><div class="week-pill week-pill--today">วันนี้</div><span class="week-cell__lbl">อ</span></div>
+        </div>
+      </article>
+
+    </main>
+  </section>
+
+
+  <!-- ============================================================
+       PAGE · NUTRITION
+       ============================================================ -->
+  <section data-page="nutrition" aria-label="โภชนาการ" hidden>
+
+    <header class="topbar">
+      <div class="topbar__id">
+        <div class="avatar"><img src="img/mocha-avatar.png" alt="" width="38" height="38"></div>
+        <div class="topbar__title">
+          <span class="name">โภชนาการ</span>
+          <span class="breed">กินอะไรดีนะ</span>
+        </div>
+      </div>
+      <button class="icon-btn" aria-label="ตั้งค่า">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </header>
+
+    <main class="app__scroll">
+
+      <!-- PROFILE -->
+      <article class="profile">
+        <div class="profile__head">
+          <div class="mascot-frame">
+            <!-- replace with mocha-sit.png from Mascot sheet -->
+            <img src="img/mocha-sit.png" alt="มอคค่านั่ง" class="anim-breath">
+          </div>
+          <div class="profile__id">
+            <div class="profile__breed">Toy Poodle · ♂</div>
+            <h1 class="profile__name">มอคค่า</h1>
+            <div class="profile__quote">“ เพื่อนซี้ตัวจิ๋วของบ้าน ”</div>
+          </div>
+        </div>
+
+        <div class="profile__stats">
+          <div class="profile__stat">
+            <div class="label">อายุ</div>
+            <div class="value">1 <span class="unit">ปี</span></div>
+          </div>
+          <div class="profile__rule"></div>
+          <div class="profile__stat">
+            <div class="label">น้ำหนัก</div>
+            <div class="value">3.2 <span class="unit">kg</span></div>
+          </div>
+          <div class="profile__rule"></div>
+          <div class="profile__stat profile__stat--accent">
+            <div class="label">kcal/วัน</div>
+            <div class="value">255</div>
+          </div>
+          <button class="btn btn--edit" style="align-self: center;">แก้ไข ›</button>
+        </div>
+      </article>
+
+      <!-- 🔥 สุก banner · cooked-weight info -->
+      <aside class="banner">
+        <div class="banner__icon" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M12 3s4 4 4 8a4 4 0 01-8 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-4-1-5 0-1 1-2 1-2z" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/>
+            <path d="M7 15a5 5 0 0010 0" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="banner__body">
+          <div class="banner__title">น้ำหนักทั้งหมด = อาหารหลังปรุงสุก</div>
+          <p>เนื้อสัตว์/ผัก = ต้มหรืออบ ไม่ใส่น้ำมัน · กรัมที่แสดงคือน้ำหนักตอนเสิร์ฟ</p>
+        </div>
+      </aside>
+
+      <!-- SEARCH -->
+      <form class="search" role="search" onsubmit="return false;">
+        <span class="search__icon" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="2"/>
+            <path d="M16 16l5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <input class="search__input" type="search"
+               placeholder="ค้นหาอาหาร / สิ่งที่ห้าม / เคล็ดลับ..."
+               aria-label="ค้นหา">
+        <kbd class="search__shortcut">⌘K</kbd>
+      </form>
+
+      <!-- CALCULATOR -->
+      <article class="calc">
+        <header class="calc__head">
+          <h2>อาหารต่อมื้อ</h2>
+          <span class="calc__formula">RER × 1.4</span>
+        </header>
+
+        <div class="t-micro" style="margin-bottom: 6px;">เป้าหมาย</div>
+        <div class="goal-row" role="radiogroup" aria-label="เป้าหมาย">
+          <button class="goal" role="radio" aria-checked="false">
+            <svg width="16" height="12" viewBox="0 0 24 24" fill="none"><path d="M3 8l5 6 5-4 8 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            ลด
+          </button>
+          <button class="goal goal--active" role="radio" aria-checked="true">
+            <svg width="16" height="12" viewBox="0 0 24 24" fill="none"><path d="M3 12h18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            ปกติ
+          </button>
+          <button class="goal" role="radio" aria-checked="false">
+            <svg width="16" height="12" viewBox="0 0 24 24" fill="none"><path d="M3 19l5-6 5 4 8-7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            เพิ่ม
+          </button>
+        </div>
+
+        <div class="result">
+          <div class="result__row">
+            <div class="result__group">
+              <div class="label">3 มื้อ · ต่อมื้อ</div>
+              <div class="result__big">85<sub>kcal</sub></div>
+            </div>
+            <div class="result__group" style="text-align: right;">
+              <div class="label">อาหารเม็ด</div>
+              <div class="result__mid">22<sub>g</sub></div>
+            </div>
+          </div>
+          <div class="bar"><div class="bar__fill" style="width: 70%"></div></div>
+        </div>
+      </article>
+
+      <!-- BRAND CAROUSEL -->
+      <section class="brand-row">
+        <header class="brand-row__head">
+          <h2>อาหารเม็ดแนะนำ</h2>
+        </header>
+        <div class="brand-row__scroll">
+
+          <article class="brand">
+            <div class="brand__icon" style="background: var(--c-blush);">
+              <!-- Food sheet · bone or kibble glyph -->
+              <img src="img/food-kibble.svg" alt="" width="22" height="22">
+            </div>
+            <div class="brand__name">ROYAL CANIN</div>
+            <div class="brand__plan">Toy Poodle</div>
+            <div class="brand__kcal">340 kcal/100g</div>
+          </article>
+
+          <article class="brand">
+            <div class="brand__icon" style="background: rgba(169,184,154,.3);">
+              <img src="img/food-leaf.svg" alt="" width="22" height="22">
+            </div>
+            <div class="brand__name">HILL'S SCIENCE</div>
+            <div class="brand__plan">Small Adult</div>
+            <div class="brand__kcal">358 kcal/100g</div>
+          </article>
+
+          <article class="brand">
+            <div class="brand__icon" style="background: var(--c-latte);">
+              <img src="img/food-paw.svg" alt="" width="22" height="22">
+            </div>
+            <div class="brand__name">PURINA PRO</div>
+            <div class="brand__plan">Small &amp; Toy</div>
+            <div class="brand__kcal">370 kcal/100g</div>
+          </article>
+
+          <article class="brand">
+            <div class="brand__icon" style="background: rgba(201,148,103,.25);">
+              <img src="img/food-fire.svg" alt="" width="22" height="22">
+            </div>
+            <div class="brand__name">ORIJEN</div>
+            <div class="brand__plan">Small &amp; Mini</div>
+            <div class="brand__kcal">465 kcal/100g</div>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- ALLOWED FOODS -->
+      <section class="foodsec">
+        <header class="foodsec__head">
+          <div class="foodsec__title">อาหารที่กินได้</div>
+          <p class="foodsec__subtitle">เหมาะสำหรับ Toy Poodle อายุ 1 ปี ให้เป็นประจำได้</p>
+        </header>
+        <div class="foodsec__list">
+
+          <article class="chip">
+            <div class="chip__icon" style="background: var(--c-latte);">
+              <img src="img/food-bowl.svg" alt="" width="17" height="17">
+            </div>
+            <div class="chip__body">
+              <div class="chip__label">อาหารเม็ด Small Breed Adult</div>
+              <div class="chip__sub">Royal Canin · ทุกมื้อ</div>
+            </div>
+          </article>
+
+          <article class="chip">
+            <div class="chip__icon" style="background: var(--c-blush);">
+              <img src="img/food-bone.svg" alt="" width="17" height="17">
+            </div>
+            <div class="chip__body">
+              <div class="chip__label">เนื้อไก่ต้ม</div>
+              <div class="chip__sub">165 kcal/100g · ไม่ใส่เกลือ</div>
+            </div>
+          </article>
+
+          <article class="chip">
+            <div class="chip__icon" style="background: rgba(126,146,122,.25);">
+              <img src="img/food-fish.svg" alt="" width="17" height="17">
+            </div>
+            <div class="chip__body">
+              <div class="chip__label">ปลาแซลมอน / ปลาทู</div>
+              <div class="chip__sub">160 kcal/100g · Omega-3</div>
+            </div>
+          </article>
+
+          <article class="chip">
+            <div class="chip__icon" style="background: rgba(169,184,154,.4);">
+              <img src="img/food-leaf.svg" alt="" width="17" height="17">
+            </div>
+            <div class="chip__body">
+              <div class="chip__label">แครอท</div>
+              <div class="chip__sub">ดิบหรือต้ม · ดีต่อฟัน</div>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- FORBIDDEN FOODS -->
+      <section class="foodsec foodsec--danger">
+        <header class="foodsec__head">
+          <div class="foodsec__title">อาหารต้องห้าม</div>
+          <p class="foodsec__subtitle">อันตรายถึงชีวิต — ห้ามให้เด็ดขาด</p>
+        </header>
+        <div class="foodsec__list">
+
+          <article class="chip chip--danger">
+            <div class="chip__icon" style="background: rgba(199,122,90,.13);">
+              <img src="img/danger-chocolate.svg" alt="" width="17" height="17">
+            </div>
+            <div class="chip__body">
+              <div class="chip__label">ช็อกโกแลต</div>
+              <div class="chip__sub">Theobromine · ร้ายแรง</div>
+            </div>
+            <span class="tag tag--danger">ห้าม</span>
+          </article>
+
+          <article class="chip chip--danger">
+            <div class="chip__icon" style="background: rgba(199,122,90,.13);">
+              <img src="img/danger-grapes.svg" alt="" width="17" height="17">
+            </div>
+            <div class="chip__body">
+              <div class="chip__label">องุ่น &amp; ลูกเกด</div>
+              <div class="chip__sub">ทำให้ไตวายเฉียบพลัน</div>
+            </div>
+            <span class="tag tag--danger">ห้าม</span>
+          </article>
+
+          <article class="chip chip--danger">
+            <div class="chip__icon" style="background: rgba(199,122,90,.13);">
+              <img src="img/danger-onion.svg" alt="" width="17" height="17">
+            </div>
+            <div class="chip__body">
+              <div class="chip__label">หัวหอม กระเทียม</div>
+              <div class="chip__sub">Thiosulfate · ทั้งสุกและดิบ</div>
+            </div>
+            <span class="tag tag--danger">ห้าม</span>
+          </article>
+
+          <article class="chip">
+            <div class="chip__icon" style="background: rgba(201,148,103,.18);">
+              <img src="img/danger-milk.svg" alt="" width="17" height="17">
+            </div>
+            <div class="chip__body">
+              <div class="chip__label">นม / เกลือ</div>
+              <div class="chip__sub">แล็กโตส · ระวัง</div>
+            </div>
+            <span class="tag tag--warn">ระวัง</span>
+          </article>
+
+        </div>
+      </section>
+
+    </main>
+  </section>
+
+
+  <!-- ============================================================
+       TAB BAR · shared across pages
+       ============================================================ -->
+  <nav class="tabbar" role="tablist" aria-label="หน้าหลัก">
+    <div class="tabbar__inner">
+      <button class="tab tab--active" data-tab="today"     role="tab" aria-selected="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-7h-6v7H4a1 1 0 01-1-1v-9z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        <span>วันนี้</span>
+      </button>
+      <button class="tab"             data-tab="calendar"  role="tab" aria-selected="false">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M3 9h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span>ปฏิทิน</span>
+      </button>
+      <button class="tab"             data-tab="nutrition" role="tab" aria-selected="false">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 12h18a8 8 0 01-8 8h-2a8 8 0 01-8-8z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="9" cy="8" r="2" stroke="currentColor" stroke-width="1.6"/><circle cx="15" cy="8" r="2" stroke="currentColor" stroke-width="1.6"/></svg>
+        <span>โภชนาการ</span>
+      </button>
+    </div>
+  </nav>
+
+
+  <!-- ============================================================
+       MODAL · log-meal sheet (slides up from bottom)
+       Open by adding .is-open to backdrop AND .sheet
+       ============================================================ -->
+  <div class="sheet-backdrop" data-sheet-backdrop="log-meal"></div>
+  <aside class="sheet" id="sheet-log-meal" role="dialog" aria-modal="true" aria-labelledby="log-meal-title">
+    <div class="sheet__handle" aria-hidden="true"></div>
+
+    <header class="sheet__head">
+      <h2 id="log-meal-title" class="sheet__title">บันทึกการให้อาหาร</h2>
+      <button class="sheet__close" aria-label="ปิด">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </header>
+
+    <!-- Step indicator -->
+    <div class="t-micro" style="margin-bottom: var(--sp-3);">ขั้นที่ 1 — เลือกผู้ให้อาหาร</div>
+
+    <!-- Step content (engineer wires up the actual JS flow) -->
+    <div class="goal-row" style="margin-bottom: var(--sp-3);">
+      <button class="goal">แม่</button>
+      <button class="goal goal--active">พ่อ</button>
+      <button class="goal">เพื่อน</button>
+    </div>
+
+    <!-- Time -->
+    <label class="t-micro" style="display: block; margin-top: var(--sp-3); margin-bottom: 6px;">หรือระบุเวลาจริง</label>
+    <div class="search">
+      <input class="search__input num" type="time" value="17:30" aria-label="เวลา">
+    </div>
+
+    <!-- Step nav -->
+    <div class="flex between" style="margin-top: var(--sp-5);">
+      <button class="btn btn--ghost">‹ ย้อนกลับ</button>
+      <button class="btn btn--primary" style="flex: 0 0 auto; padding: 9px 18px;">ถัดไป ›</button>
+    </div>
+  </aside>
+
+</div>
+
+
+<!-- ============================================================
+     Page-switching demo · the live app should use its existing
+     router; this is a minimal stand-in so the reference is browsable.
+     ============================================================ -->
+<script>
+  (function () {
+    const tabs  = document.querySelectorAll('[data-tab]');
+    const pages = document.querySelectorAll('[data-page]');
+    tabs.forEach(btn => btn.addEventListener('click', () => {
+      const target = btn.dataset.tab;
+      pages.forEach(p => p.hidden = p.dataset.page !== target);
+      tabs.forEach(t => {
+        const on = t === btn;
+        t.classList.toggle('tab--active', on);
+        t.setAttribute('aria-selected', on);
+      });
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }));
+
+    // demo: open log-meal sheet from any [data-action="log-meal"]
+    const sheet    = document.getElementById('sheet-log-meal');
+    const backdrop = document.querySelector('[data-sheet-backdrop="log-meal"]');
+    document.querySelectorAll('[data-action="log-meal"]').forEach(b => {
+      b.addEventListener('click', () => {
+        sheet.classList.add('is-open');
+        backdrop.classList.add('is-open');
+      });
+    });
+    [backdrop, sheet.querySelector('.sheet__close')].forEach(el => {
+      el && el.addEventListener('click', () => {
+        sheet.classList.remove('is-open');
+        backdrop.classList.remove('is-open');
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>

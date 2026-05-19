@@ -16,15 +16,31 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <script src="firebase-config.js"></script>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="mocha-cozy.css">
 </head>
 <body>
 
-<!-- ════ Header ════ -->
-<div class="hdr" style="position:relative">
-  <button class="hdr-btn-left" onclick="openSettings()" aria-label="การตั้งค่า">⚙️</button>
-  <button class="dark-btn" id="darkBtn" onclick="toggleDark()" aria-label="สลับธีม">🌙</button>
-  <div class="hdr-name" id="hdrName">Mocha</div>
-</div>
+<div class="app">
+
+<!-- ════ Topbar (Cozy v3) ════ -->
+<header class="topbar">
+  <div class="topbar__id">
+    <div class="avatar"><img src="img/mocha-avatar.png" alt="" width="38" height="38"></div>
+    <div class="topbar__title">
+      <span class="name" id="hdrName">มอคค่า</span>
+      <span class="breed" id="dcSyncTxt">Toy Poodle</span>
+    </div>
+  </div>
+  <div class="flex gap-2">
+    <button class="icon-btn" id="darkBtn" onclick="toggleDark()" aria-label="สลับธีม">🌙</button>
+    <button class="icon-btn" onclick="openSettings()" aria-label="การตั้งค่า">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/>
+        <path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+</header>
 
 <div id="updateBanner" onclick="applyUpdate()" role="alert">✨ มีเวอร์ชันใหม่ — แตะเพื่ออัพเดท</div>
 
@@ -80,42 +96,83 @@
 </div>
 <div id="syncBar"></div>
 
-<!-- ════ Page: Today ════ -->
-<div class="page active" id="page-today">
-  <div class="wrap">
-    <!-- Date / Clock / Status card -->
-    <div class="date-card">
-      <div class="dc-top">
-        <div class="dc-left">
-          <div class="dc-dayname" id="dcDay"></div>
-          <div class="dc-datestr" id="dcDate"></div>
+<!-- ════ Page: Today (Cozy v3) ════ -->
+<div class="page active" id="page-today" data-page="today">
+  <main class="app__scroll">
+
+    <!-- HERO · date + countdown + Mocha peek -->
+    <article class="hero">
+      <img class="hero__mascot anim-breath" src="img/mocha-peek.png" alt="">
+      <div class="hero__row">
+        <div>
+          <div class="hero__weekday" id="dcDay"></div>
+          <div class="hero__date" id="dcDate"></div>
+          <div class="hero__greet" id="dcClock">--:--:--</div>
         </div>
-        <div class="dc-clock" id="dcClock">--:--:--</div>
-      </div>
-      <div class="dc-footer">
-        <div class="dc-sync">
-          <span class="dc-dot" id="dcDot"></span>
-          <span id="dcSyncTxt">กำลังเชื่อมต่อ…</span>
+        <div class="hero__count">
+          <div class="hero__count-label">มื้อวันนี้</div>
+          <div class="hero__count-value"><span id="dcCount">0</span><sub>/4</sub></div>
+          <div class="hero__dots" id="dcDots" aria-hidden="true">
+            <i></i><i></i><i></i><i></i>
+          </div>
         </div>
-        <div class="dc-next" id="dcNext"></div>
       </div>
-    </div>
-
-    <!-- v2: Skip-meal warning banner -->
-    <div id="skipBanner" class="skip-banner" style="display:none" role="alert"></div>
-
-    <div class="sec-title">📋 บันทึก / แจ้งเรื่อง</div>
-    <div class="notes-card">
-      <div class="notes-header">
-        <span class="notes-title">วันนี้</span>
-        <button class="btn-add-note" onclick="openNoteModal()">+</button>
+      <div class="hero__next">
+        <div>
+          <div class="hero__next-label">
+            <span class="dc-dot" id="dcDot" aria-hidden="true"></span>
+            มื้อถัดไป
+          </div>
+          <div class="hero__next-time" id="dcNext"></div>
+        </div>
       </div>
-      <div class="notes-list" id="notesList"></div>
-    </div>
+    </article>
 
-    <div class="sec-title">🍖 การให้อาหาร</div>
-    <div id="cards"></div>
-  </div>
+    <!-- Skip-meal banner -->
+    <aside id="skipBanner" class="banner banner--alert" style="display:none" role="alert"></aside>
+
+    <!-- Notes section -->
+    <section class="section">
+      <header class="section__head">
+        <h2 class="section__title">📋 บันทึก</h2>
+        <button class="btn btn--add" onclick="openNoteModal()" data-action="add-note">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          เพิ่ม
+        </button>
+      </header>
+      <div class="notes" id="notesList"></div>
+    </section>
+
+    <!-- Meal grid -->
+    <section class="section">
+      <header class="section__head">
+        <h2 class="section__title">🍖 การให้อาหาร</h2>
+      </header>
+      <div class="meal-grid" id="cards"></div>
+    </section>
+
+    <!-- Streak with Mocha pack -->
+    <article class="streak" aria-label="สถิติการให้อาหารต่อเนื่อง">
+      <div class="streak__pack" aria-hidden="true">
+        <img class="anim-bob" src="img/mocha-trot.png" alt="">
+        <img class="anim-bob" src="img/mocha-trot.png" alt="">
+        <img class="anim-bob" src="img/mocha-trot.png" alt="">
+      </div>
+      <div class="streak__icon" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M12 3s4 4 4 8a4 4 0 01-8 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-4-1-5 0-1 1-2 1-2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="streak__main">
+        <div>
+          <span class="streak__count" id="streakDays">0</span>
+          <span class="streak__count-label">วันติดต่อกัน</span>
+        </div>
+        <div class="streak__quote" id="streakQuote">กินครบ 4 มื้อ · เก่งมาก</div>
+      </div>
+    </article>
+
+  </main>
 </div>
 
 <!-- ════ Page: Calendar ════ -->
@@ -315,17 +372,36 @@
   </div>
 </div>
 
-<!-- ════ Tab bar ════ -->
+<!-- ════ Tab bar (Cozy v3) ════ -->
 <nav class="tabbar">
-  <button class="tab active" onclick="showPage('today',this)" role="tab" aria-selected="true" aria-label="หน้าวันนี้">
-    <span class="ico" aria-hidden="true">🏠</span>วันนี้
-  </button>
-  <button class="tab" onclick="showPage('calendar',this)" role="tab" aria-selected="false" aria-label="ปฏิทิน">
-    <span class="ico" aria-hidden="true">📅</span>ปฏิทิน
-  </button>
-  <button class="tab" onclick="showPage('nutrition',this)" role="tab" aria-selected="false" aria-label="โภชนาการ">
-    <span class="ico" aria-hidden="true">🥗</span>โภชนาการ
-  </button>
+  <div class="tabbar__inner">
+    <button class="tab tab--active" data-tab="today" onclick="showPage('today',this)" role="tab" aria-selected="true" aria-label="หน้าวันนี้">
+      <span class="ico" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M3 11l9-7 9 7v9a2 2 0 01-2 2h-4v-7H9v7H5a2 2 0 01-2-2v-9z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span class="tab__label">วันนี้</span>
+    </button>
+    <button class="tab" data-tab="calendar" onclick="showPage('calendar',this)" role="tab" aria-selected="false" aria-label="ปฏิทิน">
+      <span class="ico" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M3 9h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <span class="tab__label">ปฏิทิน</span>
+    </button>
+    <button class="tab" data-tab="nutrition" onclick="showPage('nutrition',this)" role="tab" aria-selected="false" aria-label="โภชนาการ">
+      <span class="ico" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M12 21s-7-5-7-11a7 7 0 0114 0c0 6-7 11-7 11z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+          <circle cx="12" cy="10" r="2.5" stroke="currentColor" stroke-width="1.8"/>
+        </svg>
+      </span>
+      <span class="tab__label">โภชนาการ</span>
+    </button>
+  </div>
 </nav>
 
 <!-- ════ Feed Modal (3 steps) ════ -->
@@ -456,6 +532,8 @@
     </div>
   </div>
 </div>
+
+</div><!-- /.app -->
 
 <!-- ════ App scripts ════ -->
 <script src="data.js"></script>
