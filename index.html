@@ -19,6 +19,7 @@
 </head>
 <body>
 
+<!-- ════ Header ════ -->
 <div class="hdr" style="position:relative">
   <button class="hdr-btn-left" onclick="openSettings()" aria-label="การตั้งค่า">⚙️</button>
   <button class="dark-btn" id="darkBtn" onclick="toggleDark()" aria-label="สลับธีม">🌙</button>
@@ -30,7 +31,7 @@
 <!-- Toast -->
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-<!-- Confirm Sheet -->
+<!-- ════ Confirm Sheet ════ -->
 <div class="ov" id="ovConfirm" role="dialog" aria-modal="true">
   <div class="modal confirm-sheet">
     <div class="modal-drag"></div>
@@ -45,7 +46,7 @@
   </div>
 </div>
 
-<!-- PIN Dialog -->
+<!-- ════ PIN Dialog ════ -->
 <div class="ov" id="ovPin" role="dialog" aria-modal="true" aria-label="ยืนยันตัวตน Admin">
   <div class="modal pin-sheet">
     <div class="modal-drag"></div>
@@ -79,7 +80,7 @@
 </div>
 <div id="syncBar"></div>
 
-<!-- Page: Today -->
+<!-- ════ Page: Today ════ -->
 <div class="page active" id="page-today">
   <div class="wrap">
     <!-- Date / Clock / Status card -->
@@ -99,6 +100,10 @@
         <div class="dc-next" id="dcNext"></div>
       </div>
     </div>
+
+    <!-- v2: Skip-meal warning banner -->
+    <div id="skipBanner" class="skip-banner" style="display:none" role="alert"></div>
+
     <div class="sec-title">📋 บันทึก / แจ้งเรื่อง</div>
     <div class="notes-card">
       <div class="notes-header">
@@ -107,12 +112,13 @@
       </div>
       <div class="notes-list" id="notesList"></div>
     </div>
+
     <div class="sec-title">🍖 การให้อาหาร</div>
     <div id="cards"></div>
   </div>
 </div>
 
-<!-- Page: Calendar -->
+<!-- ════ Page: Calendar ════ -->
 <div class="page" id="page-calendar">
   <div class="wrap">
     <div class="cal-nav">
@@ -125,6 +131,7 @@
       <span><i class="dot d-part"></i>บางมื้อ</span>
       <span><i class="dot d-miss"></i>ไม่มีบันทึก</span>
       <span><i class="dot d-note"></i>มีบันทึก</span>
+      <span><i class="dot d-skip"></i>ไม่กิน</span>
     </div>
     <div class="cal-grid" id="calGrid"></div>
 
@@ -138,7 +145,7 @@
   </div>
 </div>
 
-<!-- Page: Nutrition -->
+<!-- ════ Page: Nutrition ════ -->
 <div class="page" id="page-nutrition">
   <div class="nutr-wrap">
     <div class="nutr-edit-bar" style="display:none">
@@ -155,6 +162,23 @@
         <button class="btn-save-info" onclick="saveDogInfo()">บันทึกข้อมูล</button>
       </div>
     </div>
+
+    <!-- v2: cooked-weight info card -->
+    <div class="cooked-info">
+      <span class="ci-ico">🔥</span>
+      <div>
+        <div class="ci-head">น้ำหนักทั้งหมด = อาหารหลังปรุงสุก</div>
+        <div class="ci-body">เนื้อสัตว์/ผัก = ต้มหรืออบไม่ใส่น้ำมัน · กรัมที่แสดงคือน้ำหนักตอนเสิร์ฟ ไม่ใช่ตอนดิบ</div>
+      </div>
+    </div>
+
+    <!-- v2: search bar -->
+    <div class="search-wrap">
+      <span class="search-ico">🔍</span>
+      <input type="text" id="nutrSearch" class="search-input" placeholder="ค้นหาอาหาร / สิ่งที่ห้าม / เคล็ดลับ…" oninput="nutrSearch(this.value)">
+      <button class="search-clear" onclick="document.getElementById('nutrSearch').value='';nutrSearch('')" aria-label="ล้าง">✕</button>
+    </div>
+    <div class="search-hint" id="searchHint"></div>
 
     <button class="sec-toggle" onclick="toggleNutrSection('calcCard',this)">🧮 คำนวณอาหารต่อมื้อ <span class="st-arrow open">›</span></button>
     <div class="nutr-section is-open" id="calcCard">
@@ -207,8 +231,8 @@
         <div class="group-desc">เหมาะสำหรับ Toy Poodle อายุ 1 ปี ให้เป็นประจำได้</div>
       </div></div>
       <div class="food-item"><span class="fi-ico">🥩</span><div><div class="fi-name">อาหารเม็ด Small Breed Adult</div><div class="fi-note">เลือก formula สำหรับสุนัขโตพันธุ์เล็ก เช่น Royal Canin Toy Poodle, Hill's Science Diet เปลี่ยนจาก Puppy formula ได้แล้ว</div></div></div>
-      <div class="food-item"><span class="fi-ico">🐔</span><div><div class="fi-name">เนื้อไก่ (ปรุงสุก)</div><div class="fi-note">ต้มหรืออบ ไม่มีเกลือ ไม่มีเครื่องเทศ แยกกระดูกออกให้หมด แหล่งโปรตีนที่ดีที่สุด</div></div></div>
-      <div class="food-item"><span class="fi-ico">🐟</span><div><div class="fi-name">ปลาแซลมอน / ปลาทู (ปรุงสุก)</div><div class="fi-note">มี Omega-3 ดีต่อผิวหนังและขน ต้มหรืออบ ไม่ผัดน้ำมัน ระวังก้างชิ้นเล็ก</div></div></div>
+      <div class="food-item"><span class="fi-ico">🐔</span><div><div class="fi-name">เนื้อไก่ <span class="cooked-badge">🔥 สุก</span></div><div class="fi-note">ต้มหรืออบ ไม่มีเกลือ ไม่มีเครื่องเทศ แยกกระดูกออกให้หมด แหล่งโปรตีนที่ดีที่สุด · 165 kcal/100g</div></div></div>
+      <div class="food-item"><span class="fi-ico">🐟</span><div><div class="fi-name">ปลาแซลมอน / ปลาทู <span class="cooked-badge">🔥 สุก</span></div><div class="fi-note">มี Omega-3 ดีต่อผิวหนังและขน ต้มหรืออบ ไม่ผัดน้ำมัน ระวังก้างชิ้นเล็ก · 160 kcal/100g</div></div></div>
       <div class="food-item"><span class="fi-ico">🥕</span><div><div class="fi-name">แครอท</div><div class="fi-note">ดิบหรือต้มสุกก็ได้ ดีต่อฟัน มีเบต้าแคโรทีนสูง เหมาะเป็น treat แทนขนม</div></div></div>
       <div class="food-item"><span class="fi-ico">💧</span><div><div class="fi-name">น้ำสะอาดตลอดวัน</div><div class="fi-note">เปลี่ยนน้ำทุกวัน Toy Poodle ตัวเล็กมาก dehydrate ได้เร็ว ควรมีชามน้ำ 2 จุดในบ้าน</div></div></div>
     </div>
@@ -223,7 +247,7 @@
       <div class="food-item"><span class="fi-ico">🍎</span><div><div class="fi-name">แอปเปิ้ล (ไม่มีเมล็ด)</div><div class="fi-note">ต้องเอาเมล็ดและแกนออกทุกครั้ง เมล็ดมี amygdalin ซึ่งเป็นพิษ ให้เป็น treat</div></div></div>
       <div class="food-item"><span class="fi-ico">🫐</span><div><div class="fi-name">บลูเบอร์รี่</div><div class="fi-note">Antioxidant สูง ให้ 3–5 เม็ด/ครั้ง ไม่ควรให้มาก</div></div></div>
       <div class="food-item"><span class="fi-ico">🍚</span><div><div class="fi-name">ข้าวสุก (ข้าวกล้อง/ข้าวขาว)</div><div class="fi-note">ไม่ใส่เครื่องปรุงใดๆ ให้เป็นส่วนเสริม ไม่ใช่อาหารหลัก แหล่งคาร์โบไฮเดรต</div></div></div>
-      <div class="food-item"><span class="fi-ico">🥩</span><div><div class="fi-name">เนื้อวัว / เนื้อหมู (ปรุงสุก)</div><div class="fi-note">ต้มหรืออบ ไม่มีเกลือ ตัดมันออก ให้น้อยกว่าไก่ เนื่องจากไขมันสูงกว่า</div></div></div>
+      <div class="food-item"><span class="fi-ico">🥩</span><div><div class="fi-name">เนื้อวัว / เนื้อหมู <span class="cooked-badge">🔥 สุก</span></div><div class="fi-note">ต้มหรืออบ ไม่มีเกลือ ตัดมันออก ให้น้อยกว่าไก่ เนื่องจากไขมันสูงกว่า · 180 kcal/100g</div></div></div>
     </div>
     <div class="food-group">
       <div class="group-header"><div>
@@ -291,7 +315,7 @@
   </div>
 </div>
 
-<!-- Tab bar -->
+<!-- ════ Tab bar ════ -->
 <nav class="tabbar">
   <button class="tab active" onclick="showPage('today',this)" role="tab" aria-selected="true" aria-label="หน้าวันนี้">
     <span class="ico" aria-hidden="true">🏠</span>วันนี้
@@ -304,8 +328,7 @@
   </button>
 </nav>
 
-
-<!-- ═══ Feed Modal (3 steps) ═══ -->
+<!-- ════ Feed Modal (3 steps) ════ -->
 <div class="ov" id="ovFeed">
   <div class="modal">
     <div class="modal-drag"></div>
@@ -315,7 +338,6 @@
         <button class="btn-close" onclick="closeFeed()">✕</button>
       </div>
 
-      <!-- Step indicator -->
       <div class="steps">
         <div class="si active" id="si1">1</div>
         <div class="si-line" id="sl1"></div>
@@ -325,7 +347,6 @@
       </div>
       <div class="step-label" id="stepLabel">เลือกผู้ให้อาหาร</div>
 
-      <!-- Step 1: Who -->
       <div id="fmS1">
         <div class="feeder-grid" id="feederGrid"></div>
         <div class="feeder-other" id="feederOther" style="display:none">
@@ -333,7 +354,6 @@
         </div>
       </div>
 
-      <!-- Step 2: Food -->
       <div id="fmS2" style="display:none">
         <div class="food-list" id="foodList"></div>
         <div id="subMeat" style="display:none">
@@ -350,7 +370,6 @@
         </div>
       </div>
 
-      <!-- Step 3: Time -->
       <div id="fmS3" style="display:none">
         <div class="period-grid" id="periodGrid"></div>
         <div class="or-divider"><div class="or-line"></div><span class="or-text">หรือระบุเวลาจริง</span><div class="or-line"></div></div>
@@ -359,16 +378,15 @@
         </div>
       </div>
 
-      <!-- Nav buttons -->
       <div class="step-nav">
         <button class="btn-back" id="btnBack" style="display:none" onclick="prevStep()">‹ ย้อนกลับ</button>
         <button class="btn-next" id="btnNext" onclick="nextStep()">ถัดไป ›</button>
       </div>
-    </div><!-- /modal-inner -->
+    </div>
   </div>
 </div>
 
-<!-- ═══ Note Add Modal ═══ -->
+<!-- ════ Note Add Modal ════ -->
 <div class="ov" id="ovNote">
   <div class="modal">
     <div class="modal-drag"></div>
@@ -389,7 +407,7 @@
   </div>
 </div>
 
-<!-- ═══ Meal Detail Modal ═══ -->
+<!-- ════ Meal Detail Modal ════ -->
 <div class="ov" id="ovMealDetail">
   <div class="modal">
     <div class="modal-drag"></div>
@@ -403,7 +421,7 @@
   </div>
 </div>
 
-<!-- ═══ Day Detail Modal ═══ -->
+<!-- ════ Day Detail Modal ════ -->
 <div class="ov" id="ovDay">
   <div class="modal">
     <div class="modal-drag"></div>
@@ -417,7 +435,7 @@
   </div>
 </div>
 
-<!-- ═══ Settings Modal ═══ -->
+<!-- ════ Settings Modal ════ -->
 <div class="ov" id="ovSettings">
   <div class="modal">
     <div class="modal-drag"></div>
@@ -439,1181 +457,8 @@
   </div>
 </div>
 
-<script>
-// ── Constants ────────────────────────────────────────────────────────
-const MEALS = [
-  { id:'morning', label:'มื้อเช้า',    icon:'🌅' },
-  { id:'noon',    label:'มื้อกลางวัน',icon:'☀️' },
-  { id:'evening', label:'มื้อเย็น',   icon:'🌆' },
-  { id:'night',   label:'มื้อดึก',    icon:'🌙' },
-];
-const FEEDERS = [
-  { code:'PP', name:'ปาป๊า'  },
-  { code:'MM', name:'มาม๊า'  },
-  { code:'JN', name:'เจ้นัท' },
-  { code:'LL', name:'เฮียหลิว' },
-  { code:'NT', name:'น้องธิป' },
-  { code:'JK', name:'เจ้กุง' },
-];
-const FOOD_TYPES = [
-  { id:'dry',          label:'อาหารเม็ดอย่างเดียว',                   meat:false, veg:false },
-  { id:'dry+meat',     label:'อาหารเม็ดผสมเนื้อสัตว์',               meat:true,  veg:false },
-  { id:'dry+meat+veg', label:'อาหารเม็ดผสมเนื้อสัตว์และผัก',         meat:true,  veg:true  },
-  { id:'dry+wet',      label:'อาหารเม็ดผสมอาหารเปียก',               meat:false, veg:false },
-  { id:'wet',          label:'อาหารเปียกอย่างเดียว',                  meat:false, veg:false },
-];
-const MEATS = ['🐷 หมู','🐔 ไก่','🐟 ปลา','🐊 จรเข้','🥚 ไข่ไก่'];
-const VEGS  = ['🥬 ผักกาดขาว','🥕 แครอท','🥦 กะหล่ำปลี','🫛 หัวไช้เท้า','🥦 บรอคเคอลี่'];
-const PERIODS = [
-  { id:'morning',  icon:'🌅', name:'ช่วงเช้า',    range:'5:00 – 12:00',  h:[5,12]  },
-  { id:'noon',     icon:'☀️', name:'ช่วงกลางวัน', range:'12:00 – 17:00', h:[12,17] },
-  { id:'evening',  icon:'🌆', name:'ช่วงค่ำ',      range:'17:00 – 24:00', h:[17,24] },
-  { id:'midnight', icon:'🌙', name:'ช่วงเที่ยงคืน',range:'0:00 – 5:00',   h:[0,5]   },
-];
-const DAYS_S   = ['อา','จ','อ','พ','พฤ','ศ','ส'];
-const DAYS_F   = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัส','ศุกร์','เสาร์'];
-const MONTHS_S = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-const MONTHS_F = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
-                  'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
-
-// ── Storage ──────────────────────────────────────────────────────────
-function getCfg() {
-  const cfg = JSON.parse(localStorage.getItem('cfg')||'null') || { name:'มอคค่า', times:['07:00','12:00','18:00','21:00'] };
-  if (!Array.isArray(cfg.times)) cfg.times = [];
-  while (cfg.times.length < 4) cfg.times.push('21:00');
-  return cfg;
-}
-function todayKey() { const d=new Date(); return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; }
-function getLog(k) { return (JSON.parse(localStorage.getItem('log')||'{}')||{})[k||todayKey()]||{}; }
-function writeLog(id, val) {
-  const all = JSON.parse(localStorage.getItem('log')||'{}'), k = todayKey();
-  if (!all[k]) all[k]={};
-  if (val===null) delete all[k][id]; else all[k][id]=val;
-  const ks=Object.keys(all).sort(); while(ks.length>60) delete all[ks.shift()];
-  localStorage.setItem('log', JSON.stringify(all));
-  // ── Firebase sync ──
-  if (!window.db) return;
-  try {
-    const ref = window.db.collection('logs').doc(k);
-    if (val===null) {
-      const u={}; u[id]=firebase.firestore.FieldValue.delete();
-      ref.update(u).catch(()=>{});
-    } else {
-      const s={}; s[id]=val;
-      ref.set(s, { merge:true });
-    }
-  } catch(e) { console.warn('writeLog Firebase error:', e); }
-}
-function getNotes(k) { return (JSON.parse(localStorage.getItem('notes')||'{}')||{})[k||todayKey()]||[]; }
-function saveNotes(arr, k) {
-  const key = k||todayKey();
-  const all = JSON.parse(localStorage.getItem('notes')||'{}');
-  all[key] = arr;
-  const ks=Object.keys(all).sort(); while(ks.length>60) delete all[ks.shift()];
-  localStorage.setItem('notes', JSON.stringify(all));
-  // ── Firebase sync ──
-  if (!window.db) return;
-  try { window.db.collection('notes').doc(key).set({ items: arr }); }
-  catch(e) { console.warn('saveNotes Firebase error:', e); }
-}
-function asFed(v) { if (!v) return null; return typeof v==='string' ? {time:v,by:'',food:''} : v; }
-
-// ── Header ───────────────────────────────────────────────────────────
-function renderHeader() {
-  document.getElementById('hdrName').textContent = 'Mocha';
-  renderDateCard();
-}
-
-function renderDateCard() {
-  const cfg=getCfg(), log=getLog(), now=new Date();
-  const dayEl=document.getElementById('dcDay'), dateEl=document.getElementById('dcDate');
-  if (dayEl) dayEl.textContent = DAYS_F[now.getDay()];
-  if (dateEl) dateEl.textContent = `${now.getDate()} ${MONTHS_F[now.getMonth()]} ${now.getFullYear()+543}`;
-
-  let nextMin=Infinity, nextLabel='';
-  MEALS.forEach((m,i) => {
-    if (log[m.id]) return;
-    const [h,mn]=cfg.times[i].split(':').map(Number);
-    const t=new Date(now); t.setHours(h,mn,0,0);
-    const diff=Math.round((t-now)/60000);
-    if (diff>0 && diff<nextMin) { nextMin=diff; nextLabel=m.label; }
-  });
-  const el=document.getElementById('dcNext');
-  if (!el) return;
-  if (MEALS.every(m=>log[m.id])) { el.textContent='✓ ครบทุกมื้อแล้ว'; el.className='dc-next all'; }
-  else if (nextLabel) {
-    const h=Math.floor(nextMin/60), mn=nextMin%60;
-    el.textContent=`${nextLabel} อีก ${h?h+'ชม. ':''}${mn}น.`;
-    el.className=`dc-next${nextMin<=30?' soon':''}`;
-  } else { el.textContent=''; el.className='dc-next'; }
-}
-
-function tickClock() {
-  const now=new Date(), el=document.getElementById('dcClock');
-  if (el) el.textContent=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
-}
-
-// ── Notes ────────────────────────────────────────────────────────────
-function renderNotes() {
-  const list = document.getElementById('notesList');
-  const notes = getNotes();
-  const active = notes.filter(n => !n.deleted);
-  if (!active.length) { list.innerHTML='<div class="notes-empty">ยังไม่มีบันทึกวันนี้</div>'; return; }
-  const PRI = { high:0, mid:1, low:2 };
-  const sorted = [...active].sort((a,b) => (PRI[a.priority||'mid']||1) - (PRI[b.priority||'mid']||1));
-  list.innerHTML = sorted.map(n => {
-    const dotClass = `pri-dot pri-dot-${n.priority||'mid'}`;
-    return `
-    <div class="note-item" id="note-${n.id}">
-      <div class="${dotClass}"></div>
-      <div class="note-check${n.done?' done':''}" onclick="toggleNoteDone(${n.id})">${n.done?'✓':''}</div>
-      <div class="note-body">
-        <div class="note-text-row">
-          <span class="note-text${n.done?' done':''}" onclick="startEditNote(${n.id})">${escHtml(n.text)}</span>
-          <button class="note-del-x" onclick="deleteNote(${n.id})">×</button>
-        </div>
-        <div class="note-meta">${n.time}${n.by?' • '+n.by:''}</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-let notePri = 'mid';
-function setPri(p) {
-  notePri = p;
-  ['high','mid','low'].forEach(x => {
-    const el = document.getElementById(`ps-${x}`);
-    if (el) el.classList.toggle('active', x===p);
-  });
-}
-
-function openNoteModal() {
-  document.getElementById('noteTextInput').value='';
-  notePri = 'mid'; setPri('mid');
-  document.getElementById('ovNote').classList.add('open');
-  setTimeout(()=>document.getElementById('noteTextInput').focus(),120);
-}
-function closeNoteModal() { document.getElementById('ovNote').classList.remove('open'); }
-
-function saveNote() {
-  const text = document.getElementById('noteTextInput').value.trim();
-  if (!text) return;
-  const now=new Date();
-  const time=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-  const notes=getNotes();
-  notes.push({ id:Date.now(), text, time, done:false, priority:notePri });
-  saveNotes(notes); closeNoteModal(); renderNotes();
-}
-
-function toggleNoteDone(id) {
-  const notes=getNotes();
-  const n=notes.find(x=>x.id===id); if (n) n.done=!n.done;
-  saveNotes(notes); renderNotes();
-}
-
-function startEditNote(id) {
-  const notes=getNotes(), n=notes.find(x=>x.id===id); if (!n) return;
-  const el=document.getElementById(`note-${id}`);
-  el.innerHTML=`
-    <div class="note-body" style="flex:1">
-      <div class="note-edit-row">
-        <input class="note-edit-input" id="edit-${id}" value="${escHtml(n.text)}">
-        <button class="btn-icon" onclick="saveEditNote(${id})">✓</button>
-        <button class="btn-icon" onclick="renderNotes()">✕</button>
-      </div>
-    </div>`;
-  document.getElementById(`edit-${id}`).focus();
-}
-
-function saveEditNote(id) {
-  const val=document.getElementById(`edit-${id}`).value.trim(); if (!val) return;
-  const notes=getNotes(), n=notes.find(x=>x.id===id); if (n) n.text=val;
-  saveNotes(notes); renderNotes();
-}
-
-function deleteNote(id) {
-  showConfirm('ลบบันทึกนี้?\nยังปรากฏในปฏิทิน', () => {
-    const notes=getNotes(), n=notes.find(x=>x.id===id);
-    if(n) n.deleted=true;
-    saveNotes(notes); renderNotes(); showToast('ลบบันทึกแล้ว','ok');
-  }, '🗑', 'ลบ', true);
-}
-
-// ── Today ────────────────────────────────────────────────────────────
-function renderToday() {
-  const cfg=getCfg(), log=getLog(), now=new Date(), c=document.getElementById('cards');
-  if (!c) return;
-  const frag=document.createDocumentFragment();
-  MEALS.forEach((meal,i) => {
-    const t=cfg.times?.[i] || '00:00', fed=asFed(log[meal.id]);
-    const parts=t.split(':'), h=Number(parts[0])||0, mn=Number(parts[1])||0;
-    const mt=new Date(now); mt.setHours(h,mn,0,0);
-    const overdue=!fed && now>mt;
-    const card=document.createElement('div');
-    card.className=`meal-sq${fed?' fed':overdue?' overdue':''}`;
-
-    if (fed) {
-      const info = [fed.by, fed.food].filter(Boolean).join(' · ');
-      card.innerHTML=`
-        <div class="sq-top" onclick="openMealDetail('${meal.id}','${meal.label}',${i})">
-          <span class="sq-ico">${meal.icon}</span>
-          <span class="badge done">✓</span>
-        </div>
-        <div class="sq-name" onclick="openMealDetail('${meal.id}','${meal.label}',${i})">${meal.label}</div>
-        <div class="sq-time" onclick="openMealDetail('${meal.id}','${meal.label}',${i})">${t} น.</div>
-        ${fed.time ? `<div class="sq-fed-time" onclick="openMealDetail('${meal.id}','${meal.label}',${i})">${fed.time}</div>` : ''}
-        ${info ? `<div class="sq-info" onclick="openMealDetail('${meal.id}','${meal.label}',${i})">${info}</div>` : ''}
-        <button class="sq-undo" onclick="event.stopPropagation();undoFeed('${meal.id}')">↩ ยกเลิก</button>`;
-    } else {
-      const badge = overdue
-        ? `<span class="badge overdue">⚠</span>`
-        : `<span class="badge pending">รอ</span>`;
-      card.innerHTML=`
-        <div class="sq-top">
-          <span class="sq-ico">${meal.icon}</span>
-          ${badge}
-        </div>
-        <div class="sq-name">${meal.label}</div>
-        <div class="sq-time">${t} น.</div>
-        <button class="sq-feed" onclick="openFeed('${meal.id}')">ให้อาหาร</button>`;
-    }
-    frag.appendChild(card);
-  });
-  c.innerHTML='';
-  c.appendChild(frag);
-}
-
-function undoFeed(id) { writeLog(id,null); renderToday(); renderHeader(); }
-
-function openMealDetail(id, label, idx) {
-  const fed = asFed(getLog()[id]); if (!fed) return;
-  document.getElementById('mdTitle').textContent = label;
-  const total = fed.portions?.reduce((s,p)=>s+p.kcal,0) || 0;
-  const rows = fed.portions?.length
-    ? fed.portions.map(p=>`
-        <div class="md-row">
-          <div class="md-label">${p.label}</div>
-          <div class="md-bar-wrap"><div class="md-bar" style="width:${Math.min(100,Math.round(p.g*1.5))}%"></div></div>
-          <div class="md-nums"><strong>${p.g}g</strong><span>${p.kcal} kcal</span></div>
-        </div>`).join('')
-    : `<div style="font-size:.85rem;color:var(--t2);padding:8px 0">${fed.food||'ไม่มีข้อมูลสัดส่วน'}</div>`;
-  document.getElementById('mdBody').innerHTML=`
-    <div class="md-meta">${fed.by?'<span>👤 '+fed.by+'</span>':''}<span>🕐 ${fed.time||''}</span></div>
-    ${rows}
-    ${total?`<div class="md-total">รวม <strong>${total} kcal</strong></div>`:''}
-    <button class="btn-undo" style="margin-top:14px" onclick="closeMealDetail();undoFeed('${id}')">↩ ยกเลิกการบันทึก</button>`;
-  document.getElementById('ovMealDetail').classList.add('open');
-}
-function closeMealDetail() { document.getElementById('ovMealDetail').classList.remove('open'); }
-
-// ── Feed Modal ───────────────────────────────────────────────────────
-let pendingId=null, feedStep=1;
-let selFeeder=null, customFeederVal='';
-let selFoodType=null;
-let selMeats=new Set(), selVegs=new Set();
-let selPeriod=null, selCustomTime='';
-
-function openFeed(id) {
-  pendingId=id; feedStep=1;
-  selFeeder=localStorage.getItem('lastFeeder')||null;
-  selFoodType=localStorage.getItem('lastFoodType')||null;
-  selMeats=new Set(JSON.parse(localStorage.getItem('lastMeats')||'[]'));
-  selVegs=new Set(JSON.parse(localStorage.getItem('lastVegs')||'[]'));
-  selPeriod=autoDetectPeriod(); selCustomTime='';
-
-  document.getElementById('fmMealLabel').textContent = `บันทึก: ${MEALS.find(m=>m.id===id).label}`;
-  buildFeederGrid(); buildFoodList(); buildPeriodGrid(); buildChips();
-  setStep(1);
-  document.getElementById('ovFeed').classList.add('open');
-}
-
-function closeFeed() { document.getElementById('ovFeed').classList.remove('open'); pendingId=null; }
-
-function autoDetectPeriod() {
-  const h=new Date().getHours();
-  if (h>=5&&h<12) return 'morning';
-  if (h>=12&&h<17) return 'noon';
-  if (h>=17) return 'evening';
-  return 'midnight';
-}
-
-function buildFeederGrid() {
-  const g=document.getElementById('feederGrid');
-  g.innerHTML = FEEDERS.map(f=>`
-    <div class="feeder-btn${selFeeder===f.code?' sel':''}" id="fb-${f.code}" onclick="pickFeeder('${f.code}')">
-      <div class="fb-code">${f.code}</div>
-      <div class="fb-name">${f.name}</div>
-    </div>`).join('') +
-    `<div class="feeder-btn${selFeeder==='other'?' sel':''}" id="fb-other" onclick="pickFeeder('other')">
-      <div class="fb-code" style="font-size:.85rem">อื่นๆ</div>
-      <div class="fb-name">ระบุชื่อ</div>
-    </div>`;
-  document.getElementById('feederOther').style.display = selFeeder==='other'?'block':'none';
-}
-
-function pickFeeder(code) {
-  selFeeder=code;
-  document.querySelectorAll('.feeder-btn').forEach(b=>b.classList.remove('sel'));
-  document.getElementById(`fb-${code}`)?.classList.add('sel');
-  document.getElementById('feederOther').style.display = code==='other'?'block':'none';
-  if (code!=='other') document.getElementById('customFeederTxt').value='';
-}
-
-function buildFoodList() {
-  document.getElementById('foodList').innerHTML = FOOD_TYPES.map(f=>`
-    <div class="food-btn${selFoodType===f.id?' sel':''}" id="ft-${f.id}" onclick="pickFoodType('${f.id}')">
-      ${f.label}
-    </div>`).join('');
-  updateSubOptions();
-}
-
-function pickFoodType(id) {
-  selFoodType=id;
-  document.querySelectorAll('.food-btn').forEach(b=>b.classList.remove('sel'));
-  document.getElementById(`ft-${id}`)?.classList.add('sel');
-  const ft=FOOD_TYPES.find(f=>f.id===id);
-  if (!ft.meat) selMeats=new Set();
-  if (!ft.veg)  selVegs=new Set();
-  updateSubOptions();
-}
-
-function updateSubOptions() {
-  const ft=FOOD_TYPES.find(f=>f.id===selFoodType)||{meat:false,veg:false};
-  document.getElementById('subMeat').style.display = ft.meat ? 'block' : 'none';
-  document.getElementById('subVeg').style.display  = ft.veg  ? 'block' : 'none';
-}
-
-function buildChips() {
-  document.getElementById('meatChips').innerHTML = MEATS.map(m=>`
-    <span class="chip${selMeats.has(m)?' sel':''}" onclick="toggleChip('meat','${m}')">${m}</span>`).join('');
-  document.getElementById('vegChips').innerHTML = VEGS.map(v=>`
-    <span class="chip${selVegs.has(v)?' sel':''}" onclick="toggleChip('veg','${v}')">${v}</span>`).join('');
-}
-
-function toggleChip(type, val) {
-  const set = type==='meat' ? selMeats : selVegs;
-  set.has(val) ? set.delete(val) : set.add(val);
-  buildChips();
-}
-
-function buildPeriodGrid() {
-  document.getElementById('periodGrid').innerHTML = PERIODS.map(p=>`
-    <div class="period-btn${selPeriod===p.id?' sel':''}" id="pp-${p.id}" onclick="pickPeriod('${p.id}')">
-      <div class="pico">${p.icon}</div>
-      <div class="pname">${p.name}</div>
-      <div class="prange">${p.range}</div>
-    </div>`).join('');
-  const now=new Date();
-  document.getElementById('customTime').value =
-    `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-}
-
-function pickPeriod(id) {
-  selPeriod=id; selCustomTime='';
-  document.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('sel'));
-  document.getElementById(`pp-${id}`)?.classList.add('sel');
-}
-
-function onCustomTime() {
-  selCustomTime=document.getElementById('customTime').value;
-  selPeriod='custom';
-  document.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('sel'));
-}
-
-// Steps
-const STEP_LABELS=['เลือกผู้ให้อาหาร','เลือกประเภทอาหาร','เวลาที่ให้'];
-function setStep(n) {
-  feedStep=n;
-  ['fmS1','fmS2','fmS3'].forEach((id,i) => {
-    document.getElementById(id).style.display = i+1===n ? 'block' : 'none';
-  });
-  ['si1','si2','si3'].forEach((id,i) => {
-    const el=document.getElementById(id);
-    el.className = i+1<n ? 'si done' : i+1===n ? 'si active' : 'si';
-    el.textContent = i+1<n ? '✓' : i+1;
-  });
-  ['sl1','sl2'].forEach((id,i) => {
-    document.getElementById(id).className = n>i+2 ? 'si-line done' : 'si-line';
-  });
-  document.getElementById('stepLabel').textContent = STEP_LABELS[n-1];
-  document.getElementById('btnBack').style.display = n>1 ? 'block' : 'none';
-  document.getElementById('btnNext').textContent = n===3 ? '✓ บันทึก' : 'ถัดไป ›';
-}
-
-function nextStep() {
-  if (feedStep===1) {
-    if (!selFeeder) { showToast('เลือกผู้ให้อาหารด้วย','warn'); return; }
-    if (selFeeder==='other' && !document.getElementById('customFeederTxt').value.trim()) {
-      showToast('พิมพ์ชื่อผู้ให้อาหารด้วย','warn'); return;
-    }
-    setStep(2);
-  } else if (feedStep===2) {
-    if (!selFoodType) { showToast('เลือกประเภทอาหารด้วย','warn'); return; }
-    setStep(3);
-  } else {
-    confirmFeed();
-  }
-}
-function prevStep() { if (feedStep>1) setStep(feedStep-1); }
-
-function confirmFeed() {
-  const feederName = selFeeder==='other'
-    ? (document.getElementById('customFeederTxt').value.trim()||'อื่นๆ')
-    : (FEEDERS.find(f=>f.code===selFeeder)?.name||selFeeder);
-  const ft=FOOD_TYPES.find(f=>f.id===selFoodType);
-  let foodLabel=ft?.label||'';
-  if (ft?.meat && selMeats.size) foodLabel+=` (${[...selMeats].map(m=>m.split(' ')[1]).join(', ')})`;
-  if (ft?.veg && selVegs.size) foodLabel+=` + ${[...selVegs].map(v=>v.split(' ')[1]).join(', ')}`;
-
-  const timeLabel = selCustomTime
-    ? `${selCustomTime} น.`
-    : (PERIODS.find(p=>p.id===selPeriod)?.name || '');
-
-  // compute portions for detail popup
-  const _info=getDogInfo(), _w=parseFloat(_info.weight);
-  let portions=[];
-  if (_w && ft) {
-    const _per=Math.round(Math.round(70*Math.pow(_w,.75))*1.6/getCfg().times.length);
-    if (ft.id==='dry') {
-      portions=[{label:'อาหารเม็ด',g:Math.round(_per/370*100),kcal:_per}];
-    } else {
-      const mr=ft.id==='dry+meat'?.25:.20;
-      const mk=Math.round(_per*mr), dk=ft.id==='dry+meat'?_per-mk:Math.round(_per*.75);
-      const mkey=[...selMeats][0]||'🐔 ไก่', mkc=MEAT_DATA[mkey]?.kcal||165;
-      portions=[{label:'อาหารเม็ด',g:Math.round(dk/370*100),kcal:dk},{label:mkey+' (ต้ม/อบ)',g:Math.round(mk/mkc*100),kcal:mk}];
-      if (ft.id==='dry+meat+veg'&&selVegs.size) portions.push({label:[...selVegs][0]||'ผัก',g:15,kcal:_per-dk-mk});
-    }
-  }
-  writeLog(pendingId, { time:timeLabel, by:feederName, food:foodLabel, portions });
-
-  localStorage.setItem('lastFeeder', selFeeder);
-  localStorage.setItem('lastFoodType', selFoodType);
-  localStorage.setItem('lastMeats', JSON.stringify([...selMeats]));
-  localStorage.setItem('lastVegs', JSON.stringify([...selVegs]));
-
-  closeFeed();
-  if (navigator.vibrate) navigator.vibrate([30,10,30]);
-  renderToday(); renderHeader();
-}
-
-// ── Calendar ─────────────────────────────────────────────────────────
-let calY=new Date().getFullYear(), calM=new Date().getMonth();
-
-function calPrev() { calM--; if(calM<0){calM=11;calY--;} renderCalendar(); }
-function calNext() {
-  const n=new Date();
-  if (calY>n.getFullYear()||(calY===n.getFullYear()&&calM>=n.getMonth())) return;
-  calM++; if(calM>11){calM=0;calY++;} renderCalendar();
-}
-
-function renderCalendar() {
-  document.getElementById('calTitle').textContent=`${MONTHS_F[calM]} ${calY+543}`;
-  const allLog=JSON.parse(localStorage.getItem('log')||'{}');
-  const allNotes=JSON.parse(localStorage.getItem('notes')||'{}');
-  const today=new Date(), grid=document.getElementById('calGrid');
-  grid.innerHTML='';
-  DAYS_S.forEach(d=>{const el=document.createElement('div');el.className='dow';el.textContent=d;grid.appendChild(el);});
-  const firstDow=new Date(calY,calM,1).getDay();
-  const lastDate=new Date(calY,calM+1,0).getDate();
-  for(let i=0;i<firstDow;i++){const el=document.createElement('div');el.className='cday empty';grid.appendChild(el);}
-  for(let d=1;d<=lastDate;d++){
-    const key=`${calY}-${calM+1}-${d}`;
-    const dl=allLog[key]||{}, cnt=MEALS.filter(m=>dl[m.id]).length;
-    const notes=(allNotes[key]||[]).length>0;
-    const isToday=new Date(calY,calM,d).toDateString()===today.toDateString();
-    const isPast=new Date(calY,calM,d)<new Date(today.getFullYear(),today.getMonth(),today.getDate());
-    const el=document.createElement('div');
-    el.className='cday'; el.textContent=d;
-    if(isToday) el.classList.add('is-today');
-    if(cnt===4) el.classList.add('full');
-    else if(cnt>0) el.classList.add('partial');
-    else if(isPast&&!isToday) el.classList.add('missed');
-    if(notes){const dot=document.createElement('div');dot.className='cnote';el.appendChild(dot);}
-    if(cnt>0||notes||isToday) el.onclick=()=>openDay(key,d);
-    grid.appendChild(el);
-  }
-}
-
-// ── Day detail ────────────────────────────────────────────────────────
-function openDay(key, d) {
-  const allLog=JSON.parse(localStorage.getItem('log')||'{}');
-  const allNotes=JSON.parse(localStorage.getItem('notes')||'{}');
-  const dl=allLog[key]||{}, dayNotes=allNotes[key]||[];
-  document.getElementById('dayTitle').textContent=`${d} ${MONTHS_S[calM]} ${calY+543}`;
-  const body=document.getElementById('dayBody');
-  body.innerHTML='';
-  MEALS.forEach(meal=>{
-    const fed=asFed(dl[meal.id]);
-    const el=document.createElement('div'); el.className='dd-item';
-    el.innerHTML=`<span class="dd-ico">${meal.icon}</span><div>
-      <div class="dd-name">${meal.label}</div>
-      ${fed
-        ?`<div class="dd-info"><span class="hi">${fed.time}</span>${fed.by?` • ${fed.by}`:''}${fed.food?`<br>${fed.food}`:''}</div>`
-        :`<div class="dd-none">ไม่มีบันทึก</div>`}
-    </div>`;
-    body.appendChild(el);
-  });
-  if(dayNotes.length){
-    const h=document.createElement('div');
-    h.style.cssText='font-size:.72rem;color:var(--t2);font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-top:14px;margin-bottom:4px';
-    h.textContent='📋 บันทึก';
-    body.appendChild(h);
-    dayNotes.forEach(n=>{
-      const el=document.createElement('div');
-      el.className=`dd-note-item${n.done?' done':''}${n.deleted?' dd-deleted':''}`;
-      el.innerHTML=`<div class="dd-note-text">${escHtml(n.text)}</div><div class="dd-note-time">${n.time}${n.by?' • '+n.by:''}${n.deleted?' · ลบแล้ว':''}</div>`;
-      body.appendChild(el);
-    });
-  }
-  if (localStorage.getItem('adminPin')) {
-    const editBtn=document.createElement('button');
-    editBtn.className='btn-undo'; editBtn.style.marginTop='16px';
-    editBtn.textContent='🔐 แก้ไขบันทึก (Admin)';
-    editBtn.onclick=()=>adminEditDay(key,d);
-    body.appendChild(editBtn);
-  }
-  document.getElementById('ovDay').classList.add('open');
-}
-function closeDay() { document.getElementById('ovDay').classList.remove('open'); }
-
-function adminEditDay(key, d) {
-  showPin(() => {
-    const allLog=JSON.parse(localStorage.getItem('log')||'{}'), dl=allLog[key]||{};
-    const checks=MEALS.map(m=>`
-      <label style="display:flex;align-items:center;gap:10px;padding:10px 0;border-top:.5px solid var(--sep);font-size:.9rem;cursor:pointer">
-        <input type="checkbox" id="ae-${m.id}" ${dl[m.id]?'checked':''} style="width:22px;height:22px;accent-color:var(--tint)">
-        ${m.icon} ${m.label}
-      </label>`).join('');
-    const body=document.getElementById('dayBody');
-    body.innerHTML=`<div style="font-size:.78rem;color:var(--warn);margin-bottom:12px;font-weight:700">✏️ โหมดแก้ไข Admin — ${d} ${MONTHS_S[calM]} ${calY+543}</div>
-      ${checks}
-      <button class="btn-save" style="margin-top:16px" onclick="saveAdminEdit('${key}')">บันทึกการแก้ไข</button>
-      <button class="btn-undo" style="margin-top:8px" onclick="openDay('${key}',${d})">ยกเลิก</button>`;
-  });
-}
-
-function saveAdminEdit(key) {
-  const allLog=JSON.parse(localStorage.getItem('log')||'{}');
-  if(!allLog[key]) allLog[key]={};
-  MEALS.forEach(m=>{
-    const checked=document.getElementById(`ae-${m.id}`)?.checked;
-    if(checked && !allLog[key][m.id]) allLog[key][m.id]={time:'(Admin)',by:'Admin',food:''};
-    if(!checked) delete allLog[key][m.id];
-  });
-  localStorage.setItem('log',JSON.stringify(allLog));
-  if(window.db) try{ window.db.collection('logs').doc(key).set(allLog[key]||{}); }catch(e){}
-  closeDay(); renderCalendar(); renderDash();
-  showToast('บันทึกการแก้ไขเรียบร้อย','ok');
-}
-
-// ── Settings ──────────────────────────────────────────────────────────
-function goEditProfile() {
-  closeSettings();
-  const nutritionBtn = document.querySelector('.tab:nth-child(3)');
-  showPage('nutrition', nutritionBtn || document.querySelectorAll('.tab')[2]);
-  if (!isEditing) toggleEdit();
-}
-
-function openSettings() {
-  const cfg=getCfg();
-  document.getElementById('cfg0').value=cfg.times[0];
-  document.getElementById('cfg1').value=cfg.times[1];
-  document.getElementById('cfg2').value=cfg.times[2];
-  document.getElementById('cfg3').value=cfg.times[3]||'21:00';
-  updateNotifBtn();
-  document.getElementById('ovSettings').classList.add('open');
-}
-function closeSettings() { document.getElementById('ovSettings').classList.remove('open'); }
-function saveSettings() {
-  const prev = getCfg();
-  const cfg = {
-    name: prev.name,
-    times:[document.getElementById('cfg0').value,document.getElementById('cfg1').value,document.getElementById('cfg2').value,document.getElementById('cfg3').value],
-  };
-  localStorage.setItem('cfg', JSON.stringify(cfg));
-  // ── Firebase sync ──
-  if (window.db) try { window.db.collection('config').doc('dog').set(cfg); } catch(e){}
-  closeSettings(); renderHeader(); renderToday();
-}
-
-// ── Notifications ─────────────────────────────────────────────────────
-async function reqNotif() {
-  if (!('Notification' in window)){showToast('เบราว์เซอร์ไม่รองรับการแจ้งเตือน','err');return;}
-  await Notification.requestPermission(); updateNotifBtn();
-}
-function updateNotifBtn() {
-  const ok='Notification' in window && Notification.permission==='granted';
-  const b=document.getElementById('notifBtn'); if(!b) return;
-  b.textContent=ok?'✓ เปิดการแจ้งเตือนแล้ว':'🔔 เปิดการแจ้งเตือน';
-  b.className=`btn-notif${ok?' on':''}`;
-}
-function checkNotif() {
-  if(!('Notification' in window)||Notification.permission!=='granted') return;
-  const cfg=getCfg(),log=getLog(),now=new Date();
-  const nd=JSON.parse(localStorage.getItem('nd')||'{}');
-  MEALS.forEach((meal,i)=>{
-    if(log[meal.id]) return;
-    const [h,mn]=cfg.times[i].split(':').map(Number);
-    const mt=new Date(now); mt.setHours(h,mn,0,0);
-    const diff=Math.round((mt-now)/60000);
-    const k15=`p-${meal.id}-${todayKey()}`, k0=`n-${meal.id}-${todayKey()}`;
-    if(diff===15&&!nd[k15]){new Notification(`อีก 15 นาที — ${meal.label} 🐾`,{body:`เตรียมให้อาหาร ${cfg.name}`,icon:'icon.svg',tag:k15});nd[k15]=true;}
-    if(diff===0&&!nd[k0]){new Notification(`ถึงเวลา${meal.label}! 🍖`,{body:`ให้อาหาร ${cfg.name} ได้เลย`,icon:'icon.svg',tag:k0});nd[k0]=true;}
-  });
-  localStorage.setItem('nd',JSON.stringify(nd));
-}
-
-// ── Nav ───────────────────────────────────────────────────────────────
-function showPage(name, btn) {
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t=>{ t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
-  document.getElementById(`page-${name}`).classList.add('active');
-  btn.classList.add('active'); btn.setAttribute('aria-selected','true');
-  if(name==='calendar') { renderCalendar(); renderDash(); }
-  if(name==='nutrition') { renderInfo(); renderCalc(); renderFoodProducts(); }
-}
-
-// ── Overlay dismiss ────────────────────────────────────────────────────
-[['ovFeed',closeFeed],['ovNote',closeNoteModal],['ovDay',closeDay],['ovSettings',closeSettings],['ovMealDetail',closeMealDetail],['ovConfirm',confirmNo],['ovPin',closePin]].forEach(([id,fn])=>{
-  document.getElementById(id).addEventListener('click',e=>{if(e.target===e.currentTarget) fn();});
-});
-
-// ── Firebase real-time sync ────────────────────────────────────────────
-function setSyncStatus(state, detail) {
-  const bar=document.getElementById('syncBar');
-  const dot=document.getElementById('dcDot');
-  const txt=document.getElementById('dcSyncTxt');
-  if (state==='ok') {
-    if (bar) bar.style.display='none';
-    if (dot) dot.style.background='var(--ok)';
-    if (txt) txt.textContent='เชื่อมต่อแล้ว';
-  } else if (state==='off') {
-    if (bar) { bar.style.display='block'; bar.style.color='var(--err)'; bar.innerHTML='🔴 ออฟไลน์ — <span style="text-decoration:underline;cursor:pointer" onclick="location.reload()">แตะเพื่อ refresh</span>'; }
-    if (dot) dot.style.background='var(--err)';
-    if (txt) txt.textContent='ออฟไลน์';
-  } else {
-    if (bar) { bar.style.display='block'; bar.style.color='var(--t3)'; bar.textContent='⏳ กำลังเชื่อมต่อ…'; }
-    if (dot) dot.style.background='var(--t3)';
-    if (txt) txt.textContent='กำลังเชื่อมต่อ…';
-  }
-  if (detail) console.warn('[Sync]', detail);
-}
-
-function startSync() {
-  if (!window.db) {
-    setSyncStatus('off', 'window.db is null — Firebase SDK not loaded or old cache active');
-    return;
-  }
-
-  const k = todayKey();
-
-  // Listen: feeding log วันนี้
-  window.db.collection('logs').doc(k).onSnapshot(snap => {
-    setSyncStatus('ok');
-    const data = snap.data() || {};
-    const all = JSON.parse(localStorage.getItem('log')||'{}');
-    if (JSON.stringify(all[k]) === JSON.stringify(data)) return;
-    all[k] = data;
-    localStorage.setItem('log', JSON.stringify(all));
-    renderToday(); renderHeader();
-  }, err => { console.warn('log snapshot error:', err); setSyncStatus('off'); });
-
-  // Listen: notes วันนี้
-  window.db.collection('notes').doc(k).onSnapshot(snap => {
-    const items = (snap.data()||{}).items || [];
-    const all = JSON.parse(localStorage.getItem('notes')||'{}');
-    if (JSON.stringify(all[k]) === JSON.stringify(items)) return;
-    all[k] = items;
-    localStorage.setItem('notes', JSON.stringify(all));
-    renderNotes();
-  }, err => console.warn('notes snapshot error:', err));
-
-  // Listen: dog profile (nutrition page)
-  window.db.collection('config').doc('profile').onSnapshot(snap => {
-    const data = snap.data(); if (!data) return;
-    if (localStorage.getItem('dogInfo') === JSON.stringify(data)) return;
-    localStorage.setItem('dogInfo', JSON.stringify(data));
-    renderInfo();
-  }, err => console.warn('profile snapshot error:', err));
-
-  // Listen: dog config
-  window.db.collection('config').doc('dog').onSnapshot(snap => {
-    const data = snap.data();
-    if (!data) return;
-    const local = JSON.parse(localStorage.getItem('cfg')||'null');
-    const merged = { ...(local||{}), ...data };
-    if (!Array.isArray(merged.times) || merged.times.length < 3) return;
-    if (localStorage.getItem('cfg') === JSON.stringify(merged)) return;
-    localStorage.setItem('cfg', JSON.stringify(merged));
-    renderHeader(); renderToday();
-  }, err => console.warn('config snapshot error:', err));
-
-  // โหลดประวัติทั้งหมด (calendar)
-  window.db.collection('logs').get().then(snap => {
-    const all = JSON.parse(localStorage.getItem('log')||'{}');
-    snap.forEach(d => { all[d.id] = d.data(); });
-    localStorage.setItem('log', JSON.stringify(all));
-  });
-  window.db.collection('notes').get().then(snap => {
-    const all = JSON.parse(localStorage.getItem('notes')||'{}');
-    snap.forEach(d => { all[d.id] = (d.data().items||[]); });
-    localStorage.setItem('notes', JSON.stringify(all));
-  });
-}
-
-// ── Dark mode ─────────────────────────────────────────────────────────
-function toggleDark() {
-  const isDark = document.documentElement.classList.toggle('dark');
-  localStorage.setItem('darkMode', isDark ? '1' : '0');
-  document.getElementById('darkBtn').textContent = isDark ? '☀️' : '🌙';
-}
-function applyDarkMode() {
-  const isDark = localStorage.getItem('darkMode') === '1';
-  document.documentElement.classList.toggle('dark', isDark);
-  const btn = document.getElementById('darkBtn');
-  if (btn) btn.textContent = isDark ? '☀️' : '🌙';
-}
-
-// ── Nutrition ─────────────────────────────────────────────────────────
-const INFO_DEFAULTS = { name:'มอคค่า', age:'1 ปี', weight:'', calories:'' };
-let isEditing = false;
-
-function getDogInfo() {
-  return JSON.parse(localStorage.getItem('dogInfo')||'null') || { ...INFO_DEFAULTS };
-}
-
-function calcKcal(w) {
-  w = parseFloat(w);
-  if (isNaN(w) || w <= 0 || w > 15) return '';
-  return Math.round(70 * Math.pow(w, 0.75) * 1.6);
-}
-
-function autoKcal() {
-  const kcal = calcKcal(document.getElementById('ei-weight').value);
-  const calInput = document.getElementById('ei-cal');
-  const hint = document.getElementById('kcal-hint');
-  if (kcal) { calInput.value = kcal; if (hint) hint.textContent = 'คำนวณอัตโนมัติ (RER × 1.6)'; }
-  else { if (hint) hint.textContent = ''; }
-}
-
-function renderInfo() {
-  const info = getDogInfo();
-  const heroName = document.getElementById('heroName');
-  if (heroName) heroName.textContent = info.name;
-  const grid = document.getElementById('infoGrid');
-  if (!grid) return;
-  if (isEditing) {
-    grid.innerHTML = `
-      <div class="info-cell"><div class="ic-label">ชื่อ</div><input class="ic-input" id="ei-name" value="${escHtml(info.name)}"></div>
-      <div class="info-cell">
-        <div class="ic-label">อายุ</div>
-        <div style="display:flex;align-items:center;gap:6px">
-          <input class="ic-input" id="ei-age-y" type="number" min="0" max="20" placeholder="0" value="${escHtml(info.ageY||'')}" style="flex:1;min-width:0">
-          <span style="font-size:.85rem;color:var(--t2);white-space:nowrap">ปี</span>
-          <input class="ic-input" id="ei-age-m" type="number" min="0" max="11" placeholder="0" value="${escHtml(info.ageM||'')}" style="flex:1;min-width:0">
-          <span style="font-size:.85rem;color:var(--t2);white-space:nowrap">เดือน</span>
-        </div>
-      </div>
-      <div class="info-cell">
-        <div class="ic-label">น้ำหนัก</div>
-        <input class="ic-input" id="ei-weight" value="${escHtml(info.weight)}" placeholder="0.0" oninput="autoKcal()" type="number" step="0.1" min="0.5" max="10">
-        <div class="ic-unit">กิโลกรัม</div>
-      </div>
-      <div class="info-cell">
-        <div class="ic-label">แคลอรี่ต่อวัน</div>
-        <input class="ic-input" id="ei-cal" value="${escHtml(info.calories)}" placeholder="kcal" type="number">
-        <div class="ic-unit" id="kcal-hint" style="color:var(--ok);font-size:.68rem;margin-top:3px">${info.weight ? 'คำนวณอัตโนมัติ (RER × 1.6)' : 'ใส่น้ำหนักเพื่อคำนวณ'}</div>
-      </div>`;
-    document.getElementById('infoSaveRow').style.display = 'block';
-  } else {
-    const kcalAuto = info.weight ? calcKcal(info.weight) : null;
-    const kcalDisplay = info.calories || (kcalAuto ? `~${kcalAuto}` : '—');
-    const kcalNote = (!info.calories && kcalAuto) ? `<div class="ic-unit" style="color:var(--ok)">คำนวณจาก ${info.weight} กก.</div>` : '';
-    grid.innerHTML = `
-      <div class="info-cell"><div class="ic-label">ชื่อ</div><div class="ic-val">${escHtml(info.name)}</div></div>
-      <div class="info-cell"><div class="ic-label">อายุ</div><div class="ic-val">${escHtml(info.age||'—')}</div></div>
-      <div class="info-cell"><div class="ic-label">น้ำหนัก</div><div class="ic-val">${escHtml(info.weight||'—')}</div><div class="ic-unit">กิโลกรัม</div></div>
-      <div class="info-cell"><div class="ic-label">แคลอรี่/วัน</div><div class="ic-val">${escHtml(kcalDisplay)}</div>${kcalNote}</div>`;
-    document.getElementById('infoSaveRow').style.display = 'none';
-  }
-}
-
-function saveDogInfo() {
-  const ageY = document.getElementById('ei-age-y').value.trim();
-  const ageM = document.getElementById('ei-age-m').value.trim();
-  const ageParts = [];
-  if (ageY && ageY!=='0') ageParts.push(`${ageY} ปี`);
-  if (ageM && ageM!=='0') ageParts.push(`${ageM} เดือน`);
-  const info = {
-    name:     document.getElementById('ei-name').value.trim()   || INFO_DEFAULTS.name,
-    age:      ageParts.join(' ') || INFO_DEFAULTS.age,
-    ageY, ageM,
-    weight:   document.getElementById('ei-weight').value.trim() || '',
-    calories: document.getElementById('ei-cal').value.trim()    || '',
-  };
-  showConfirm('บันทึกข้อมูลโปรไฟล์?', () => {
-    localStorage.setItem('dogInfo', JSON.stringify(info));
-    if (window.db) {
-      window.db.collection('config').doc('profile').set(info);
-      if (info.name) window.db.collection('config').doc('dog').set({ name: info.name }, { merge: true });
-    }
-    toggleEdit(); renderInfo(); renderCalc();
-    showToast('บันทึกข้อมูลแล้ว','ok');
-  }, '💾', 'บันทึก');
-}
-
-function requestToggleEdit() { toggleEdit(); }
-function toggleEdit() {
-  isEditing = !isEditing;
-  const btn = document.getElementById('editCfgBtn');
-  if (btn) { btn.textContent = isEditing ? '✕ ยกเลิก' : '✏️ แก้ไข'; btn.className = isEditing ? 'btn-edit-cfg editing' : 'btn-edit-cfg'; }
-  renderInfo();
-}
-
-// ── Food Product Grid ────────────────────────────────────────────────
-const FOOD_PRODUCTS = [
-  { cat:'🏆 สูตรสำหรับพันธุ์', items:[
-    { brand:'Royal Canin', name:'Toy Poodle Adult', kcal:340, note:'สูตรเฉพาะพันธุ์ ขนดี', bg:'#c8102e', fg:'#fff', ico:'👑' },
-    { brand:"Hill's Science", name:'Small & Mini Adult', kcal:358, note:'โปรตีนสูง ย่อยง่าย', bg:'#005eb8', fg:'#fff', ico:'🏔' },
-    { brand:'Purina Pro Plan', name:'Small & Toy Breed', kcal:370, note:'เหมาะสุนัขกระตือรือร้น', bg:'#e31837', fg:'#fff', ico:'🐾' },
-  ]},
-  { cat:'⚖️ สูตรควบคุมน้ำหนัก', items:[
-    { brand:'Royal Canin', name:'Satiety Small', kcal:285, note:'กากใยสูง อิ่มนาน', bg:'#c8102e', fg:'#fff', ico:'👑' },
-    { brand:"Hill's", name:'Metabolic Small', kcal:298, note:'เผาผลาญดีขึ้น', bg:'#005eb8', fg:'#fff', ico:'🏔' },
-    { brand:'Purina', name:'Weight Management', kcal:318, note:'ไขมันต่ำ โปรตีนสูง', bg:'#e31837', fg:'#fff', ico:'🐾' },
-  ]},
-  { cat:'⭐ Premium / Grain-Free', items:[
-    { brand:'Orijen', name:'Small & Mini', kcal:465, note:'เนื้อสัตว์ 85% grain-free', bg:'#6b3a2a', fg:'#fff', ico:'🦅' },
-    { brand:'Acana', name:'Small Breed', kcal:423, note:'ส่วนผสมจากธรรมชาติ', bg:'#2d5a3d', fg:'#fff', ico:'🌿' },
-    { brand:'Ziwi Peak', name:'Air-Dried', kcal:388, note:'คุณภาพระดับ Vet', bg:'#1a3a5c', fg:'#fff', ico:'🐟' },
-  ]},
-];
-
-function renderFoodProducts() {
-  const el = document.getElementById('foodProductGrid'); if (!el) return;
-  el.innerHTML = FOOD_PRODUCTS.map(cat=>`
-    <div class="fp-cat-label">${cat.cat}</div>
-    <div class="fp-grid">${cat.items.map(p=>`
-      <div class="fp-card">
-        <div class="fp-ico" style="background:${p.bg};color:${p.fg}">${p.ico}</div>
-        <div class="fp-brand">${p.brand}</div>
-        <div class="fp-name">${p.name}</div>
-        <div class="fp-kcal">${p.kcal} kcal/100g</div>
-        <div class="fp-note">${p.note}</div>
-      </div>`).join('')}
-    </div>`).join('');
-}
-
-// ── Nutrition collapsible sections ───────────────────────────────────
-function toggleNutrSection(id, btn) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const isOpen = el.classList.toggle('is-open');
-  const arrow = btn?.querySelector('.st-arrow');
-  if (arrow) arrow.classList.toggle('open', isOpen);
-  if (btn) btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-}
-
-let collapsibleReady = false;
-function makeCollapsible() {
-  if (collapsibleReady) return;
-  collapsibleReady = true;
-  document.querySelectorAll('#page-nutrition .food-item').forEach(item => {
-    const note = item.querySelector('.fi-note'); if (!note) return;
-    const db = document.createElement('div'); db.className = 'detail-body'; db.innerHTML = note.innerHTML;
-    note.replaceWith(db);
-    const icon = document.createElement('span'); icon.className = 'expand-icon'; icon.textContent = '›';
-    item.appendChild(icon);
-    item.addEventListener('click', () => item.classList.toggle('open'));
-  });
-  document.querySelectorAll('#page-nutrition .danger-item').forEach(item => {
-    const why = item.querySelector('.di-why'); if (!why) return;
-    why.classList.add('detail-body'); why.classList.remove('di-why');
-    const icon = document.createElement('span'); icon.className = 'expand-icon'; icon.textContent = '›';
-    item.querySelector('.di-right')?.appendChild(icon);
-    item.addEventListener('click', () => item.classList.toggle('open'));
-  });
-  document.querySelectorAll('#page-nutrition .tip-item').forEach(item => {
-    const body = item.querySelector('.tip-body'); if (!body) return;
-    body.classList.add('detail-body'); body.classList.remove('tip-body');
-    const icon = document.createElement('span'); icon.className = 'expand-icon'; icon.textContent = '›';
-    item.querySelector('.tip-ico')?.after(icon);
-    item.addEventListener('click', () => item.classList.toggle('open'));
-  });
-}
-
-// ── Toast ────────────────────────────────────────────────────────────
-function showToast(msg, type='info', ms=2600) {
-  const el=document.getElementById('toast'); if(!el) return;
-  clearTimeout(el._t);
-  el.textContent=msg;
-  el.className=`toast toast-${type}`;
-  requestAnimationFrame(()=>{ requestAnimationFrame(()=>{ el.classList.add('show'); }); });
-  el._t=setTimeout(()=>el.classList.remove('show'), ms);
-}
-
-// ── Confirm Sheet ─────────────────────────────────────────────────────
-let _confirmCb=null;
-function showConfirm(msg, onYes, icon='⚠️', yesLabel='ยืนยัน', yesDanger=false) {
-  _confirmCb=onYes;
-  document.getElementById('confirmMsg').textContent=msg;
-  document.getElementById('confirmIcon').textContent=icon;
-  const yBtn=document.getElementById('confirmYesBtn');
-  yBtn.textContent=yesLabel;
-  yBtn.className=`btn-next confirm-yes${yesDanger?' confirm-danger':''}`;
-  document.getElementById('ovConfirm').classList.add('open');
-}
-function confirmYes() { document.getElementById('ovConfirm').classList.remove('open'); _confirmCb?.(); _confirmCb=null; }
-function confirmNo()  { document.getElementById('ovConfirm').classList.remove('open'); _confirmCb=null; }
-
-// ── PIN Dialog ────────────────────────────────────────────────────────
-let _pinCb=null, _pinVal='';
-function showPin(onSuccess) {
-  _pinCb=onSuccess; _pinVal='';
-  _renderPinDots(); _setPinHint('ใส่รหัส 6 หลัก','');
-  document.getElementById('ovPin').classList.add('open');
-}
-function closePin() { document.getElementById('ovPin').classList.remove('open'); _pinCb=null; }
-function pinInput(n) {
-  if(_pinVal.length>=6) return;
-  _pinVal+=n; _renderPinDots();
-  if(_pinVal.length===6) setTimeout(_checkPin,150);
-}
-function pinBack() { _pinVal=_pinVal.slice(0,-1); _renderPinDots(); _setPinHint('ใส่รหัส 6 หลัก',''); }
-function _renderPinDots() {
-  document.querySelectorAll('#pinDots .pin-dot').forEach((d,i)=>d.classList.toggle('filled',i<_pinVal.length));
-}
-function _setPinHint(msg,cls) {
-  const h=document.getElementById('pinHint'); if(!h) return;
-  h.textContent=msg; h.className=`pin-hint${cls?' '+cls:''}`;
-}
-function _checkPin() {
-  const stored=localStorage.getItem('adminPin')||'000000';
-  if(_pinVal===stored){ closePin(); _pinCb?.(); }
-  else {
-    _pinVal=''; _renderPinDots();
-    _setPinHint('รหัสไม่ถูกต้อง','pin-err');
-    document.getElementById('pinDots').classList.add('shake');
-    setTimeout(()=>{ document.getElementById('pinDots').classList.remove('shake'); _setPinHint('ใส่รหัส 6 หลัก',''); },600);
-  }
-}
-
-// ── Calorie Calculator ────────────────────────────────────────────────
-const DRY_KCAL = 370; // kcal/100g (Royal Canin Toy Poodle / Small Breed Adult)
-const MEAT_DATA = {
-  '🐔 ไก่':   { en:'Chicken (boiled)',  kcal:165 },
-  '🐷 หมู':   { en:'Pork lean (boiled)',kcal:180 },
-  '🐟 ปลา':   { en:'Fish (boiled)',     kcal:160 },
-  '🐊 จรเข้': { en:'Crocodile (boiled)',kcal:120 },
-  '🥚 ไข่ไก่':{ en:'Boiled egg',       kcal:155 },
-};
-let calcCombo = 'dry';
-let calcMeat  = '🐔 ไก่';
-let calcGoal  = 'maintain';
-
-// Toy Poodle adult (neutered) specific multipliers — ref: NRC 2006, WSAVA Nutritional Guidelines
-const GOAL_DATA = {
-  lose:     { factor:1.0, meals:3, color:'var(--ok)', label:'ลดน้ำหนัก',
-              tip:'Toy Poodle อ้วนง่าย — ให้ที่ RER × 1.0 (ประมาณ 80% ของปกติ) แบ่ง 3 มื้อ/วัน เพิ่มผักต้มสุกเป็นเครื่องเคียง (แครอท บร็อคโคลี) เพื่อความอิ่มโดยไม่เพิ่มพลังงาน ควรปรึกษาสัตวแพทย์ก่อนเริ่มโปรแกรมลดน้ำหนัก' },
-  maintain: { factor:1.4, meals:3, color:'var(--tint)', label:'ปกติ',
-              tip:'Toy Poodle ผู้ใหญ่ที่ตัดแต่งพันธุ์แล้ว (Neutered) ใช้ RER × 1.4 เหมาะสมกว่า × 1.6 เนื่องจากเป็นสุนัขในบ้าน กิจกรรมน้อย แนะนำ 2-3 มื้อ/วัน — การให้ 3 มื้อช่วยป้องกันภาวะน้ำตาลในเลือดต่ำ (Hypoglycemia) ซึ่งพบได้ในสุนัขพันธุ์เล็ก' },
-  gain:     { factor:1.8, meals:3, color:'var(--warn)', label:'เพิ่มน้ำหนัก',
-              tip:'สำหรับ Toy Poodle ที่น้ำหนักต่ำกว่าเกณฑ์หรืออยู่ในช่วงฟื้นตัว ใช้ RER × 1.8 แบ่ง 3 มื้อ/วัน เสริมเนื้อสัตว์ไม่ติดมัน (ไก่ต้ม ปลาแซลมอน) 20-25% ของแต่ละมื้อ ไม่แนะนำให้เกิน × 2.0 เพราะจะสะสมไขมันมากเกินไปในสุนัขพันธุ์เล็ก' },
-};
-
-function setCalcGoal(g) {
-  calcGoal = g;
-  ['lose','maintain','gain'].forEach(k => document.getElementById(`gb-${k}`)?.classList.remove('active'));
-  document.getElementById(`gb-${g}`)?.classList.add('active');
-  renderCalc();
-}
-
-function setCalcCombo(c) {
-  calcCombo = c;
-  ['dry','meat','veg'].forEach(k => document.getElementById(`cb-${k}`)?.classList.remove('active'));
-  document.getElementById(`cb-${c==='dry'?'dry':c==='dry+meat'?'meat':'veg'}`)?.classList.add('active');
-  document.getElementById('meatPickerWrap').style.display = c !== 'dry' ? 'block' : 'none';
-  renderCalc();
-}
-
-function setCalcMeat(m) {
-  calcMeat = m;
-  document.querySelectorAll('#meatPicker .chip').forEach(el => el.classList.toggle('sel', el.dataset.meat === m));
-  renderCalc();
-}
-
-function renderCalc() {
-  const info = getDogInfo();
-  const cfg  = getCfg();
-  const w = parseFloat(info.weight);
-  const noW = document.getElementById('calcNoWeight');
-  const body = document.getElementById('calcBody');
-
-  if (!w || w <= 0) { noW.style.display='block'; body.style.display='none'; return; }
-  noW.style.display='none'; body.style.display='block';
-
-  const goal = GOAL_DATA[calcGoal];
-  const rer  = Math.round(70 * Math.pow(w, 0.75));
-  const dailyKcal = Math.round(rer * goal.factor);
-  const meals = goal.meals || cfg.times.length;
-  const perKcal = Math.round(dailyKcal / meals);
-
-  // goal tip
-  const tipEl = document.getElementById('goalTip');
-  if (tipEl) tipEl.innerHTML =
-    `<span class="gt-dot" style="background:${goal.color}"></span>${goal.tip}`;
-
-  document.getElementById('calcSummary').innerHTML =
-    `<div class="cs-row"><span>RER (พลังงานพัก)</span><strong>${rer} kcal</strong></div>` +
-    `<div class="cs-row"><span>ตัวคูณ (${goal.label})</span><strong>× ${goal.factor}</strong></div>` +
-    `<div class="cs-row"><span>พลังงานรวมต่อวัน</span><strong>${dailyKcal} kcal</strong></div>` +
-    `<div class="cs-row cs-per"><span>แนะนำ ${meals} มื้อ · ต่อมื้อ</span><strong style="color:${goal.color}">${perKcal} kcal</strong></div>`;
-
-  // meat picker
-  const mp = document.getElementById('meatPicker');
-  mp.innerHTML = Object.keys(MEAT_DATA).map(m =>
-    `<span class="chip${m===calcMeat?' sel':''}" data-meat="${m}" onclick="setCalcMeat('${m}')">${m}</span>`
-  ).join('');
-
-  // portions
-  let rows = '';
-  if (calcCombo === 'dry') {
-    const g = Math.round(perKcal / DRY_KCAL * 100);
-    rows = mealRow('อาหารเม็ด', g, perKcal, '#9B6B45');
-  } else {
-    const meatRatio = calcCombo === 'dry+meat' ? 0.25 : 0.20;
-    const meatKcal  = Math.round(perKcal * meatRatio);
-    const dryKcal   = calcCombo === 'dry+meat' ? perKcal - meatKcal : Math.round(perKcal * 0.75);
-    const meatKcalPer100 = MEAT_DATA[calcMeat]?.kcal || 165;
-    const dryG  = Math.round(dryKcal / DRY_KCAL * 100);
-    const meatG = Math.round(meatKcal / meatKcalPer100 * 100);
-    rows = mealRow('อาหารเม็ด', dryG, dryKcal, '#9B6B45') +
-           mealRow(calcMeat + ' (ต้ม/อบ)', meatG, meatKcal, '#5DA87A');
-    if (calcCombo === 'dry+meat+veg') {
-      const vegKcal = perKcal - dryKcal - meatKcal;
-      rows += mealRow('ผัก (แครอท/บร็อคโคลี่)', 15, vegKcal, '#a78bfa');
-    }
-  }
-
-  document.getElementById('calcResult').innerHTML =
-    `<div class="cr-head">ต่อ 1 มื้อ — ${meals} มื้อ/วัน (${perKcal} kcal/มื้อ)</div>${rows}` +
-    `<div class="cr-note">* อาหารเม็ด Small Breed Adult ~370 kcal/100g · ปรับตามยี่ห้อจริง</div>`;
-}
-
-function mealRow(label, grams, kcal, color) {
-  return `<div class="cr-row">
-    <div class="cr-label">${label}</div>
-    <div class="cr-bar-wrap"><div class="cr-bar" style="width:${Math.min(100,grams*2)}%;background:${color}"></div></div>
-    <div class="cr-nums"><strong>${grams}g</strong> <span>${kcal} kcal</span></div>
-  </div>`;
-}
-
-// ── Dashboard ─────────────────────────────────────────────────────────
-let dashMode = 'day';
-function setDash(m) {
-  dashMode = m;
-  ['day','week','month'].forEach(k => document.getElementById(`dt-${k}`)?.classList.toggle('active', k===m));
-  renderDash();
-}
-
-function renderDash() {
-  const el = document.getElementById('dashCard'); if (!el) return;
-  const allLog = JSON.parse(localStorage.getItem('log')||'{}');
-  const today = new Date();
-  const mk = d => `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
-  const cnt = log => MEALS.filter(m => log[m.id]).length;
-
-  if (dashMode === 'day') {
-    const log = allLog[mk(today)] || {};
-    const fed = cnt(log), total = MEALS.length;
-    const pct = Math.round(fed/total*100);
-    const dots = MEALS.map(m => {
-      const f = asFed(log[m.id]);
-      return `<div class="db-dot-wrap"><div class="db-dot${f?' fed':''}">${m.icon}</div><div class="db-dot-lbl">${m.label.replace('มื้อ','')}</div></div>`;
-    }).join('');
-    const info = getDogInfo(); const w = parseFloat(info.weight);
-    const kcalTarget = w ? Math.round(70*Math.pow(w,.75)*1.6) : 0;
-    const kcalDone = fed * (kcalTarget ? Math.round(kcalTarget/total) : 0);
-    const kcalBar = kcalTarget ? `
-      <div class="db-kcal-row">
-        <span>แคลอรี่วันนี้</span>
-        <span><strong>${kcalDone}</strong> / ${kcalTarget} kcal</span>
-      </div>
-      <div class="db-bar-wrap"><div class="db-bar" style="width:${Math.min(100,Math.round(kcalDone/kcalTarget*100))}%"></div></div>` : '';
-    el.innerHTML = `<div class="db-dots">${dots}</div>
-      <div class="db-summary">${fed === total ? '🎉 ครบทุกมื้อแล้ววันนี้!' : `ให้แล้ว <strong>${fed}/${total}</strong> มื้อ`}</div>
-      ${kcalBar}`;
-
-  } else if (dashMode === 'week') {
-    let html = '<div class="db-week">';
-    for (let i=6; i>=0; i--) {
-      const d = new Date(today); d.setDate(d.getDate()-i);
-      const log = allLog[mk(d)] || {}, c = cnt(log);
-      const isPast = d <= today;
-      const fill = c===MEALS.length?'full':c>0?'part':'';
-      html += `<div class="db-wday">
-        <div class="db-wcol${fill?' '+fill:''}">${c>0?c:''}</div>
-        <div class="db-wlbl">${DAYS_S[d.getDay()]}</div>
-      </div>`;
-    }
-    html += '</div>';
-    const weekFed = Array.from({length:7},(_,i)=>{const d=new Date(today);d.setDate(d.getDate()-(6-i));return cnt(allLog[mk(d)]||{});});
-    const avg = (weekFed.reduce((a,b)=>a+b,0)/7).toFixed(1);
-    html += `<div class="db-summary">เฉลี่ย <strong>${avg}</strong> มื้อ/วัน · 7 วันที่ผ่านมา</div>`;
-    el.innerHTML = html;
-
-  } else {
-    const y = today.getFullYear(), mo = today.getMonth();
-    let full=0, part=0, miss=0, streak=0, cur=0;
-    for (let d=1; d<=today.getDate(); d++) {
-      const log = allLog[`${y}-${mo+1}-${d}`]||{}, c=cnt(log);
-      if (c===MEALS.length){full++;cur++;}
-      else if(c>0){part++;cur=0;}
-      else{miss++;cur=0;}
-      streak=Math.max(streak,cur);
-    }
-    el.innerHTML = `
-      <div class="db-month-grid">
-        <div class="db-mstat"><span class="db-mico">✅</span><strong>${full}</strong><span>วันครบมื้อ</span></div>
-        <div class="db-mstat"><span class="db-mico">🟡</span><strong>${part}</strong><span>วันบางมื้อ</span></div>
-        <div class="db-mstat"><span class="db-mico">❌</span><strong>${miss}</strong><span>วันขาด</span></div>
-        <div class="db-mstat"><span class="db-mico">🔥</span><strong>${streak}</strong><span>วันติดต่อกัน</span></div>
-      </div>
-      <div class="db-summary">เดือน${MONTHS_S[mo]} ${y+543}</div>`;
-  }
-}
-
-// ── SW update ─────────────────────────────────────────────────────────
-let _newSW = null;
-function showUpdateBanner() {
-  const b=document.getElementById('updateBanner'); if (b) b.style.display='block';
-}
-function applyUpdate() {
-  if (_newSW) { _newSW.postMessage({type:'SKIP_WAITING'}); navigator.serviceWorker.addEventListener('controllerchange',()=>location.reload()); }
-  else location.reload();
-}
-
-// ── SW + Boot ──────────────────────────────────────────────────────────
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').then(reg => {
-    reg.addEventListener('updatefound', () => {
-      _newSW = reg.installing;
-      _newSW.addEventListener('statechange', () => {
-        if (_newSW.state==='installed' && navigator.serviceWorker.controller) showUpdateBanner();
-      });
-    });
-  }).catch(()=>{});
-}
-if (!localStorage.getItem('adminPin')) localStorage.setItem('adminPin','000000');
-applyDarkMode();
-renderHeader(); renderToday(); renderNotes();
-renderInfo(); renderCalc(); makeCollapsible(); renderFoodProducts();
-startSync();
-tickClock();
-setInterval(tickClock, 1000);
-setInterval(()=>{renderHeader();renderToday();checkNotif();},30000);
-</script>
+<!-- ════ App scripts ════ -->
+<script src="data.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

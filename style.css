@@ -223,6 +223,7 @@
     .d-part { background: var(--tint); }
     .d-miss { background: var(--err); }
     .d-note { background: #a78bfa; }
+    .d-skip { background: #C87941; }
 
     .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 5px; }
     .dow { text-align: center; font-size: .68rem; color: var(--t2); padding: 4px 0; font-weight: 600; }
@@ -884,3 +885,149 @@
     }
     html.dark .date-card { box-shadow: none; }
     html.dark #updateBanner { background: var(--tintd); }
+
+    /* ═══════════════════════════════════════════════════════════════
+       v2 — Skip-meal feature
+       =══════════════════════════════════════════════════════════════ */
+
+    /* Skip banner (Today page) */
+    .skip-banner {
+      background: linear-gradient(135deg, #C87941, #D4924F);
+      color: #fff; padding: 14px 18px; border-radius: var(--r);
+      font-size: .92rem; font-weight: 700; line-height: 1.4;
+      margin: 12px 0; cursor: pointer; box-shadow: 0 4px 12px rgba(200,121,65,.25);
+      transition: transform .15s, box-shadow .15s;
+    }
+    .skip-banner:active { transform: scale(.98); }
+    .skip-banner strong { font-weight: 800; }
+    html.dark .skip-banner { box-shadow: 0 4px 12px rgba(0,0,0,.4); }
+
+    /* Meal card actions: 2 buttons (feed + skip) */
+    .sq-actions { display: flex; gap: 6px; margin-top: auto; }
+    .sq-actions .sq-feed { flex: 1.4; }
+    .sq-skip {
+      flex: 1; padding: 10px 6px; border-radius: 10px;
+      background: transparent; color: var(--t2);
+      border: 1.5px solid var(--sep); font-weight: 700; font-size: .78rem;
+      font-family: inherit; cursor: pointer;
+      transition: all .15s;
+    }
+    .sq-skip:active { background: var(--c2); transform: scale(.96); }
+    html.dark .sq-skip { color: var(--t2); border-color: rgba(255,255,255,.12); }
+    html.dark .sq-skip:active { background: rgba(255,255,255,.05); }
+
+    /* Skipped meal card state */
+    .meal-sq.skipped {
+      background: var(--c2); border: 1px dashed rgba(200,121,65,.4);
+    }
+    .meal-sq.skipped .sq-name,
+    .meal-sq.skipped .sq-time { opacity: .65; }
+    .badge.skipped {
+      background: rgba(200,121,65,.15); color: #C87941;
+      border: 1px solid rgba(200,121,65,.3);
+    }
+    .sq-reason {
+      background: transparent !important; color: #C87941 !important;
+      border: 1.5px dashed rgba(200,121,65,.5) !important;
+      font-size: .76rem !important;
+    }
+
+    /* Day detail — skipped meal */
+    .dd-info.dd-skip { color: #C87941; }
+    .dd-info.dd-skip .hi { color: #C87941; font-weight: 700; }
+
+    /* Calendar — day with skip */
+    .cday.has-skip::after {
+      content: ''; position: absolute; top: 4px; right: 4px;
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #C87941;
+    }
+    .cday { position: relative; }
+
+    /* Dashboard dot — skipped */
+    .db-dot.skipped {
+      background: rgba(200,121,65,.15);
+      border: 1px dashed rgba(200,121,65,.5);
+      opacity: .8;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       v2 — Nutrition improvements
+       =══════════════════════════════════════════════════════════════ */
+
+    /* "weights = cooked" info card */
+    .cooked-info {
+      display: flex; gap: 12px; align-items: flex-start;
+      background: linear-gradient(135deg, rgba(200,121,65,.08), rgba(212,146,79,.06));
+      border: 1px solid rgba(200,121,65,.2);
+      border-radius: var(--r); padding: 14px 16px;
+      margin: 14px 0 12px;
+    }
+    .cooked-info .ci-ico {
+      font-size: 1.5rem; line-height: 1; flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .cooked-info .ci-head {
+      font-size: .88rem; font-weight: 800; color: var(--t1);
+      letter-spacing: -.01em; margin-bottom: 4px;
+    }
+    .cooked-info .ci-body {
+      font-size: .76rem; color: var(--t2); line-height: 1.5;
+    }
+    html.dark .cooked-info {
+      background: linear-gradient(135deg, rgba(200,121,65,.12), rgba(212,146,79,.08));
+      border-color: rgba(200,121,65,.25);
+    }
+
+    /* "cooked" badge (next to food name) */
+    .cooked-badge {
+      display: inline-block; vertical-align: middle;
+      font-size: .62rem; font-weight: 800;
+      background: rgba(200,121,65,.15); color: #C87941;
+      padding: 2px 7px; border-radius: 999px;
+      margin-left: 6px; letter-spacing: .3px;
+      border: 1px solid rgba(200,121,65,.25);
+    }
+    html.dark .cooked-badge {
+      background: rgba(200,121,65,.2); color: #E89668;
+      border-color: rgba(200,121,65,.35);
+    }
+
+    /* Search bar */
+    .search-wrap {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--c1); border-radius: 12px;
+      padding: 10px 12px; margin: 0 0 4px;
+      border: 1px solid var(--sep);
+    }
+    .search-wrap .search-ico { font-size: 1rem; color: var(--t3); flex-shrink: 0; }
+    .search-input {
+      flex: 1; border: none; outline: none; background: transparent;
+      font-family: inherit; font-size: .92rem; color: var(--t1);
+      min-width: 0;
+    }
+    .search-input::placeholder { color: var(--t3); }
+    .search-clear {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: var(--c2); border: none; cursor: pointer;
+      color: var(--t2); font-size: .85rem; flex-shrink: 0;
+    }
+    .search-clear:active { background: var(--c3); }
+    .search-hint {
+      font-size: .72rem; color: var(--t2); padding: 4px 4px 8px;
+      min-height: 1.1em;
+    }
+    html.dark .search-wrap { background: var(--c1); border-color: rgba(255,255,255,.08); }
+
+    /* v2 — Dashboard skip stat row */
+    .db-skip-stat {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 12px; margin-top: 10px;
+      background: rgba(200,121,65,.08);
+      border: 1px dashed rgba(200,121,65,.3);
+      border-radius: 10px;
+      font-size: .82rem; color: var(--t1); line-height: 1.4;
+    }
+    .db-skip-stat .db-mico { font-size: 1.1rem; flex-shrink: 0; }
+    .db-skip-stat strong { color: #C87941; font-weight: 800; }
+    html.dark .db-skip-stat { background: rgba(200,121,65,.12); border-color: rgba(200,121,65,.35); }
