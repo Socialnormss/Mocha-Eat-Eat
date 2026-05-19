@@ -58,7 +58,8 @@ function renderDateCard() {
   const cfg=getCfg(), log=getLog(), now=new Date();
   const dayEl=document.getElementById('dcDay'), dateEl=document.getElementById('dcDate');
   if (dayEl) dayEl.textContent = DAYS_F[now.getDay()];
-  if (dateEl) dateEl.textContent = `${now.getDate()} ${MONTHS_F[now.getMonth()]} ${now.getFullYear()+543}`;
+  // short form in hero to avoid layout overflow with Thai full month names
+  if (dateEl) dateEl.textContent = `${now.getDate()} ${MONTHS_S[now.getMonth()]}`;
 
   let nextMin=Infinity, nextLabel='';
   MEALS.forEach((m,i) => {
@@ -1189,10 +1190,12 @@ function renderDash() {
   if (dashMode === 'day') {
     const log = allLog[mk(today)] || {};
     const fed = cnt(log), total = MEALS.length;
-    const dots = MEALS.map(m => {
+    const dots = MEALS.map((m,i) => {
       const f = asFed(log[m.id]);
       const cls = f && f.skipped ? ' skipped' : f ? ' fed' : '';
-      const ic = f && f.skipped ? '💤' : m.icon;
+      const ic = f && f.skipped
+        ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>`
+        : `<img src="img/time-${TIME_ASSET[i]||'morning'}.png" alt="" width="100%" height="100%">`;
       return `<div class="db-dot-wrap"><div class="db-dot${cls}">${ic}</div><div class="db-dot-lbl">${m.label.replace('มื้อ','')}</div></div>`;
     }).join('');
     const info = getDogInfo(); const w = parseFloat(info.weight);

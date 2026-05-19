@@ -1117,7 +1117,43 @@ input, textarea { font: inherit; color: inherit; }
 
 /* clock line under date (uses #dcClock) */
 .hero__greet { font-family: var(--font-num); font-variant-numeric: tabular-nums;
-  letter-spacing: 0.04em; font-size: 13px; color: var(--c-muted); margin-top: 2px; }
+  letter-spacing: 0.04em; font-size: 13px; color: rgba(255,255,255,.65); margin-top: 2px; }
+
+/* meal progress strip — between hero and notes */
+.meal-progress {
+  margin: 0 var(--sp-5) var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--c-paper);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--rule);
+  box-shadow: var(--shadow-soft);
+  display: flex; align-items: center; gap: var(--sp-3);
+}
+.meal-progress__label {
+  font-family: var(--font-serif); font-size: 13px; font-weight: 600;
+  color: var(--c-muted); flex-shrink: 0;
+}
+.meal-progress__dots {
+  display: flex; gap: 6px; flex: 1;
+}
+.meal-progress__dots i {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--c-latte); display: inline-block;
+  transition: background var(--t-fast), transform var(--t-fast);
+}
+.meal-progress__dots i.is-on {
+  background: var(--c-caramel);
+  transform: scale(1.05);
+}
+.meal-progress__count {
+  font-family: var(--font-num); font-variant-numeric: tabular-nums;
+  font-size: 18px; font-weight: 700; color: var(--c-mocha);
+  letter-spacing: -0.02em; flex-shrink: 0;
+}
+.meal-progress__count sub {
+  font-size: 12px; font-weight: 500; color: var(--c-muted); margin-left: 1px;
+  bottom: 0; vertical-align: baseline;
+}
 
 /* next-meal state: ครบทุกมื้อ */
 .hero__next-time.all { color: var(--c-sage-deep); font-weight: 600; }
@@ -1173,5 +1209,49 @@ input, textarea { font: inherit; color: inherit; }
 
 /* darkBtn icon button (header) */
 #darkBtn { font-size: 16px; }
+
+/* ────────────────────────────────────────────────────────────
+   29 · LEGACY PAGES bridge — Calendar + Nutrition keep v2.1 markup
+   but get Cozy palette so they don't look out of place
+   ──────────────────────────────────────────────────────────── */
+
+/* ensure pages have side padding (cozy .app has no left/right padding) */
+.page .wrap {
+  padding: var(--sp-4) var(--sp-5);
+  padding-bottom: calc(100px + max(env(safe-area-inset-bottom), 12px));
+}
+
+/* Calendar nav */
+.cal-nav { padding: 0; margin: 0 0 var(--sp-4); gap: var(--sp-3); align-items: center; }
+.cal-arr {
+  width: 36px; height: 36px;
+  background: var(--c-paper); border: 1px solid var(--rule);
+  color: var(--c-ink); font-size: 18px; border-radius: 50%;
+  flex-shrink: 0; box-shadow: var(--shadow-soft);
+}
+.cal-month {
+  flex: 1; text-align: center;
+  font-family: var(--font-serif); font-size: 18px; font-weight: 600;
+  color: var(--c-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.cal-legend { color: var(--c-muted); margin-bottom: var(--sp-3); }
+.cal-grid { gap: 4px; }
+
+/* Nutrition profile hero — replace 🐩 with mocha-sit */
+#page-nutrition .hero-avatar {
+  background: var(--c-paper);
+  border-radius: 50%;
+  width: 96px; height: 96px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto var(--sp-3);
+  overflow: hidden;
+  border: 3px solid var(--c-paper);
+  box-shadow: var(--shadow-card);
+}
+#page-nutrition .hero-avatar::before {
+  content: ''; display: block; width: 100%; height: 100%;
+  background: url('img/mocha-sit.png') center / cover no-repeat;
+}
+#page-nutrition .hero-avatar > * { display: none; }
 
 /* end · mocha-cozy.css */

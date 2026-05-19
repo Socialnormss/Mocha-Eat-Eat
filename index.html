@@ -100,7 +100,7 @@
 <div class="page active" id="page-today" data-page="today">
   <main class="app__scroll">
 
-    <!-- HERO · date + countdown + Mocha peek -->
+    <!-- HERO · date + Mocha peek -->
     <article class="hero">
       <img class="hero__mascot anim-breath" src="img/mocha-peek.png" alt="">
       <div class="hero__row">
@@ -108,13 +108,6 @@
           <div class="hero__weekday" id="dcDay"></div>
           <div class="hero__date" id="dcDate"></div>
           <div class="hero__greet" id="dcClock">--:--:--</div>
-        </div>
-        <div class="hero__count">
-          <div class="hero__count-label">มื้อวันนี้</div>
-          <div class="hero__count-value"><span id="dcCount">0</span><sub>/4</sub></div>
-          <div class="hero__dots" id="dcDots" aria-hidden="true">
-            <i></i><i></i><i></i><i></i>
-          </div>
         </div>
       </div>
       <div class="hero__next">
@@ -128,13 +121,22 @@
       </div>
     </article>
 
+    <!-- Meal progress strip · standalone, between hero and notes -->
+    <div class="meal-progress">
+      <span class="meal-progress__label">มื้อวันนี้</span>
+      <div class="meal-progress__dots" id="dcDots" aria-hidden="true">
+        <i></i><i></i><i></i><i></i>
+      </div>
+      <span class="meal-progress__count"><span id="dcCount">0</span><sub>/4</sub></span>
+    </div>
+
     <!-- Skip-meal banner -->
     <aside id="skipBanner" class="banner banner--alert" style="display:none" role="alert"></aside>
 
     <!-- Notes section -->
     <section class="section">
       <header class="section__head">
-        <h2 class="section__title">📋 บันทึก</h2>
+        <h2 class="section__title">บันทึก</h2>
         <button class="btn btn--add" onclick="openNoteModal()" data-action="add-note">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
           เพิ่ม
@@ -146,7 +148,7 @@
     <!-- Meal grid -->
     <section class="section">
       <header class="section__head">
-        <h2 class="section__title">🍖 การให้อาหาร</h2>
+        <h2 class="section__title">การให้อาหาร</h2>
       </header>
       <div class="meal-grid" id="cards"></div>
     </section>
@@ -287,11 +289,11 @@
         <div class="group-title" style="margin-top:6px">อาหารหลักที่ควรให้</div>
         <div class="group-desc">เหมาะสำหรับ Toy Poodle อายุ 1 ปี ให้เป็นประจำได้</div>
       </div></div>
-      <div class="food-item"><span class="fi-ico">🥩</span><div><div class="fi-name">อาหารเม็ด Small Breed Adult</div><div class="fi-note">เลือก formula สำหรับสุนัขโตพันธุ์เล็ก เช่น Royal Canin Toy Poodle, Hill's Science Diet เปลี่ยนจาก Puppy formula ได้แล้ว</div></div></div>
-      <div class="food-item"><span class="fi-ico">🐔</span><div><div class="fi-name">เนื้อไก่ <span class="cooked-badge">🔥 สุก</span></div><div class="fi-note">ต้มหรืออบ ไม่มีเกลือ ไม่มีเครื่องเทศ แยกกระดูกออกให้หมด แหล่งโปรตีนที่ดีที่สุด · 165 kcal/100g</div></div></div>
-      <div class="food-item"><span class="fi-ico">🐟</span><div><div class="fi-name">ปลาแซลมอน / ปลาทู <span class="cooked-badge">🔥 สุก</span></div><div class="fi-note">มี Omega-3 ดีต่อผิวหนังและขน ต้มหรืออบ ไม่ผัดน้ำมัน ระวังก้างชิ้นเล็ก · 160 kcal/100g</div></div></div>
-      <div class="food-item"><span class="fi-ico">🥕</span><div><div class="fi-name">แครอท</div><div class="fi-note">ดิบหรือต้มสุกก็ได้ ดีต่อฟัน มีเบต้าแคโรทีนสูง เหมาะเป็น treat แทนขนม</div></div></div>
-      <div class="food-item"><span class="fi-ico">💧</span><div><div class="fi-name">น้ำสะอาดตลอดวัน</div><div class="fi-note">เปลี่ยนน้ำทุกวัน Toy Poodle ตัวเล็กมาก dehydrate ได้เร็ว ควรมีชามน้ำ 2 จุดในบ้าน</div></div></div>
+      <div class="food-item"><span class="fi-ico"><img src="img/food-kibble.png" alt="" width="22" height="22" style="display:block;width:24px;height:24px;object-fit:cover;border-radius:7px"></span><div><div class="fi-name">อาหารเม็ด Small Breed Adult</div><div class="fi-note">เลือก formula สำหรับสุนัขโตพันธุ์เล็ก เช่น Royal Canin Toy Poodle, Hill's Science Diet เปลี่ยนจาก Puppy formula ได้แล้ว</div></div></div>
+      <div class="food-item"><span class="fi-ico"><img src="img/food-chicken.png" alt="" width="22" height="22" style="display:block;width:24px;height:24px;object-fit:cover;border-radius:7px"></span><div><div class="fi-name">เนื้อไก่ <span class="cooked-badge">🔥 สุก</span></div><div class="fi-note">ต้มหรืออบ ไม่มีเกลือ ไม่มีเครื่องเทศ แยกกระดูกออกให้หมด แหล่งโปรตีนที่ดีที่สุด · 165 kcal/100g</div></div></div>
+      <div class="food-item"><span class="fi-ico"><img src="img/food-fish.png" alt="" width="22" height="22" style="display:block;width:24px;height:24px;object-fit:cover;border-radius:7px"></span><div><div class="fi-name">ปลาแซลมอน / ปลาทู <span class="cooked-badge">🔥 สุก</span></div><div class="fi-note">มี Omega-3 ดีต่อผิวหนังและขน ต้มหรืออบ ไม่ผัดน้ำมัน ระวังก้างชิ้นเล็ก · 160 kcal/100g</div></div></div>
+      <div class="food-item"><span class="fi-ico"><img src="img/food-carrot.png" alt="" width="22" height="22" style="display:block;width:24px;height:24px;object-fit:cover;border-radius:7px"></span><div><div class="fi-name">แครอท</div><div class="fi-note">ดิบหรือต้มสุกก็ได้ ดีต่อฟัน มีเบต้าแคโรทีนสูง เหมาะเป็น treat แทนขนม</div></div></div>
+      <div class="food-item"><span class="fi-ico"><img src="img/food-bowl.png" alt="" width="22" height="22" style="display:block;width:24px;height:24px;object-fit:cover;border-radius:7px"></span><div><div class="fi-name">น้ำสะอาดตลอดวัน</div><div class="fi-note">เปลี่ยนน้ำทุกวัน Toy Poodle ตัวเล็กมาก dehydrate ได้เร็ว ควรมีชามน้ำ 2 จุดในบ้าน</div></div></div>
     </div>
     <div class="food-group">
       <div class="group-header"><div>
@@ -299,12 +301,12 @@
         <div class="group-title" style="margin-top:6px">อาหารที่กินได้ตามปกติ</div>
         <div class="group-desc">ให้ได้แต่ไม่ต้องให้ทุกวัน</div>
       </div></div>
-      <div class="food-item"><span class="fi-ico">🥦</span><div><div class="fi-name">บรอคเคอลี / กะหล่ำปลี</div><div class="fi-note">ต้มนิ่ม ให้เป็นส่วนน้อย (ไม่เกิน 10% ของมื้อ) ช่วยระบบย่อย</div></div></div>
-      <div class="food-item"><span class="fi-ico">🥒</span><div><div class="fi-name">แตงกวา / บวบ</div><div class="fi-note">แคลอรี่ต่ำมาก เหมาะเป็น treat สำหรับสุนัขที่ต้องควบคุมน้ำหนัก</div></div></div>
-      <div class="food-item"><span class="fi-ico">🍎</span><div><div class="fi-name">แอปเปิ้ล (ไม่มีเมล็ด)</div><div class="fi-note">ต้องเอาเมล็ดและแกนออกทุกครั้ง เมล็ดมี amygdalin ซึ่งเป็นพิษ ให้เป็น treat</div></div></div>
-      <div class="food-item"><span class="fi-ico">🫐</span><div><div class="fi-name">บลูเบอร์รี่</div><div class="fi-note">Antioxidant สูง ให้ 3–5 เม็ด/ครั้ง ไม่ควรให้มาก</div></div></div>
-      <div class="food-item"><span class="fi-ico">🍚</span><div><div class="fi-name">ข้าวสุก (ข้าวกล้อง/ข้าวขาว)</div><div class="fi-note">ไม่ใส่เครื่องปรุงใดๆ ให้เป็นส่วนเสริม ไม่ใช่อาหารหลัก แหล่งคาร์โบไฮเดรต</div></div></div>
-      <div class="food-item"><span class="fi-ico">🥩</span><div><div class="fi-name">เนื้อวัว / เนื้อหมู <span class="cooked-badge">🔥 สุก</span></div><div class="fi-note">ต้มหรืออบ ไม่มีเกลือ ตัดมันออก ให้น้อยกว่าไก่ เนื่องจากไขมันสูงกว่า · 180 kcal/100g</div></div></div>
+      <div class="food-item"><span class="fi-ico"><img src="img/food-broccoli.png" alt="" width="22" height="22" style="display:block;width:24px;height:24px;object-fit:cover;border-radius:7px"></span><div><div class="fi-name">บรอคเคอลี / กะหล่ำปลี</div><div class="fi-note">ต้มนิ่ม ให้เป็นส่วนน้อย (ไม่เกิน 10% ของมื้อ) ช่วยระบบย่อย</div></div></div>
+      <div class="food-item"><span class="fi-ico"><img src="img/food-leaf.png" alt="" width="22" height="22" style="display:block;width:24px;height:24px;object-fit:cover;border-radius:7px"></span><div><div class="fi-name">แตงกวา / บวบ</div><div class="fi-note">แคลอรี่ต่ำมาก เหมาะเป็น treat สำหรับสุนัขที่ต้องควบคุมน้ำหนัก</div></div></div>
+      <div class="food-item"><span class="fi-ico"><img src="img/food-apple.png" alt="" width="22" height="22" style="display:block;width:24px;height:24px;object-fit:cover;border-radius:7px"></span><div><div class="fi-name">แอปเปิ้ล (ไม่มีเมล็ด)</div><div class="fi-note">ต้องเอาเมล็ดและแกนออกทุกครั้ง เมล็ดมี amygdalin ซึ่งเป็นพิษ ให้เป็น treat</div></div></div>
+      <div class="food-item"><span class="fi-ico"><img src="img/food-apple.png" alt="" width="22" height="22" style="display:block;width:24px;height:24px;object-fit:cover;border-radius:7px"></span><div><div class="fi-name">บลูเบอร์รี่</div><div class="fi-note">Antioxidant สูง ให้ 3–5 เม็ด/ครั้ง ไม่ควรให้มาก</div></div></div>
+      <div class="food-item"><span class="fi-ico"><img src="img/food-rice.png" alt="" width="22" height="22" style="display:block;width:24px;height:24px;object-fit:cover;border-radius:7px"></span><div><div class="fi-name">ข้าวสุก (ข้าวกล้อง/ข้าวขาว)</div><div class="fi-note">ไม่ใส่เครื่องปรุงใดๆ ให้เป็นส่วนเสริม ไม่ใช่อาหารหลัก แหล่งคาร์โบไฮเดรต</div></div></div>
+      <div class="food-item"><span class="fi-ico"><img src="img/food-beef.png" alt="" width="22" height="22" style="display:block;width:24px;height:24px;object-fit:cover;border-radius:7px"></span><div><div class="fi-name">เนื้อวัว / เนื้อหมู <span class="cooked-badge">🔥 สุก</span></div><div class="fi-note">ต้มหรืออบ ไม่มีเกลือ ตัดมันออก ให้น้อยกว่าไก่ เนื่องจากไขมันสูงกว่า · 180 kcal/100g</div></div></div>
     </div>
     <div class="food-group">
       <div class="group-header"><div>
@@ -312,11 +314,11 @@
         <div class="group-title" style="margin-top:6px">ให้เสริมได้ แต่ไม่ใช่อาหารหลัก</div>
         <div class="group-desc">ให้ปริมาณน้อย เป็นครั้งคราว หรือตามคำแนะนำสัตวแพทย์</div>
       </div></div>
-      <div class="food-item"><span class="fi-ico">🍳</span><div><div class="fi-name">ไข่ต้ม</div><div class="fi-note">โปรตีนสูง ให้ไม่เกิน 1/2 ฟอง 2–3 ครั้ง/สัปดาห์ ไข่ขาวดิบย่อยยาก ต้องต้มเสมอ</div></div></div>
-      <div class="food-item"><span class="fi-ico">🎃</span><div><div class="fi-name">ฟักทอง (ต้มสุก)</div><div class="fi-note">ไฟเบอร์สูง ช่วยระบบย่อยเมื่อท้องเสียหรือท้องผูก ให้ 1–2 ช้อนชา/มื้อ</div></div></div>
-      <div class="food-item"><span class="fi-ico">🫙</span><div><div class="fi-name">น้ำมันมะพร้าว</div><div class="fi-note">ช่วยขนและผิวหนัง ให้ 1/4 ช้อนชา/วัน ถ้าให้มากเกินอาจท้องเสีย</div></div></div>
-      <div class="food-item"><span class="fi-ico">🐟</span><div><div class="fi-name">น้ำมันปลา (Fish Oil)</div><div class="fi-note">Omega-3 ดีต่อขนและสมอง ให้ตามคำแนะนำบนฉลาก ไม่ควรให้เกินขนาด</div></div></div>
-      <div class="food-item"><span class="fi-ico">🦷</span><div><div class="fi-name">Dental Treat / กระดูกนิ่ม</div><div class="fi-note">ช่วยขูดหินปูน เลือกขนาดเหมาะกับ Toy Poodle ไม่ให้ทุกวัน (แคลอรี่เพิ่ม)</div></div></div>
+      <div class="food-item"><span class="fi-ico"><img src="img/food-egg.png" alt="" width="22" height="22" style="display:block;width:24px;height:24px;object-fit:cover;border-radius:7px"></span><div><div class="fi-name">ไข่ต้ม</div><div class="fi-note">โปรตีนสูง ให้ไม่เกิน 1/2 ฟอง 2–3 ครั้ง/สัปดาห์ ไข่ขาวดิบย่อยยาก ต้องต้มเสมอ</div></div></div>
+      <div class="food-item"><span class="fi-ico"><img src="img/food-broccoli.png" alt="" width="22" height="22" style="display:block;width:24px;height:24px;object-fit:cover;border-radius:7px"></span><div><div class="fi-name">ฟักทอง (ต้มสุก)</div><div class="fi-note">ไฟเบอร์สูง ช่วยระบบย่อยเมื่อท้องเสียหรือท้องผูก ให้ 1–2 ช้อนชา/มื้อ</div></div></div>
+      <div class="food-item"><span class="fi-ico"><img src="img/food-bowl.png" alt="" width="22" height="22" style="display:block;width:24px;height:24px;object-fit:cover;border-radius:7px"></span><div><div class="fi-name">น้ำมันมะพร้าว</div><div class="fi-note">ช่วยขนและผิวหนัง ให้ 1/4 ช้อนชา/วัน ถ้าให้มากเกินอาจท้องเสีย</div></div></div>
+      <div class="food-item"><span class="fi-ico"><img src="img/food-fish.png" alt="" width="22" height="22" style="display:block;width:24px;height:24px;object-fit:cover;border-radius:7px"></span><div><div class="fi-name">น้ำมันปลา (Fish Oil)</div><div class="fi-note">Omega-3 ดีต่อขนและสมอง ให้ตามคำแนะนำบนฉลาก ไม่ควรให้เกินขนาด</div></div></div>
+      <div class="food-item"><span class="fi-ico"><img src="img/food-bone.png" alt="" width="22" height="22" style="display:block;width:24px;height:24px;object-fit:cover;border-radius:7px"></span><div><div class="fi-name">Dental Treat / กระดูกนิ่ม</div><div class="fi-note">ช่วยขูดหินปูน เลือกขนาดเหมาะกับ Toy Poodle ไม่ให้ทุกวัน (แคลอรี่เพิ่ม)</div></div></div>
     </div>
 
     </div><!-- /nutrCanEat -->
@@ -327,19 +329,19 @@
       <div style="padding:14px 16px 10px;border-bottom:.5px solid var(--sep)">
         <span style="font-size:.72rem;color:var(--err);font-weight:800;text-transform:uppercase;letter-spacing:.5px">⚠️ อันตรายถึงชีวิต — ห้ามให้เด็ดขาด</span>
       </div>
-      <div class="danger-item crit"><span class="di-ico">🍫</span><div class="di-right"><div class="di-top"><span class="di-name">ช็อกโกแลต</span><span class="di-lv lv-crit">🚨 ร้ายแรงมาก</span></div><div class="di-why">มี Theobromine ย่อยสลายไม่ได้ ทำให้ชัก หัวใจเต้นผิดจังหวะ อาจเสียชีวิต Dark chocolate อันตรายสูงสุด</div></div></div>
-      <div class="danger-item crit"><span class="di-ico">🍬</span><div class="di-right"><div class="di-top"><span class="di-name">Xylitol (น้ำตาลเทียม)</span><span class="di-lv lv-crit">🚨 ร้ายแรงมาก</span></div><div class="di-why">พบในหมากฝรั่ง ขนมไร้น้ำตาล ยาสีฟันบางยี่ห้อ ทำให้น้ำตาลในเลือดต่ำฉับพลันและตับวาย</div></div></div>
-      <div class="danger-item crit"><span class="di-ico">🍇</span><div class="di-right"><div class="di-top"><span class="di-name">องุ่น &amp; ลูกเกด</span><span class="di-lv lv-crit">🚨 ร้ายแรงมาก</span></div><div class="di-why">ทำให้ไตวายเฉียบพลัน แม้ปริมาณน้อยมากก็อันตราย ยังไม่ทราบสารพิษที่แน่ชัด</div></div></div>
-      <div class="danger-item crit"><span class="di-ico">☕</span><div class="di-right"><div class="di-top"><span class="di-name">คาเฟอีน (กาแฟ ชา โกโก้)</span><span class="di-lv lv-crit">🚨 ร้ายแรงมาก</span></div><div class="di-why">กระตุ้นระบบประสาทและหัวใจมากเกินไป ทำให้ชัก หัวใจวาย</div></div></div>
-      <div class="danger-item crit"><span class="di-ico">🍺</span><div class="di-right"><div class="di-top"><span class="di-name">แอลกอฮอล์ทุกชนิด</span><span class="di-lv lv-crit">🚨 ร้ายแรงมาก</span></div><div class="di-why">ตับสุนัขย่อยสลายแอลกอฮอล์ไม่ได้ แม้ปริมาณเล็กน้อยก็เป็นพิษ</div></div></div>
+      <div class="danger-item crit"><span class="di-ico"><img src="img/danger-chocolate.png" alt="" width="22" height="22" style="display:block;width:24px;height:24px;object-fit:cover;border-radius:7px"></span><div class="di-right"><div class="di-top"><span class="di-name">ช็อกโกแลต</span><span class="di-lv lv-crit">🚨 ร้ายแรงมาก</span></div><div class="di-why">มี Theobromine ย่อยสลายไม่ได้ ทำให้ชัก หัวใจเต้นผิดจังหวะ อาจเสียชีวิต Dark chocolate อันตรายสูงสุด</div></div></div>
+      <div class="danger-item crit"><span class="di-ico"><img src="img/danger-xylitol.png" alt="" width="22" height="22" style="display:block;width:24px;height:24px;object-fit:cover;border-radius:7px"></span><div class="di-right"><div class="di-top"><span class="di-name">Xylitol (น้ำตาลเทียม)</span><span class="di-lv lv-crit">🚨 ร้ายแรงมาก</span></div><div class="di-why">พบในหมากฝรั่ง ขนมไร้น้ำตาล ยาสีฟันบางยี่ห้อ ทำให้น้ำตาลในเลือดต่ำฉับพลันและตับวาย</div></div></div>
+      <div class="danger-item crit"><span class="di-ico"><img src="img/danger-grape.png" alt="" width="22" height="22" style="display:block;width:24px;height:24px;object-fit:cover;border-radius:7px"></span><div class="di-right"><div class="di-top"><span class="di-name">องุ่น &amp; ลูกเกด</span><span class="di-lv lv-crit">🚨 ร้ายแรงมาก</span></div><div class="di-why">ทำให้ไตวายเฉียบพลัน แม้ปริมาณน้อยมากก็อันตราย ยังไม่ทราบสารพิษที่แน่ชัด</div></div></div>
+      <div class="danger-item crit"><span class="di-ico"><img src="img/danger-caffeine.png" alt="" width="22" height="22" style="display:block;width:24px;height:24px;object-fit:cover;border-radius:7px"></span><div class="di-right"><div class="di-top"><span class="di-name">คาเฟอีน (กาแฟ ชา โกโก้)</span><span class="di-lv lv-crit">🚨 ร้ายแรงมาก</span></div><div class="di-why">กระตุ้นระบบประสาทและหัวใจมากเกินไป ทำให้ชัก หัวใจวาย</div></div></div>
+      <div class="danger-item crit"><span class="di-ico"><img src="img/danger-wine.png" alt="" width="22" height="22" style="display:block;width:24px;height:24px;object-fit:cover;border-radius:7px"></span><div class="di-right"><div class="di-top"><span class="di-name">แอลกอฮอล์ทุกชนิด</span><span class="di-lv lv-crit">🚨 ร้ายแรงมาก</span></div><div class="di-why">ตับสุนัขย่อยสลายแอลกอฮอล์ไม่ได้ แม้ปริมาณเล็กน้อยก็เป็นพิษ</div></div></div>
     </div>
     <div class="danger-group">
       <div style="padding:14px 16px 10px;border-bottom:.5px solid var(--sep)">
         <span style="font-size:.72rem;color:var(--warn);font-weight:800;text-transform:uppercase;letter-spacing:.5px">⚠️ อันตรายสูง</span>
       </div>
-      <div class="danger-item high"><span class="di-ico">🧅</span><div class="di-right"><div class="di-top"><span class="di-name">หัวหอม กระเทียม ต้นหอม</span><span class="di-lv lv-high">อันตรายสูง</span></div><div class="di-why">มี thiosulfate ทำลายเม็ดเลือดแดง ทำให้โลหิตจาง ทั้งดิบและปรุงสุก ทั้งในอาหารมนุษย์</div></div></div>
-      <div class="danger-item high"><span class="di-ico">🥑</span><div class="di-right"><div class="di-top"><span class="di-name">อาโวคาโด</span><span class="di-lv lv-high">อันตรายสูง</span></div><div class="di-why">มี Persin ทำให้อาเจียน ท้องเสีย ส่งผลต่อหัวใจ ทั้งเนื้อ เมล็ด และใบ</div></div></div>
-      <div class="danger-item high"><span class="di-ico">🌰</span><div class="di-right"><div class="di-top"><span class="di-name">แมคคาเดเมียนัท</span><span class="di-lv lv-high">อันตรายสูง</span></div><div class="di-why">ทำให้กล้ามเนื้ออ่อนแรง สั่น อุณหภูมิร่างกายสูง โดยเฉพาะขาหลัง</div></div></div>
+      <div class="danger-item high"><span class="di-ico"><img src="img/danger-onion.png" alt="" width="22" height="22" style="display:block;width:24px;height:24px;object-fit:cover;border-radius:7px"></span><div class="di-right"><div class="di-top"><span class="di-name">หัวหอม กระเทียม ต้นหอม</span><span class="di-lv lv-high">อันตรายสูง</span></div><div class="di-why">มี thiosulfate ทำลายเม็ดเลือดแดง ทำให้โลหิตจาง ทั้งดิบและปรุงสุก ทั้งในอาหารมนุษย์</div></div></div>
+      <div class="danger-item high"><span class="di-ico"><img src="img/danger-avocado.png" alt="" width="22" height="22" style="display:block;width:24px;height:24px;object-fit:cover;border-radius:7px"></span><div class="di-right"><div class="di-top"><span class="di-name">อาโวคาโด</span><span class="di-lv lv-high">อันตรายสูง</span></div><div class="di-why">มี Persin ทำให้อาเจียน ท้องเสีย ส่งผลต่อหัวใจ ทั้งเนื้อ เมล็ด และใบ</div></div></div>
+      <div class="danger-item high"><span class="di-ico"><img src="img/danger-macadamia.png" alt="" width="22" height="22" style="display:block;width:24px;height:24px;object-fit:cover;border-radius:7px"></span><div class="di-right"><div class="di-top"><span class="di-name">แมคคาเดเมียนัท</span><span class="di-lv lv-high">อันตรายสูง</span></div><div class="di-why">ทำให้กล้ามเนื้ออ่อนแรง สั่น อุณหภูมิร่างกายสูง โดยเฉพาะขาหลัง</div></div></div>
       <div class="danger-item high"><span class="di-ico">🦴</span><div class="di-right"><div class="di-top"><span class="di-name">กระดูกปรุงสุก</span><span class="di-lv lv-high">อันตรายสูง</span></div><div class="di-why">แตกเป็นเสี้ยนแหลมบาดหลอดอาหาร/ลำไส้ได้ กระดูกดิบรับได้แต่มีความเสี่ยงแบคทีเรีย</div></div></div>
     </div>
     <div class="danger-group">
