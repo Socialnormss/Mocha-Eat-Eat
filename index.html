@@ -319,14 +319,17 @@
        ════════════════════════════════════════════════════════════════ -->
   <nav class="tabbar" role="tablist" aria-label="หน้าหลัก">
     <div class="tabbar__inner">
-      <button class="tab tab--active" data-tab="today" onclick="showPage('today',this)" role="tab" aria-selected="true" aria-label="วันนี้">
+      <button class="tab tab--active" data-tab="today" onclick="showPage('today',this)" role="tab" aria-selected="true">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-7h-6v7H4a1 1 0 01-1-1v-9z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        <span>วันนี้</span>
       </button>
-      <button class="tab" data-tab="calendar" onclick="showPage('calendar',this)" role="tab" aria-selected="false" aria-label="ปฏิทิน">
+      <button class="tab" data-tab="calendar" onclick="showPage('calendar',this)" role="tab" aria-selected="false">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M3 9h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span>ปฏิทิน</span>
       </button>
-      <button class="tab" data-tab="nutrition" onclick="showPage('nutrition',this)" role="tab" aria-selected="false" aria-label="โภชนาการ">
+      <button class="tab" data-tab="nutrition" onclick="showPage('nutrition',this)" role="tab" aria-selected="false">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 12h18a8 8 0 01-8 8h-2a8 8 0 01-8-8z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="9" cy="8" r="2" stroke="currentColor" stroke-width="1.6"/><circle cx="15" cy="8" r="2" stroke="currentColor" stroke-width="1.6"/></svg>
+        <span>โภชนาการ</span>
       </button>
     </div>
   </nav>

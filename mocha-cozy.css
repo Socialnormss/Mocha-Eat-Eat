@@ -1307,4 +1307,123 @@ input, textarea { font: inherit; color: inherit; }
 }
 #page-nutrition .info-card { background: transparent !important; box-shadow: none !important; padding: 0 !important; }
 
-/* end · mocha-cozy.css */
+
+/* ════════════════════════════════════════════════════════════════
+   v4.1 OVERRIDES — fix issues from user feedback 2026-05-20
+   ════════════════════════════════════════════════════════════════ */
+
+/* --- Calendar: force cal-nav buttons inside card (override legacy .cal-nav from style.css) --- */
+.cal-card .cal-head {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-3) !important;
+  padding: 2px 0 !important;
+}
+.cal-card .cal-nav {
+  display: inline-flex !important;
+  width: 32px !important; height: 32px !important;
+  margin: 0 !important; padding: 0 !important;
+  flex: 0 0 32px !important;
+  border-radius: 10px !important;
+  background: var(--c-cream) !important;
+  color: var(--c-mocha) !important;
+  border: 1px solid var(--rule) !important;
+  align-items: center; justify-content: center;
+}
+.cal-card .cal-nav svg { display: block; }
+.cal-card .cal-head h2 {
+  flex: 1; text-align: center;
+  font-family: var(--font-serif); font-size: 19px; font-weight: 500;
+  color: var(--c-ink); margin: 0;
+}
+
+/* --- Dashboard slot icons: smaller, perfectly circular, image inset 22px --- */
+.slot__icon {
+  width: 52px !important; height: 52px !important;
+  border-radius: 50% !important;
+  background: var(--c-cream);
+  border: 1px solid var(--c-latte);
+  overflow: hidden;
+}
+.slot__icon img {
+  width: 34px !important; height: 34px !important;
+  object-fit: contain !important;
+  border-radius: 0 !important;
+  margin: auto;
+}
+.slot--done .slot__icon {
+  background: rgba(169,184,154,.22) !important;
+  border-color: rgba(169,184,154,.5) !important;
+}
+.slot__kcal { font-size: 13px !important; font-weight: 600 !important; color: var(--c-ink) !important; }
+
+/* --- Tab bar: ensure label visible (cozy already has flex column but force readability) --- */
+.tab span {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  margin-top: 2px;
+}
+
+/* --- Cooked-weight banner: bigger icon + bigger text --- */
+.banner .banner__icon {
+  width: 42px !important; height: 42px !important;
+  border-radius: 12px !important;
+}
+.banner .banner__icon svg { width: 22px; height: 22px; }
+.banner .banner__title { font-size: 16px !important; }
+.banner .banner__body p { font-size: 12.5px !important; line-height: 1.5; }
+
+/* --- Profile: TOY POODLE · ♂ same baseline / size + bigger name --- */
+.profile__breed {
+  font-size: 12px !important;
+  letter-spacing: 0.12em !important;
+}
+.profile__breed .sym {
+  display: inline-block;
+  font-size: 12px;
+  vertical-align: baseline;
+  line-height: 1;
+  margin-left: 2px;
+}
+.profile__name { font-size: 38px !important; line-height: 1.05 !important; }
+
+/* Editable quote: looks like read-only text but click to edit */
+.profile__quote {
+  cursor: text;
+  border-bottom: 1px dashed transparent;
+  transition: border-color .15s;
+}
+.profile__quote:hover { border-bottom-color: var(--c-caramel); }
+.profile__quote.editing {
+  background: var(--c-cream);
+  padding: 4px 8px;
+  border-radius: 6px;
+  outline: none;
+  border-bottom-color: var(--c-mocha);
+}
+
+/* --- Profile stats: kg/y/m unit same size as number --- */
+.profile__stat .value { font-size: 22px !important; }
+.profile__stat .unit-big {
+  font-family: var(--font-num); font-variant-numeric: tabular-nums;
+  font-size: 22px !important; font-weight: 700;
+  color: var(--c-ink); letter-spacing: -0.03em; margin-left: 1px;
+}
+.profile__stat--accent .unit-big { color: var(--c-mocha); }
+
+/* --- Calc result: numbers inline with unit, not subscript --- */
+.result__big {
+  font-size: 36px !important;
+}
+.result__big sub, .result__mid sub {
+  font-size: 14px !important;
+  font-weight: 600;
+  vertical-align: baseline;
+  margin-left: 4px;
+  color: var(--c-muted);
+}
+
+/* end · v4.1 overrides */

@@ -916,6 +916,12 @@ function renderInfo() {
   if (!card) return;
   const kcalAuto = info.weight ? calcKcal(info.weight) : null;
   const kcalDisplay = info.calories || kcalAuto || '—';
+  const quote = info.quote || 'เพื่อนซี้ตัวจิ๋วของบ้าน';
+
+  // Compact age: "1y 1m" English abbreviation per user feedback
+  const ageY = info.ageY ? `${info.ageY}y` : '';
+  const ageM = info.ageM ? `${info.ageM}m` : '';
+  const ageCompact = [ageY, ageM].filter(Boolean).join(' ') || (info.age || '—');
 
   if (isEditing) {
     card.innerHTML = `
@@ -924,9 +930,9 @@ function renderInfo() {
           <img src="img/mocha-sit.png" alt="" class="anim-breath">
         </div>
         <div class="profile__id">
-          <div class="profile__breed">Toy Poodle · ♂</div>
-          <input class="ic-input" id="ei-name" value="${escHtml(info.name)}" style="font-family:var(--font-serif);font-size:26px;font-weight:500;color:var(--c-mocha);background:transparent;border:none;border-bottom:1px solid var(--rule);padding:2px 0;width:100%;letter-spacing:-.01em">
-          <div class="profile__quote">โหมดแก้ไข</div>
+          <div class="profile__breed">TOY POODLE <span class="sym">·&nbsp;♂</span></div>
+          <input id="ei-name" value="${escHtml(info.name)}" style="font-family:var(--font-serif);font-size:38px;font-weight:500;color:var(--c-ink);background:transparent;border:none;border-bottom:1px solid var(--rule);padding:2px 0;width:100%;letter-spacing:-.03em;line-height:1.05">
+          <input id="ei-quote" value="${escHtml(quote)}" placeholder="ใส่คำพูดน่ารักๆ..." style="font-family:var(--font-serif);font-style:italic;font-size:13px;color:var(--c-mocha);background:var(--c-cream);border:none;outline:none;padding:4px 8px;border-radius:6px;width:100%;margin-top:6px">
         </div>
       </div>
 
@@ -934,19 +940,19 @@ function renderInfo() {
         <div>
           <div class="t-micro">อายุ</div>
           <div style="display:flex;gap:6px;margin-top:4px;align-items:center">
-            <input class="ic-input" id="ei-age-y" type="number" min="0" max="20" placeholder="0" value="${escHtml(info.ageY||'')}" style="flex:1;min-width:0;font-family:var(--font-num);padding:6px;border:1px solid var(--rule);border-radius:8px;text-align:center">
+            <input id="ei-age-y" type="number" min="0" max="20" placeholder="0" value="${escHtml(info.ageY||'')}" style="flex:1;min-width:0;font-family:var(--font-num);padding:6px;border:1px solid var(--rule);border-radius:8px;text-align:center">
             <span style="font-size:11px;color:var(--c-muted)">ปี</span>
-            <input class="ic-input" id="ei-age-m" type="number" min="0" max="11" placeholder="0" value="${escHtml(info.ageM||'')}" style="flex:1;min-width:0;font-family:var(--font-num);padding:6px;border:1px solid var(--rule);border-radius:8px;text-align:center">
+            <input id="ei-age-m" type="number" min="0" max="11" placeholder="0" value="${escHtml(info.ageM||'')}" style="flex:1;min-width:0;font-family:var(--font-num);padding:6px;border:1px solid var(--rule);border-radius:8px;text-align:center">
             <span style="font-size:11px;color:var(--c-muted)">เดือน</span>
           </div>
         </div>
         <div>
           <div class="t-micro">น้ำหนัก (kg)</div>
-          <input class="ic-input" id="ei-weight" value="${escHtml(info.weight)}" placeholder="0.0" oninput="autoKcal()" type="number" step="0.1" min="0.5" max="10" style="margin-top:4px;width:100%;font-family:var(--font-num);padding:6px;border:1px solid var(--rule);border-radius:8px;text-align:center">
+          <input id="ei-weight" value="${escHtml(info.weight)}" placeholder="0.0" oninput="autoKcal()" type="number" step="0.1" min="0.5" max="10" style="margin-top:4px;width:100%;font-family:var(--font-num);padding:6px;border:1px solid var(--rule);border-radius:8px;text-align:center">
         </div>
         <div style="grid-column:1/-1">
-          <div class="t-micro">แคลอรี่/วัน (kcal)</div>
-          <input class="ic-input" id="ei-cal" value="${escHtml(info.calories)}" placeholder="auto" type="number" style="margin-top:4px;width:100%;font-family:var(--font-num);padding:6px;border:1px solid var(--rule);border-radius:8px;text-align:center">
+          <div class="t-micro">พลังงานต่อวัน (kcal)</div>
+          <input id="ei-cal" value="${escHtml(info.calories)}" placeholder="auto" type="number" style="margin-top:4px;width:100%;font-family:var(--font-num);padding:6px;border:1px solid var(--rule);border-radius:8px;text-align:center">
           <div id="kcal-hint" style="font-size:10px;color:var(--c-sage-deep);margin-top:4px">${info.weight ? 'คำนวณอัตโนมัติ (RER × 1.6)' : 'ใส่น้ำหนักเพื่อคำนวณ'}</div>
         </div>
       </div>
@@ -962,29 +968,63 @@ function renderInfo() {
           <img src="img/mocha-sit.png" alt="มอคค่านั่ง" class="anim-breath">
         </div>
         <div class="profile__id">
-          <div class="profile__breed">Toy Poodle · ♂</div>
+          <div class="profile__breed">TOY POODLE <span class="sym">·&nbsp;♂</span></div>
           <h1 class="profile__name">${escHtml(info.name)}</h1>
-          <div class="profile__quote">“ เพื่อนซี้ตัวจิ๋วของบ้าน ”</div>
+          <div class="profile__quote" id="profileQuote" onclick="editQuote(this)" title="แตะเพื่อแก้ไข">“ ${escHtml(quote)} ”</div>
         </div>
       </div>
       <div class="profile__stats">
         <div class="profile__stat">
           <div class="label">อายุ</div>
-          <div class="value">${escHtml(info.age||'—')}</div>
+          <div class="value">${escHtml(ageCompact)}</div>
         </div>
         <div class="profile__rule"></div>
         <div class="profile__stat">
           <div class="label">น้ำหนัก</div>
-          <div class="value">${escHtml(info.weight||'—')} <span class="unit">kg</span></div>
+          <div class="value">${escHtml(info.weight||'—')}<span class="unit-big">kg</span></div>
         </div>
         <div class="profile__rule"></div>
         <div class="profile__stat profile__stat--accent">
-          <div class="label">kcal/วัน</div>
-          <div class="value">${escHtml(kcalDisplay)}</div>
+          <div class="label">พลังงานต่อวัน</div>
+          <div class="value">${escHtml(kcalDisplay)}<span class="unit-big">kcal</span></div>
         </div>
         <button class="btn btn--edit" style="align-self:center" onclick="toggleEdit()">แก้ไข ›</button>
       </div>`;
   }
+}
+
+// Click to edit quote inline
+function editQuote(el) {
+  if (el.classList.contains('editing')) return;
+  const current = (getDogInfo().quote || 'เพื่อนซี้ตัวจิ๋วของบ้าน');
+  el.classList.add('editing');
+  el.contentEditable = 'true';
+  el.textContent = current;
+  el.focus();
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  const sel = window.getSelection();
+  sel.removeAllRanges(); sel.addRange(range);
+
+  const finish = () => {
+    el.removeEventListener('blur', finish);
+    el.removeEventListener('keydown', onKey);
+    el.contentEditable = 'false';
+    el.classList.remove('editing');
+    const newQuote = el.textContent.trim() || 'เพื่อนซี้ตัวจิ๋วของบ้าน';
+    const info = getDogInfo();
+    info.quote = newQuote;
+    localStorage.setItem('dogInfo', JSON.stringify(info));
+    if (window.db) window.db.collection('config').doc('profile').set(info, { merge: true });
+    el.innerHTML = `“ ${escHtml(newQuote)} ”`;
+    showToast('บันทึกคำพูดแล้ว','ok');
+  };
+  const onKey = (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); el.blur(); }
+    if (e.key === 'Escape') { e.preventDefault(); el.textContent = current; el.blur(); }
+  };
+  el.addEventListener('blur', finish);
+  el.addEventListener('keydown', onKey);
 }
 
 function saveDogInfo() {
@@ -993,12 +1033,14 @@ function saveDogInfo() {
   const ageParts = [];
   if (ageY && ageY!=='0') ageParts.push(`${ageY} ปี`);
   if (ageM && ageM!=='0') ageParts.push(`${ageM} เดือน`);
+  const existing = getDogInfo();
   const info = {
     name:     document.getElementById('ei-name').value.trim()   || INFO_DEFAULTS.name,
     age:      ageParts.join(' ') || INFO_DEFAULTS.age,
     ageY, ageM,
     weight:   document.getElementById('ei-weight').value.trim() || '',
     calories: document.getElementById('ei-cal').value.trim()    || '',
+    quote:    document.getElementById('ei-quote')?.value.trim() || existing.quote || 'เพื่อนซี้ตัวจิ๋วของบ้าน',
   };
   showConfirm('บันทึกข้อมูลโปรไฟล์?', () => {
     localStorage.setItem('dogInfo', JSON.stringify(info));
@@ -1254,11 +1296,11 @@ function setDash(m) {
     btn.classList.toggle('period__btn--active', k===m);
     btn.setAttribute('aria-selected', k===m ? 'true' : 'false');
   });
-  renderDash();
+  // dash card content stays — period toggle is decorative (per user feedback v4.1)
 }
 
 function renderDash() {
-  const el = document.getElementById('dashCard'); if (!el) return;
+  const dashEl = document.getElementById('dashCard'); if (!dashEl) return;
   const allLog = JSON.parse(localStorage.getItem('log')||'{}');
   const today = new Date();
   const mk = d => `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
@@ -1267,119 +1309,82 @@ function renderDash() {
   const kcalTarget = w ? Math.round(70*Math.pow(w,.75)*1.6) : 0;
   const perMealKcal = kcalTarget ? Math.round(kcalTarget / MEALS.length) : 0;
 
-  if (dashMode === 'day') {
-    const log = allLog[mk(today)] || {};
-    const fed = cnt(log), total = MEALS.length;
-    const slots = MEALS.map((m,i) => {
-      const f = asFed(log[m.id]);
-      const doneCls = f && !f.skipped ? ' slot--done' : '';
-      const lbl = m.label.replace('มื้อ','');
-      const kcal = f && !f.skipped ? (perMealKcal || '✓') : (f && f.skipped ? '—' : '—');
-      return `
-        <div class="slot${doneCls}">
-          <div class="slot__icon"><img src="img/time-${TIME_ASSET[i]||'morning'}.png" alt="" width="22" height="22"></div>
-          <span class="slot__label">${lbl}</span>
-          <span class="slot__kcal">${kcal}</span>
-        </div>`;
-    }).join('');
-    const kcalDone = fed * perMealKcal;
-    const totalBlock = kcalTarget ? `
-      <div class="dash__total">
-        <div class="dash__total-row">
-          <span class="label">แคลอรี่</span>
-          <span><span class="num">${kcalDone}</span> <span class="of">/ ${kcalTarget} kcal</span></span>
-        </div>
-        <div class="dash__progress"><i style="width:${Math.min(100,Math.round(kcalDone/kcalTarget*100))}%"></i></div>
-      </div>` : '';
-    el.className = 'dash';
-    el.innerHTML = `
-      <div class="dash__head">
-        <div>
-          <h3>วันนี้ · <span class="day-ref">${today.getDate()} ${MONTHS_S[today.getMonth()]}</span></h3>
-          <div class="dash__sub">${fed === total ? `ครบทุกมื้อแล้ว` : `กินไปแล้ว ${fed} จาก ${total} มื้อ`}</div>
-        </div>
+  // DAY dash (always)
+  const log = allLog[mk(today)] || {};
+  const fed = cnt(log), total = MEALS.length;
+  const slots = MEALS.map((m,i) => {
+    const f = asFed(log[m.id]);
+    const doneCls = f && !f.skipped ? ' slot--done' : '';
+    const lbl = m.label.replace('มื้อ','');
+    const kcal = f && !f.skipped ? (perMealKcal ? perMealKcal : '✓') : '—';
+    return `
+      <div class="slot${doneCls}">
+        <div class="slot__icon"><img src="img/time-${TIME_ASSET[i]||'morning'}.png" alt="" width="22" height="22"></div>
+        <span class="slot__label">${lbl}</span>
+        <span class="slot__kcal">${kcal}</span>
+      </div>`;
+  }).join('');
+  const kcalDone = fed * perMealKcal;
+  const totalBlock = kcalTarget ? `
+    <div class="dash__total">
+      <div class="dash__total-row">
+        <span class="label">แคลอรี่</span>
+        <span><span class="num">${kcalDone}</span> <span class="of">/ ${kcalTarget} kcal</span></span>
       </div>
-      <div class="dash__slots">${slots}</div>
-      ${totalBlock}`;
+      <div class="dash__progress"><i style="width:${Math.min(100,Math.round(kcalDone/kcalTarget*100))}%"></i></div>
+    </div>` : '';
+  dashEl.className = 'dash';
+  dashEl.innerHTML = `
+    <div class="dash__head">
+      <div>
+        <h3>วันนี้ · <span class="day-ref">${today.getDate()} ${MONTHS_S[today.getMonth()]}</span></h3>
+        <div class="dash__sub">${fed === total ? 'ครบทุกมื้อแล้ว' : `กินไปแล้ว ${fed} จาก ${total} มื้อ`}</div>
+      </div>
+    </div>
+    <div class="dash__slots">${slots}</div>
+    ${totalBlock}`;
 
-  } else if (dashMode === 'week') {
-    // 7 days ending today
-    let cells = '';
-    let completeCnt = 0;
-    for (let i=6; i>=0; i--) {
-      const d = new Date(today); d.setDate(d.getDate()-i);
-      const log = allLog[mk(d)] || {}, c = cnt(log);
-      const isToday = i === 0;
-      let pillCls = '', pillText = '';
-      if (isToday) { pillCls = 'week-pill--today'; pillText = 'วันนี้'; }
-      else if (c === MEALS.length) { pillCls = 'week-pill--complete'; pillText = '✓'; completeCnt++; }
-      else if (c > 0) { pillCls = 'week-pill--partial'; pillText = `${c}/${MEALS.length}`; }
-      else { pillCls = ''; pillText = '—'; }
-      cells += `<div class="week-cell"><div class="week-pill ${pillCls}">${pillText}</div><span class="week-cell__lbl">${DAYS_S[d.getDay()]}</span></div>`;
-    }
-    // streak today (consecutive complete days back from today)
-    let streak = 0;
-    const cursor = new Date(today);
-    while (true) {
-      const k = mk(cursor);
-      if (cnt(allLog[k]||{}) >= MEALS.length) { streak++; cursor.setDate(cursor.getDate()-1); }
-      else break;
-    }
-    el.className = 'dash week-streak';
-    el.innerHTML = `
-      <div class="week-streak__head">
-        <div>
-          <div class="label">7 วันที่ผ่านมา</div>
-          <div><span class="big">${completeCnt}/7</span> <span class="sub">วันครบมื้อ</span></div>
-        </div>
-        <span class="streak-badge">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-            <path d="M12 3s4 4 4 8a4 4 0 01-8 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-4-1-5 0-1 1-2 1-2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-          </svg>
-          ${streak} STREAK
-        </span>
-      </div>
-      <div class="week-row">${cells}</div>`;
-
-  } else {
-    const y = today.getFullYear(), mo = today.getMonth();
-    let full=0, part=0, miss=0, maxStreak=0, cur=0;
-    let skipMeals=0, skipDays=0;
-    for (let d=1; d<=today.getDate(); d++) {
-      const log = allLog[`${y}-${mo+1}-${d}`]||{}, c=cnt(log);
-      const daySkips = MEALS.filter(m=>{const f=asFed(log[m.id]);return f && f.skipped;}).length;
-      skipMeals += daySkips;
-      if (daySkips > 0) skipDays++;
-      if (c===MEALS.length){full++;cur++;}
-      else if(c>0){part++;cur=0;}
-      else{miss++;cur=0;}
-      maxStreak=Math.max(maxStreak,cur);
-    }
-    const slots = [
-      { lbl:'ครบมื้อ', val: full, key:'complete' },
-      { lbl:'บางมื้อ', val: part, key:'partial' },
-      { lbl:'ขาด',     val: miss, key:'miss' },
-      { lbl:'สตรีคสูงสุด', val: maxStreak, key:'streak' },
-    ].map(s => `
-        <div class="slot${s.val>0 && (s.key==='complete'||s.key==='streak')?' slot--done':''}">
-          <div class="slot__icon"><img src="img/time-${s.key==='complete'?'morning':s.key==='partial'?'noon':s.key==='miss'?'night':'evening'}.png" alt="" width="22" height="22"></div>
-          <span class="slot__label">${s.lbl}</span>
-          <span class="slot__kcal">${s.val}</span>
-        </div>`).join('');
-    const skipNote = skipMeals > 0
-      ? `<div class="dash__sub" style="margin-top:8px;color:var(--c-rust)">ไม่กิน ${skipMeals} มื้อ · ${skipDays} วัน</div>`
-      : '';
-    el.className = 'dash';
-    el.innerHTML = `
-      <div class="dash__head">
-        <div>
-          <h3>เดือน${MONTHS_F[mo]}</h3>
-          <div class="dash__sub">รวมถึงวันนี้ · ${today.getDate()} วัน</div>
-        </div>
-      </div>
-      <div class="dash__slots">${slots}</div>
-      ${skipNote}`;
+  // WEEK-STREAK (always shown below dash · per user feedback v4.1)
+  let weekEl = document.getElementById('weekStreakCard');
+  if (!weekEl) {
+    weekEl = document.createElement('article');
+    weekEl.id = 'weekStreakCard';
+    weekEl.className = 'week-streak';
+    dashEl.insertAdjacentElement('afterend', weekEl);
   }
+  let cells = '';
+  let completeCnt = 0;
+  for (let i=6; i>=0; i--) {
+    const d = new Date(today); d.setDate(d.getDate()-i);
+    const dlog = allLog[mk(d)] || {}, c = cnt(dlog);
+    const isToday = i === 0;
+    let pillCls = '', pillText = '';
+    if (isToday) { pillCls = 'week-pill--today'; pillText = 'วันนี้'; }
+    else if (c === MEALS.length) { pillCls = 'week-pill--complete'; pillText = '✓'; completeCnt++; }
+    else if (c > 0) { pillCls = 'week-pill--partial'; pillText = `${c}/${MEALS.length}`; }
+    else { pillText = '—'; }
+    cells += `<div class="week-cell"><div class="week-pill ${pillCls}">${pillText}</div><span class="week-cell__lbl">${DAYS_S[d.getDay()]}</span></div>`;
+  }
+  // running streak ending today
+  let streak = 0;
+  const cursor = new Date(today);
+  while (cnt(allLog[mk(cursor)]||{}) >= MEALS.length) {
+    streak++; cursor.setDate(cursor.getDate()-1);
+  }
+  weekEl.innerHTML = `
+    <div class="week-streak__head">
+      <div>
+        <div class="label">7 วันที่ผ่านมา</div>
+        <div><span class="big">${completeCnt}/7</span> <span class="sub">วันครบมื้อ</span></div>
+      </div>
+      <span class="streak-badge">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+          <path d="M12 3s4 4 4 8a4 4 0 01-8 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-4-1-5 0-1 1-2 1-2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>
+        ${streak} STREAK
+      </span>
+    </div>
+    <div class="week-row">${cells}</div>`;
 }
 
 // ── SW update banner ──────────────────────────────────────────────────
