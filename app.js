@@ -280,7 +280,7 @@ function renderToday() {
           </span>
         </div>
         <div class="meal__label">${meal.label}</div>
-        <div class="meal__time">${t}${fed.time?' · '+fed.time:''}</div>
+        <div class="meal__time">${t}${(fed.time && /^\d{1,2}:\d{2}$/.test(fed.time) && fed.time!==t) ? ' · '+fed.time : ''}</div>
         ${info ? `<div class="meal__detail"><div class="meal__foods">${escHtml(info)}</div></div>` : ''}
         <button class="meal__undo-mini" onclick="event.stopPropagation();undoFeed('${meal.id}')" aria-label="ยกเลิก">↩</button>`;
     } else {

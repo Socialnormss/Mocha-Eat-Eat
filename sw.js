@@ -1,4 +1,4 @@
-const CACHE = 'dog-feeder-v7.1-cozy';
+const CACHE = 'dog-feeder-v7.2-cozy';
 const ASSETS = ['./index.html', './style.css', './mocha-cozy.css', './data.js', './app.js', './manifest.json', './icon.png', './firebase-config.js'];
 
 self.addEventListener('install', e => {

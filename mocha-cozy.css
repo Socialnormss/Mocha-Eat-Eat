@@ -299,13 +299,13 @@ input, textarea { font: inherit; color: inherit; }
 
 .hero__mascot {
   position: absolute;
-  right: -6px; bottom: -10px;
-  width: 120px; height: auto;
+  right: 4px; bottom: -8px;
+  width: 168px; height: auto;
   z-index: 1;
   pointer-events: none;
 }
 
-.hero__row    { display: flex; justify-content: space-between; align-items: flex-start; position: relative; z-index: 2; }
+.hero__row { display: flex; justify-content: flex-start; align-items: flex-start; position: relative; z-index: 2; padding-right: 130px; }
 .hero__weekday{ font-size: 11px; letter-spacing: 0.16em; opacity: .7;
                 text-transform: uppercase; font-weight: 600; }
 .hero__date   { font-family: var(--font-num); font-variant-numeric: tabular-nums;
@@ -350,7 +350,7 @@ input, textarea { font: inherit; color: inherit; }
   margin-bottom: var(--sp-3);
 }
 .section__title { font-family: var(--font-serif); font-size: var(--fs-h2);
-                  font-weight: 500; letter-spacing: -0.02em; color: var(--c-ink); margin: 0; }
+                  font-weight: 700; letter-spacing: -0.02em; color: var(--c-ink); margin: 0; }
 .section__meta  { font-family: var(--font-num); font-variant-numeric: tabular-nums;
                   font-size: 12px; color: var(--c-muted); font-weight: 500; }
 
@@ -376,14 +376,14 @@ input, textarea { font: inherit; color: inherit; }
 .meal__head { display: flex; justify-content: space-between; align-items: flex-start; }
 
 .meal__icon {
-  width: 40px; height: 40px; border-radius: 13px;
-  background: rgba(232,210,181,.4);
+  width: 48px; height: 48px; border-radius: 14px;
+  background: transparent;
   display: flex; align-items: center; justify-content: center;
   color: var(--c-caramel);
   overflow: hidden;
 }
 .meal__icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.meal--done .meal__icon { background: rgba(169,184,154,.18); color: var(--c-sage-deep); }
+.meal--done .meal__icon { background: transparent; color: var(--c-sage-deep); }
 
 .meal__status-done {
   width: 24px; height: 24px; border-radius: 12px;
@@ -460,14 +460,17 @@ input, textarea { font: inherit; color: inherit; }
 .btn--ghost:hover { border-color: var(--rule-strong); color: var(--c-ink); }
 
 .btn--add {
-  background: var(--c-paper);
-  color: var(--c-mocha);
-  border: 1px solid var(--rule);
-  border-radius: 10px;
-  padding: 5px 11px;
+  background: var(--c-mocha);
+  color: #fff;
+  border: 0;
+  border-radius: 12px;
+  padding: 6px 12px;
   font-size: 12px;
+  font-weight: 600;
   box-shadow: var(--shadow-soft);
+  display: inline-flex; align-items: center; gap: 4px;
 }
+.btn--add svg { stroke: currentColor; }
 
 .btn--edit {
   background: var(--c-mocha);
@@ -510,19 +513,22 @@ input, textarea { font: inherit; color: inherit; }
 
 /* Mocha pack — 3 puppies trotting in formation, leader at right */
 .streak__pack {
-  position: absolute; right: 8px; bottom: 4px;
+  position: absolute; right: 10px; bottom: -2px;
   display: flex; align-items: flex-end; gap: 0;
   pointer-events: none; z-index: 0;
 }
 .streak__pack img {
-  width: 46px; height: 46px; object-fit: contain;
+  width: 70px; height: 70px; object-fit: contain;
 }
-.streak__pack img:nth-child(1) { opacity: .28; transform: scale(.82); margin-right: -18px; }
-.streak__pack img:nth-child(2) { opacity: .55; transform: scale(.92); margin-right: -16px; }
+.streak__pack img:nth-child(1) { opacity: .32; transform: scale(.78); margin-right: -28px; }
+.streak__pack img:nth-child(2) { opacity: .60; transform: scale(.90); margin-right: -24px; }
 .streak__pack img:nth-child(3) { opacity: 1;   transform: scale(1); }
 .streak__pack .anim-bob { animation-duration: 1.6s; }
 .streak__pack img:nth-child(1).anim-bob { animation-delay: -.6s; }
 .streak__pack img:nth-child(2).anim-bob { animation-delay: -.3s; }
+
+/* Allow pack to extend outside streak card naturally */
+.streak { padding-right: 110px; overflow: visible; }
 
 
 /* ────────────────────────────────────────────────────────────
@@ -1221,21 +1227,34 @@ input, textarea { font: inherit; color: inherit; }
   padding-bottom: calc(100px + max(env(safe-area-inset-bottom), 12px));
 }
 
-/* Calendar nav */
-.cal-nav { padding: 0; margin: 0 0 var(--sp-4); gap: var(--sp-3); align-items: center; }
-.cal-arr {
-  width: 36px; height: 36px;
-  background: var(--c-paper); border: 1px solid var(--rule);
-  color: var(--c-ink); font-size: 18px; border-radius: 50%;
-  flex-shrink: 0; box-shadow: var(--shadow-soft);
+/* Calendar nav (Cozy palette override of legacy) */
+#page-calendar .cal-nav {
+  display: flex !important; align-items: center !important;
+  justify-content: space-between !important;
+  margin: 0 0 var(--sp-4); gap: var(--sp-3);
 }
-.cal-month {
-  flex: 1; text-align: center;
-  font-family: var(--font-serif); font-size: 18px; font-weight: 600;
-  color: var(--c-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+#page-calendar .cal-arr {
+  width: 36px !important; height: 36px !important;
+  background: var(--c-paper) !important; border: 1px solid var(--rule) !important;
+  color: var(--c-ink) !important; font-size: 18px !important; border-radius: 50% !important;
+  flex-shrink: 0 !important; box-shadow: var(--shadow-soft);
+  padding: 0; line-height: 1;
 }
-.cal-legend { color: var(--c-muted); margin-bottom: var(--sp-3); }
-.cal-grid { gap: 4px; }
+#page-calendar .cal-month {
+  flex: 1 1 0 !important;
+  text-align: center;
+  font-family: var(--font-serif); font-size: 16px !important; font-weight: 700 !important;
+  color: var(--c-ink) !important;
+  min-width: 0;
+  padding: 0 4px;
+  white-space: nowrap;
+  overflow: visible;
+}
+#page-calendar .cal-legend { color: var(--c-muted); margin-bottom: var(--sp-3); font-size: 11px; }
+#page-calendar .cal-grid { gap: 4px; }
+#page-calendar .dow { color: var(--c-mocha); font-weight: 700; font-size: 11px; }
+#page-calendar .cday { color: var(--c-ink); }
+#page-calendar .cday.empty { color: transparent; }
 
 /* Nutrition profile hero — replace 🐩 with mocha-sit */
 #page-nutrition .hero-avatar {
@@ -1253,5 +1272,8 @@ input, textarea { font: inherit; color: inherit; }
   background: url('img/mocha-sit.png') center / cover no-repeat;
 }
 #page-nutrition .hero-avatar > * { display: none; }
+
+/* hide duplicate name cell in info-grid (already shown in hero) */
+#page-nutrition .info-grid .info-cell:first-child { display: none; }
 
 /* end · mocha-cozy.css */
