@@ -590,11 +590,11 @@ function confirmFeed() {
 // ── Calendar ─────────────────────────────────────────────────────────
 let calY=new Date().getFullYear(), calM=new Date().getMonth();
 
-function calPrev() { calM--; if(calM<0){calM=11;calY--;} renderCalendar(); }
+function calPrev() { calM--; if(calM<0){calM=11;calY--;} renderCalendar(); if (dashMode==='month') renderDash(); }
 function calNext() {
   const n=new Date();
   if (calY>n.getFullYear()||(calY===n.getFullYear()&&calM>=n.getMonth())) return;
-  calM++; if(calM>11){calM=0;calY++;} renderCalendar();
+  calM++; if(calM>11){calM=0;calY++;} renderCalendar(); if (dashMode==='month') renderDash();
 }
 
 function renderCalendar() {
@@ -1290,22 +1290,26 @@ function setDash(m) {
     btn.classList.toggle('period__btn--active', k===m);
     btn.setAttribute('aria-selected', k===m ? 'true' : 'false');
   });
-  // dash card content stays — period toggle is decorative (per user feedback v4.1)
+  renderDash();
 }
 
-function renderDash() {
-  const dashEl = document.getElementById('dashCard'); if (!dashEl) return;
+// helper — daily date key
+const _dk = d => `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+const _cnt = log => MEALS.filter(m => { const f=asFed(log[m.id]); return f && !f.skipped; }).length;
+const _skipCnt = log => MEALS.filter(m => { const f=asFed(log[m.id]); return f && f.skipped; }).length;
+
+function _kcalTargets() {
+  const info = getDogInfo(); const w = parseFloat(info.weight);
+  const target = w ? Math.round(70*Math.pow(w,.75)*1.6) : 0;
+  return { target, perMeal: target ? Math.round(target / MEALS.length) : 0 };
+}
+
+function _renderDayCard() {
   const allLog = JSON.parse(localStorage.getItem('log')||'{}');
   const today = new Date();
-  const mk = d => `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
-  const cnt = log => MEALS.filter(m => { const f=asFed(log[m.id]); return f && !f.skipped; }).length;
-  const info = getDogInfo(); const w = parseFloat(info.weight);
-  const kcalTarget = w ? Math.round(70*Math.pow(w,.75)*1.6) : 0;
-  const perMealKcal = kcalTarget ? Math.round(kcalTarget / MEALS.length) : 0;
-
-  // DAY dash (always)
-  const log = allLog[mk(today)] || {};
-  const fed = cnt(log), total = MEALS.length;
+  const log = allLog[_dk(today)] || {};
+  const fed = _cnt(log), total = MEALS.length;
+  const { target: kcalTarget, perMeal: perMealKcal } = _kcalTargets();
   const slots = MEALS.map((m,i) => {
     const f = asFed(log[m.id]);
     const doneCls = f && !f.skipped ? ' slot--done' : '';
@@ -1319,16 +1323,16 @@ function renderDash() {
       </div>`;
   }).join('');
   const kcalDone = fed * perMealKcal;
+  const pct = kcalTarget ? Math.min(100, Math.round(kcalDone/kcalTarget*100)) : 0;
   const totalBlock = kcalTarget ? `
     <div class="dash__total">
       <div class="dash__total-row">
         <span class="label">แคลอรี่</span>
         <span><span class="num">${kcalDone}</span> <span class="of">/ ${kcalTarget} kcal</span></span>
       </div>
-      <div class="dash__progress"><i style="width:${Math.min(100,Math.round(kcalDone/kcalTarget*100))}%"></i></div>
+      <div class="dash__progress"><i style="width:${pct}%"></i></div>
     </div>` : '';
-  dashEl.className = 'dash';
-  dashEl.innerHTML = `
+  return `
     <div class="dash__head">
       <div>
         <h3>วันนี้ · <span class="day-ref">${today.getDate()} ${MONTHS_S[today.getMonth()]}</span></h3>
@@ -1337,20 +1341,16 @@ function renderDash() {
     </div>
     <div class="dash__slots">${slots}</div>
     ${totalBlock}`;
+}
 
-  // WEEK-STREAK (always shown below dash · per user feedback v4.1)
-  let weekEl = document.getElementById('weekStreakCard');
-  if (!weekEl) {
-    weekEl = document.createElement('article');
-    weekEl.id = 'weekStreakCard';
-    weekEl.className = 'week-streak';
-    dashEl.insertAdjacentElement('afterend', weekEl);
-  }
+function _renderWeekCard() {
+  const allLog = JSON.parse(localStorage.getItem('log')||'{}');
+  const today = new Date();
   let cells = '';
   let completeCnt = 0;
   for (let i=6; i>=0; i--) {
     const d = new Date(today); d.setDate(d.getDate()-i);
-    const dlog = allLog[mk(d)] || {}, c = cnt(dlog);
+    const dlog = allLog[_dk(d)] || {}, c = _cnt(dlog);
     const isToday = i === 0;
     let pillCls = '', pillText = '';
     if (isToday) { pillCls = 'week-pill--today'; pillText = 'วันนี้'; }
@@ -1362,10 +1362,10 @@ function renderDash() {
   // running streak ending today
   let streak = 0;
   const cursor = new Date(today);
-  while (cnt(allLog[mk(cursor)]||{}) >= MEALS.length) {
+  while (_cnt(allLog[_dk(cursor)]||{}) >= MEALS.length) {
     streak++; cursor.setDate(cursor.getDate()-1);
   }
-  weekEl.innerHTML = `
+  return `
     <div class="week-streak__head">
       <div>
         <div class="label">7 วันที่ผ่านมา</div>
@@ -1379,6 +1379,79 @@ function renderDash() {
       </span>
     </div>
     <div class="week-row">${cells}</div>`;
+}
+
+function _renderMonthCard() {
+  const allLog = JSON.parse(localStorage.getItem('log')||'{}');
+  // use calM/calY (current calendar view) when available, else current month
+  const y = (typeof calY === 'number') ? calY : new Date().getFullYear();
+  const m = (typeof calM === 'number') ? calM : new Date().getMonth();
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  const today = new Date();
+  const isCurMonth = (today.getFullYear()===y && today.getMonth()===m);
+  const lastDay = isCurMonth ? today.getDate() : daysInMonth;
+
+  let complete=0, partial=0, skips=0, kcalSum=0, recordedDays=0;
+  let bestStreak=0, curStreak=0;
+  const { perMeal } = _kcalTargets();
+  for (let d=1; d<=lastDay; d++) {
+    const log = allLog[`${y}-${m+1}-${d}`] || {};
+    const c = _cnt(log), s = _skipCnt(log);
+    const recorded = Object.keys(log).length > 0;
+    if (recorded) recordedDays++;
+    if (c === MEALS.length) { complete++; curStreak++; bestStreak = Math.max(bestStreak, curStreak); }
+    else { curStreak = 0; if (c>0) partial++; }
+    skips += s;
+    kcalSum += c * perMeal;
+  }
+  const avgKcal = recordedDays ? Math.round(kcalSum / recordedDays) : 0;
+  const monthLabel = `${MONTHS_S[m]} ${y+543}`;
+
+  return `
+    <div class="dash-month__head">
+      <div>
+        <div class="label">เดือน ${monthLabel}</div>
+        <div><span class="big">${complete}</span> <span class="sub">/ ${lastDay} วันครบมื้อ</span></div>
+      </div>
+      <span class="streak-badge">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+          <path d="M12 3s4 4 4 8a4 4 0 01-8 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-4-1-5 0-1 1-2 1-2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>
+        ${bestStreak} BEST
+      </span>
+    </div>
+    <div class="dash-month__grid">
+      <div class="dash-month__cell">
+        <span class="dash-month__num">${partial}</span>
+        <span class="dash-month__cap">บางมื้อ</span>
+      </div>
+      <div class="dash-month__cell">
+        <span class="dash-month__num">${skips}</span>
+        <span class="dash-month__cap">ไม่กิน</span>
+      </div>
+      <div class="dash-month__cell">
+        <span class="dash-month__num">${avgKcal}</span>
+        <span class="dash-month__cap">kcal เฉลี่ย/วัน</span>
+      </div>
+    </div>`;
+}
+
+function renderDash() {
+  const dashEl = document.getElementById('dashCard'); if (!dashEl) return;
+  // remove legacy v4.1 weekStreakCard if present (now merged into period toggle)
+  const legacyWeek = document.getElementById('weekStreakCard');
+  if (legacyWeek) legacyWeek.remove();
+
+  if (dashMode === 'day') {
+    dashEl.className = 'dash dash--ci';
+    dashEl.innerHTML = _renderDayCard();
+  } else if (dashMode === 'week') {
+    dashEl.className = 'dash week-streak';
+    dashEl.innerHTML = _renderWeekCard();
+  } else {
+    dashEl.className = 'dash dash-month';
+    dashEl.innerHTML = _renderMonthCard();
+  }
 }
 
 // ── SW update banner ──────────────────────────────────────────────────
