@@ -1,6 +1,6 @@
-const CACHE = 'dog-feeder-v8.3-cozy';
+const CACHE = 'dog-feeder-v16-chars';
 const ASSETS = [
-  './index.html', './style.css', './mocha-cozy.css',
+  './index.html', './style.css', './mocha-cozy.css', './mocha-fun.css',
   './data.js', './app.js', './manifest.json', './icon.png', './firebase-config.js',
   './img/mocha-avatar.png', './img/mocha-peek.png', './img/mocha-sit.png', './img/mocha-trot.png',
   './img/time-morning.png', './img/time-noon.png', './img/time-evening.png', './img/time-night.png',
@@ -11,6 +11,12 @@ const ASSETS = [
   './img/danger-chocolate.png', './img/danger-grape.png', './img/danger-xylitol.png',
   './img/danger-caffeine.png', './img/danger-wine.png', './img/danger-onion.png',
   './img/danger-avocado.png', './img/danger-macadamia.png', './img/danger-milk.png',
+  './img/elements/el-ricebowl.png', './img/elements/el-sandwich.png', './img/elements/el-orange.png',
+  './img/elements/el-mug.png', './img/elements/el-flame.png', './img/elements/el-spoon.png',
+  './img/elements/el-tomato.png', './img/elements/el-bottle.png', './img/elements/el-gum.png',
+  './img/elements/el-ricecooker.png', './img/elements/el-cake.png', './img/elements/el-acorn.png',
+  './img/elements/el-dango.png', './img/elements/el-teapot.png', './img/elements/el-orange2.png',
+  './img/elements/el-tv.png', './img/elements/el-jam.png', './img/elements/el-yogurt.png',
 ];
 
 self.addEventListener('install', e => {

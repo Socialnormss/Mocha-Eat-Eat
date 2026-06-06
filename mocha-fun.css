@@ -1,0 +1,541 @@
+/* ════════════════════════════════════════════════════════════════════
+   mocha-fun.css — "Bubbly Pastel" theme layer (v6)
+   โหลดหลัง style.css + mocha-cozy.css → override tokens + รื้อ component
+   แนว: mood-app สว่าง พาสเทล ตัวหนังสือหนา ตัวการ์ตูนแบน ฟอนต์ Kanit
+   ════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── core palette (ทับ cozy tokens) ── */
+  --c-cream:     #F3F1EA;   /* app background (off-white อุ่น) */
+  --c-paper:     #FFFFFF;   /* card surface */
+  --c-latte:     #ECE8DE;   /* divider / soft fill */
+  --c-caramel:   #F2A65A;   /* peach accent */
+  --c-mocha:     #1F9E57;   /* PRIMARY / brand → เขียวสด */
+  --c-espresso:  #6C5CE7;   /* ม่วง (gradient รอง) */
+  --c-ink:       #18150F;   /* ตัวอักษรหลัก (เกือบดำ) */
+  --c-muted:     #6E6A5F;   /* ตัวอักษรรอง */
+  --c-faint:     #A8A498;   /* ตัวอักษรจาง */
+
+  --c-sage:      #9BDB6B;   /* done / success (เขียวสด) */
+  --c-sage-deep: #4FB02B;
+  --c-blush:     #FFC2D6;   /* ชมพูพาสเทล */
+  --c-rust:      #FF6B6B;   /* danger / skip (คอรัล) */
+
+  /* ── accent สำหรับปุ่ม/เมนู (แทนสีดำ) → ส้มไฟ เข้ากับ Norm ── */
+  --c-accent:      #F15A29;
+  --c-accent-deep: #D6481C;
+
+  --rule:        rgba(24,21,15,.09);
+  --rule-strong: rgba(24,21,15,.16);
+
+  /* ── pastel fills (ของใหม่) ── */
+  --pastel-green:  #DCF3C4;
+  --pastel-peach:  #FFE3C7;
+  --pastel-purple: #E6DDFB;
+  --pastel-pink:   #FFDBE8;
+  --pastel-blue:   #D2EAFB;
+  --pastel-yellow: #FFEFBE;
+
+  /* ── legacy tokens (modal/calendar เก่าใน style.css) → พาสเทล ── */
+  --bg: #FFFFFF; --c1: #FFFFFF; --c2: #F3F1EA; --c3: #ECE8DE;
+  --sep: rgba(24,21,15,.10);
+  --t1: #18150F; --t2: #6E6A5F; --t3: #A8A498;
+  --tint: #1F9E57; --tintd: #16803F;
+  --ok: #4FB02B; --err: #FF6B6B; --warn: #F2A65A;
+
+  /* ── ฟอนต์ Kanit ทั้งแอป ── */
+  --font-serif: 'Kanit', system-ui, sans-serif;   /* หัวข้อ (หนา) */
+  --font-sans:  'Kanit', 'Noto Sans Thai', system-ui, sans-serif;
+  --font-num:   'Kanit', system-ui, sans-serif;
+
+  /* ── ตัวอักษรใหญ่ + หนา ── */
+  --fs-display:  48px;
+  --fs-h1:       36px;
+  --fs-h2:       25px;
+  --fs-h3:       19px;
+  --fs-body:     15px;
+  --fs-body-sm:  13px;
+  --fs-meta:     12px;
+  --fs-micro:    11px;
+
+  /* ── มุมโค้งกลมมาก ── */
+  --r-sm:   14px;
+  --r-md:   18px;
+  --r-lg:   22px;
+  --r-xl:   26px;
+  --r-2xl:  30px;
+  --r-3xl:  34px;
+
+  /* ── เงานุ่ม flat ── */
+  --shadow-card:  0 6px 18px rgba(24,21,15,.07);
+  --shadow-soft:  0 3px 10px rgba(24,21,15,.05);
+  --shadow-hero:  0 14px 30px rgba(24,21,15,.10);
+  --shadow-press: 0 2px 6px rgba(24,21,15,.10);
+}
+
+/* ── พื้นหลัง: ครีม + พาสเทลบลॉบจาง ๆ มุมบน ── */
+html, body { font-family: var(--font-sans); color: var(--c-ink); font-weight: 500; }
+body {
+  background:
+    radial-gradient(420px 320px at -8% -6%, rgba(155,219,107,.20), transparent 70%),
+    radial-gradient(380px 300px at 108% 2%, rgba(255,194,214,.22), transparent 70%),
+    var(--c-cream) !important;
+  background-attachment: fixed;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   TOPBAR
+   ════════════════════════════════════════════════════════════════════ */
+.topbar { padding-top: calc(env(safe-area-inset-top) + 10px); background: transparent !important; }
+.avatar {
+  width: 50px; height: 50px; border-radius: 50%;
+  border: 3px solid #fff; box-shadow: var(--shadow-soft);
+  background: var(--pastel-peach); overflow: hidden;
+}
+.avatar img { width: 112%; height: 112%; object-fit: cover; margin: -6% 0 0 -6%; }
+.topbar__title .name  { font-family: var(--font-serif) !important; font-size: 23px !important;
+                        font-weight: 700 !important; color: var(--c-ink); letter-spacing: -.01em; }
+.topbar__title .breed { font-size: 13px; color: var(--c-muted); font-weight: 500; }
+.icon-btn {
+  width: 46px; height: 46px; border-radius: 16px;
+  background: #fff; color: var(--c-ink);
+  box-shadow: var(--shadow-soft); border: 1px solid var(--rule);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   HERO → การ์ดพาสเทลเขียว หัวข้อหนา + มาสคอต
+   ════════════════════════════════════════════════════════════════════ */
+.hero {
+  border-radius: var(--r-3xl) !important;
+  background: linear-gradient(150deg, #E6F6D2 0%, #D6F0C0 100%) !important;
+  color: var(--c-ink) !important;
+  box-shadow: var(--shadow-card) !important;
+  padding: 22px 24px !important;
+  min-height: 172px !important;
+  overflow: visible !important;
+}
+.hero::before { width: 130px; height: 130px; top: -38px; right: 80px;
+                background: rgba(255,255,255,.45) !important; }
+.hero::after  { width: 70px; height: 70px; bottom: 18px; left: 30%;
+                background: rgba(159,219,107,.35) !important; }
+
+.hero__mascot { width: 150px !important; right: 0 !important; bottom: -8px !important;
+                filter: drop-shadow(0 8px 10px rgba(24,21,15,.14)); z-index: 3 !important; }
+
+.hero__bubble {
+  position: absolute; z-index: 4; right: 104px; top: 6px;
+  background: var(--c-accent); color: #fff;
+  font-family: var(--font-serif); font-weight: 600; font-size: 14px;
+  padding: 8px 14px; border-radius: 16px 16px 4px 16px;
+  box-shadow: 0 6px 14px rgba(24,21,15,.20); white-space: nowrap;
+  animation: bubbleBob 2.6s ease-in-out infinite;
+}
+.hero__bubble::after { content:''; position:absolute; right:-6px; bottom:8px;
+  border:6px solid transparent; border-left-color:var(--c-accent); border-right:0; }
+@keyframes bubbleBob { 0%,100%{ transform: translateY(0) } 50%{ transform: translateY(-4px) } }
+
+.hero__row { padding-right: 116px !important; flex-direction: column !important;
+             align-items: flex-start !important; }
+.hero__weekday { font-size: 14px !important; letter-spacing: 0 !important; text-transform: none !important;
+                 opacity: 1 !important; font-weight: 600 !important; color: var(--c-muted) !important; }
+.hero__date { font-family: var(--font-num) !important; font-size: 40px !important; font-weight: 700 !important;
+              letter-spacing: -.02em !important; margin-top: 0 !important; color: var(--c-ink) !important;
+              text-shadow: none !important; }
+.hero__greet { font-size: 13px !important; opacity: 1 !important; font-weight: 500 !important;
+               color: var(--c-muted) !important; }
+
+.hero__count { text-align: left !important; margin-top: 14px; }
+.hero__count-label { font-size: 13px !important; letter-spacing: 0 !important; text-transform: none !important;
+                     opacity: 1 !important; font-weight: 600 !important; color: var(--c-muted) !important; }
+.hero__count-value { font-family: var(--font-num) !important; font-size: 52px !important; font-weight: 700 !important;
+                     letter-spacing: -.03em !important; color: var(--c-ink) !important; text-shadow: none !important; }
+.hero__count-value sub { font-size: 24px !important; opacity: .55 !important; color: var(--c-ink) !important; }
+.hero__dots { justify-content: flex-start !important; gap: 8px !important; margin-top: 10px !important; }
+.hero__dots i { width: 16px !important; height: 16px !important; background: rgba(24,21,15,.14) !important; }
+.hero__dots i.is-on { background: var(--c-sage-deep) !important; box-shadow: 0 0 0 4px rgba(79,176,43,.18); }
+
+.hero__next {
+  border-top: none !important; max-width: none !important; margin-top: 16px !important; padding-top: 0 !important;
+  background: #fff; border-radius: 16px; padding: 9px 16px !important;
+  display: inline-flex !important; gap: 10px; align-items: center; width: auto;
+  box-shadow: var(--shadow-soft);
+}
+.hero__next-label { font-size: 11px !important; opacity: 1 !important; color: var(--c-muted) !important;
+                    text-transform: none !important; letter-spacing: 0 !important; }
+.hero__next-time { font-family: var(--font-num) !important; font-size: 16px !important; font-weight: 700 !important;
+                   color: var(--c-ink) !important; }
+
+/* ════════════════════════════════════════════════════════════════════
+   SECTION + MEAL CARDS (พาสเทลสลับสี เต็มความกว้าง)
+   ════════════════════════════════════════════════════════════════════ */
+.section__title { font-family: var(--font-serif) !important; font-size: 24px !important; font-weight: 700 !important;
+                  letter-spacing: -.01em !important; }
+.section__meta  { font-family: var(--font-num) !important; font-size: 13px !important; font-weight: 600 !important;
+                  color: var(--c-mocha) !important; white-space: nowrap !important; flex-shrink: 0 !important; }
+.section__head { gap: 10px !important; }
+.btn--add { background: var(--c-accent) !important; color: #fff !important; border-radius: 14px !important;
+            font-size: 13px !important; font-weight: 600 !important; padding: 8px 15px !important;
+            box-shadow: var(--shadow-soft) !important; }
+
+.meal-grid { grid-template-columns: 1fr 1fr !important; gap: 12px !important; }
+
+.meal {
+  border-radius: var(--r-2xl) !important;
+  border: none !important;
+  box-shadow: var(--shadow-card) !important;
+  padding: 16px !important;
+  background: #fff !important;
+}
+.meal:active { transform: translateY(2px) scale(.99); }
+/* สลับสีพาสเทลตามมื้อ (1=เช้า peach · 2=เย็น blue) */
+.meal-grid .meal:nth-child(1) { background: var(--pastel-peach) !important; }
+.meal-grid .meal:nth-child(2) { background: var(--pastel-blue) !important; }
+
+.meal__icon { width: 60px !important; height: 60px !important; border-radius: 50% !important;
+              background: rgba(255,255,255,.7) !important; box-shadow: none !important; }
+.meal__icon img { border-radius: 50% !important; }
+
+.meal__status-done { width: 32px !important; height: 32px !important; border-radius: 50% !important;
+                     background: var(--c-sage-deep) !important; color: #fff !important;
+                     box-shadow: 0 4px 10px rgba(79,176,43,.35) !important; }
+.meal__status-done svg path { stroke: #fff !important; }
+.meal__status-empty { color: var(--c-muted) !important; }
+
+.meal__label { font-family: var(--font-serif) !important; font-size: 22px !important; font-weight: 700 !important;
+               margin-top: 12px !important; letter-spacing: -.01em !important; color: var(--c-ink) !important; }
+.meal__time  { font-family: var(--font-sans) !important; font-size: 14px !important; font-weight: 500 !important;
+               letter-spacing: 0 !important; margin-top: 1px !important; color: var(--c-muted) !important; }
+
+/* แถบกรัม */
+.meal__portion { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.ptag { font-family: var(--font-sans); font-size: 13.5px; font-weight: 600;
+        padding: 5px 13px; border-radius: 999px; background: rgba(255,255,255,.75); color: var(--c-ink);
+        white-space: nowrap; }
+.ptag--meat { background: rgba(255,107,107,.16); color: #C9453F; }
+
+.meal__actions { gap: 8px !important; margin-top: 14px !important; flex-direction: column !important;
+                 align-items: stretch !important; }
+.meal__actions .btn { min-width: 0 !important; width: 100% !important; }
+.btn { font-family: var(--font-serif) !important; font-size: 15px !important; font-weight: 600 !important; }
+.btn--primary { background: var(--c-accent) !important; color: #fff !important; border-radius: 14px !important;
+                padding: 12px 0 !important; box-shadow: 0 6px 14px rgba(24,21,15,.18) !important; }
+.btn--primary:hover, .btn--primary:active { background: var(--c-accent-deep) !important; }
+.btn--ghost { border-radius: 14px !important; padding: 10px 0 !important; background: rgba(255,255,255,.55) !important;
+              border: none !important; color: var(--c-muted) !important; font-size: 14px !important; }
+.meal__label { font-size: 19px !important; }
+.meal__icon { width: 52px !important; height: 52px !important; }
+.ptag { font-size: 12px !important; padding: 4px 10px !important; }
+
+/* การ์ดมื้อที่ให้แล้ว = เขียวพาสเทล */
+.meal-grid .meal--done,
+.meal-grid .meal--done:nth-child(1),
+.meal-grid .meal--done:nth-child(2) { background: var(--pastel-green) !important; }
+.meal--done .meal__icon { background: rgba(255,255,255,.7) !important; }
+.meal--done .meal__label, .meal--done .meal__time { color: var(--c-ink) !important; }
+.meal--done .ptag { background: rgba(255,255,255,.7) !important; color: var(--c-ink) !important; }
+.meal--done .meal__foods { color: var(--c-muted) !important; font-style: normal !important; }
+.meal--done .meal__detail { border-top-color: rgba(24,21,15,.12) !important; }
+.meal__undo-mini { color: var(--c-muted) !important; opacity: .7 !important; border-color: var(--rule) !important; }
+
+/* มื้อที่ "ไม่กิน" = ชมพูแดงพาสเทล */
+.meal-grid .meal--skipped,
+.meal-grid .meal--skipped:nth-child(1),
+.meal-grid .meal--skipped:nth-child(2) { background: var(--pastel-pink) !important; }
+
+/* มื้อเลยเวลา */
+.meal--overdue { box-shadow: 0 0 0 2px rgba(255,107,107,.5), var(--shadow-card) !important; }
+.meal--overdue .meal__time { color: #C9453F !important; }
+
+/* ════════════════════════════════════════════════════════════════════
+   STREAK → การ์ดสรุปเขียวใหญ่ (แบบ Monthly Summary)
+   ════════════════════════════════════════════════════════════════════ */
+.streak {
+  background: linear-gradient(150deg, #B7E98A, #9BDB6B) !important;
+  border: none !important; border-radius: var(--r-2xl) !important;
+  box-shadow: 0 12px 26px rgba(123,189,74,.30) !important;
+  padding: 20px 110px 20px 22px !important;
+  color: var(--c-ink) !important;
+}
+.streak__icon { width: 52px !important; height: 52px !important; border-radius: 50% !important;
+                background: rgba(255,255,255,.55) !important; color: var(--c-sage-deep) !important;
+                box-shadow: none !important; }
+.streak__count { font-family: var(--font-num) !important; font-size: 42px !important; font-weight: 700 !important;
+                 color: var(--c-ink) !important; letter-spacing: -.02em !important; }
+.streak__count-label { color: rgba(24,21,15,.7) !important; font-weight: 600 !important; font-size: 15px !important; }
+.streak__quote { color: rgba(24,21,15,.6) !important; font-style: normal !important; font-size: 13px !important;
+                 font-weight: 500 !important; margin-top: 5px !important; }
+.streak__pack img { width: 76px !important; height: 76px !important; }
+
+/* ════════════════════════════════════════════════════════════════════
+   NOTES
+   ════════════════════════════════════════════════════════════════════ */
+.notes { border-radius: var(--r-xl) !important; border: none !important; box-shadow: var(--shadow-card) !important; }
+.note__text { font-family: var(--font-sans) !important; font-weight: 500 !important; }
+
+/* ════════════════════════════════════════════════════════════════════
+   TAB BAR → pill ขาว + active เขียวกลม
+   ════════════════════════════════════════════════════════════════════ */
+.tabbar { background: linear-gradient(to top, var(--c-cream) 55%, rgba(243,241,234,0)) !important; }
+.tabbar__inner { border-radius: var(--r-2xl) !important; box-shadow: 0 10px 28px rgba(24,21,15,.14) !important;
+                 padding: 8px !important; gap: 6px; background: #fff !important; }
+.tab { border-radius: 18px !important; font-family: var(--font-serif) !important; font-size: 12px !important;
+       font-weight: 600 !important; padding: 10px 0 !important; gap: 4px !important; color: var(--c-muted) !important; }
+.tab span { font-size: 12px !important; }
+.tab--active { color: var(--c-sage-deep) !important; background: var(--pastel-green) !important; }
+
+/* ════════════════════════════════════════════════════════════════════
+   หน้าอื่น (โภชนาการ / ปฏิทิน)
+   ════════════════════════════════════════════════════════════════════ */
+.profile, .calc, .cal-card, .dash, .foodsec, .chip, .brand, .banner, .period, .notes, .search {
+  border-radius: var(--r-xl) !important;
+}
+.profile, .calc, .cal-card, .dash { border: none !important; box-shadow: var(--shadow-card) !important; }
+.profile__name { font-family: var(--font-serif) !important; font-weight: 700 !important; }
+.calc__head h2, .foodsec__title, .brand-row__head h2, .cal-head h2, .dash__head h3 {
+  font-family: var(--font-serif) !important; font-weight: 700 !important;
+}
+
+/* ปุ่ม toggle (goal / period / dash) active = ดำ */
+.goal--active, .period__btn--active {
+  background: var(--c-accent) !important; color: #fff !important;
+  border-color: transparent !important; box-shadow: var(--shadow-soft) !important;
+}
+
+/* banner → พาสเทลเหลือง */
+.banner { background: var(--pastel-yellow) !important; border: none !important; box-shadow: var(--shadow-soft) !important; }
+.banner__icon { background: var(--c-caramel) !important; border-radius: 50% !important; }
+.banner__title { color: var(--c-ink) !important; font-family: var(--font-serif) !important; font-weight: 600 !important; }
+.banner--alert { background: var(--pastel-pink) !important; }
+.banner--alert .banner__icon { background: var(--c-rust) !important; }
+
+/* ════════════════════════════════════════════════════════════════════
+   CALENDAR → ช่องวันเป็นกระเบื้องสีพาสเทล (ใช้ :has())
+   ════════════════════════════════════════════════════════════════════ */
+.cal-grid { gap: 5px !important; }
+.day { border-radius: 15px !important; background: var(--c-latte); aspect-ratio: 1/1; position: relative; }
+.day--faded { background: transparent !important; }
+.day__n { font-family: var(--font-num) !important; font-weight: 600 !important; font-size: 14px !important; }
+.day__dot { display: none !important; }  /* ใช้สีพื้นช่อง + หน้า emoji แทนจุด */
+
+.day:has(.day__dot--complete) { background: var(--c-sage) !important; }
+.day:has(.day__dot--complete) .day__n { color: #1c3d0a !important; }
+.day:has(.day__dot--partial)  { background: #FFD24D !important; }
+.day:has(.day__dot--partial)  .day__n { color: #6a4a05 !important; }
+.day:has(.day__dot--skip)     { background: var(--c-rust) !important; }
+.day:has(.day__dot--skip)     .day__n { color: #fff !important; }
+.day:has(.day__dot--note)     { background: var(--c-blush) !important; }
+.day:has(.day__dot--note)     .day__n { color: #7a2547 !important; }
+
+/* ตัวการ์ตูนมุมขวาบนตามสถานะ (ยกเว้นวันนี้) */
+.day:not(.day--today)::after { content:''; position: absolute; top: 3px; right: 3px;
+  width: 17px; height: 17px; background-size: contain; background-repeat: no-repeat; }
+.day:not(.day--today):has(.day__dot--complete)::after { background-image: url(img/elements/el-ricecooker.png); }
+.day:not(.day--today):has(.day__dot--partial)::after  { background-image: url(img/elements/el-tv.png); }
+.day:not(.day--today):has(.day__dot--skip)::after     { background-image: url(img/elements/el-bottle.png); }
+
+.day--today::before { background: var(--c-accent) !important; box-shadow: 0 4px 10px rgba(241,90,41,.4) !important; }
+.day--today .day__n { color: #fff !important; font-weight: 700 !important; }
+.cal-nav { color: var(--c-ink) !important; background: var(--c-latte) !important; border-radius: 50% !important; }
+.weekdays span { font-weight: 600 !important; color: var(--c-muted) !important; }
+
+/* legend สีกลม */
+.legend__item i { border-radius: 50% !important; width: 10px !important; height: 10px !important; }
+.legend__item span { font-weight: 500 !important; }
+
+/* ════════════════════════════════════════════════════════════════════
+   MODAL — ปุ่ม + หัวข้อ
+   ════════════════════════════════════════════════════════════════════ */
+.btn-next, .btn-save, .confirm-yes, .pin-key, .modal-title {
+  font-family: var(--font-serif) !important; font-weight: 600 !important;
+}
+.btn-save, .btn-next, .confirm-yes { background: var(--c-accent) !important; color: #fff !important; }
+.modal-title { font-weight: 700 !important; font-size: 20px !important; }
+.si.active, .si.done { background: var(--c-accent) !important; }
+.pri-sel.active, .fb.sel, .chip.sel { border-color: var(--c-accent) !important; }
+
+/* ════════════════════════════════════════════════════════════════════
+   INFO TILES (โภชนาการ) — กล่องสั้น กดแล้วเด้ง sheet
+   ════════════════════════════════════════════════════════════════════ */
+.info-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.itile {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+  text-align: left; padding: 18px 16px; border-radius: var(--r-xl);
+  box-shadow: var(--shadow-card); border: none; cursor: pointer;
+  transition: transform var(--t-fast) var(--ease-out);
+}
+.itile:active { transform: translateY(2px) scale(.98); }
+.itile__ico { width: 48px; height: 48px; object-fit: contain; margin-bottom: 6px;
+              filter: drop-shadow(0 3px 5px rgba(24,21,15,.12)); }
+.itile__t { font-family: var(--font-serif); font-size: 17px; font-weight: 700; color: var(--c-ink); }
+.itile__s { font-family: var(--font-sans); font-size: 12px; font-weight: 500; color: var(--c-muted); }
+.itile--eat    { background: var(--pastel-green); }
+.itile--danger { background: var(--pastel-pink); }
+.itile--tips   { background: var(--pastel-yellow); }
+.itile--cook   { background: var(--pastel-peach); }
+
+/* เนื้อหาใน sheet */
+.info-top { display: flex; align-items: center; gap: 12px; margin: 0 0 14px; }
+.info-char { width: 58px; height: 58px; object-fit: contain; flex-shrink: 0;
+             filter: drop-shadow(0 4px 6px rgba(24,21,15,.12)); }
+.info-lead { font-family: var(--font-sans); font-size: 13.5px; color: var(--c-muted); margin: 0;
+             line-height: 1.5; }
+.info-lead b { color: var(--c-ink); }
+
+/* แถวสติกเกอร์ท้ายหน้าปฏิทิน */
+.cal-deco { padding: 14px 20px 4px; text-align: center; }
+.cal-deco__row { display: flex; justify-content: center; align-items: flex-end; gap: 14px; }
+.cal-deco__row img { width: 72px; height: 72px; object-fit: contain;
+                     filter: drop-shadow(0 5px 7px rgba(24,21,15,.12)); }
+.cal-deco__row img:nth-child(2) { width: 84px; height: 84px; }
+.cal-deco__cap { font-family: var(--font-serif); font-size: 14px; font-weight: 600;
+                 color: var(--c-muted); margin: 10px 0 0; }
+.info-ul { margin: 0; padding-left: 18px; font-size: 14px; color: var(--c-ink); line-height: 1.7; }
+.info-ul b { color: var(--c-accent-deep); }
+#infoBody { max-height: 64vh; overflow-y: auto; }
+#infoBody .chip { margin-bottom: 8px; }
+/* ไอคอนชิป: พื้นสม่ำเสมอ (ยกเว้นของต้องห้าม) + รองรับ element */
+.chip:not(.chip--danger) .chip__icon { background: var(--c-latte) !important; }
+.chip__icon { width: 38px !important; height: 38px !important; }
+.chip__icon img[src*="elements/"] { width: 30px !important; height: 30px !important; object-fit: contain; }
+
+/* reminders (หน้าปฏิทิน) */
+.rm-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--c-accent); margin-top: 7px; flex-shrink: 0; }
+.rm-lbl { display: block; font-family: var(--font-sans); font-size: 12px; font-weight: 600;
+          color: var(--c-muted); margin: 10px 0 4px; }
+.rm-input { width: 100%; font-family: var(--font-sans); font-size: 14px; padding: 10px 12px;
+            border: 1px solid var(--rule); border-radius: 12px; background: var(--c-cream); color: var(--c-ink); }
+#ovReminder textarea { width: 100%; min-height: 70px; font-family: var(--font-sans); font-size: 14px;
+            padding: 10px 12px; border: 1px solid var(--rule); border-radius: 12px;
+            background: var(--c-cream); color: var(--c-ink); resize: vertical; box-sizing: border-box; }
+
+/* dashboard "วันนี้" (.dash--ci) → พาสเทลม่วง ตัวหนังสือเข้ม */
+.dash.dash--ci { background: var(--pastel-purple) !important; color: var(--c-ink) !important; }
+.dash.dash--ci .dash__head h3,
+.dash.dash--ci .slot__label { color: var(--c-ink) !important; }
+.dash.dash--ci .dash__head .day-ref { color: var(--c-espresso) !important; }
+.dash.dash--ci .dash__sub,
+.dash.dash--ci .slot__kcal,
+.dash.dash--ci .dash__total .label,
+.dash.dash--ci .dash__total .of { color: var(--c-muted) !important; }
+.dash.dash--ci .dash__total .num { color: var(--c-sage-deep) !important; }
+.dash.dash--ci .dash__total { border-top-color: rgba(24,21,15,.12) !important; }
+.dash.dash--ci .slot__icon { background: rgba(255,255,255,.6) !important; border-color: transparent !important; }
+.dash.dash--ci .dash__progress { background: rgba(255,255,255,.5) !important; }
+
+/* ════════════════════════════════════════════════════════════════════
+   GREETING (หน้าวันนี้ใหม่) — ทักทายตัวหนาใหญ่ + มาสคอต
+   ════════════════════════════════════════════════════════════════════ */
+.greet { position: relative; margin: 4px 20px 18px; min-height: 116px; padding-right: 110px; }
+.greet__hi { font-family: var(--font-serif); font-size: 15px; font-weight: 600; color: var(--c-muted); }
+.greet__q  { font-family: var(--font-serif); font-size: 30px; font-weight: 700; line-height: 1.12;
+             letter-spacing: -.02em; color: var(--c-ink); margin: 2px 0 12px; }
+.greet__meta { display: flex; flex-wrap: wrap; gap: 7px; }
+.greet__chip { font-family: var(--font-sans); font-size: 12.5px; font-weight: 600; color: var(--c-ink);
+               background: #fff; border-radius: 999px; padding: 5px 12px; box-shadow: var(--shadow-soft); }
+.greet__chip--count { background: var(--pastel-green); color: var(--c-sage-deep); }
+.greet__chip--count b { font-weight: 700; }
+.greet__chip--kcal { background: var(--pastel-yellow); color: #8a6d12; }
+.greet__chip--kcal:empty { display: none; }
+.greet__mascot { position: absolute; right: -6px; bottom: -6px; width: 122px; height: auto; z-index: 2;
+                 filter: drop-shadow(0 8px 10px rgba(24,21,15,.14)); pointer-events: none; }
+.greet .hero__bubble { right: 78px !important; top: -2px !important; }
+/* greet ไม่มีมาสคอต (หน้าปฏิทิน) */
+.greet--plain { min-height: 0; padding-right: 0; margin-bottom: 14px; }
+
+/* stat row 3 ช่อง (สรุปเดือน) */
+.stat-row--3 { grid-template-columns: 1fr 1fr 1fr; }
+.stat-row--3 .stat { padding: 14px 10px; }
+.stat-row--3 .stat__ico { width: 34px; height: 34px; }
+.stat-row--3 .stat__big { font-size: 23px; margin-top: 6px; }
+.stat-row--3 .stat__unit { font-size: 12px; margin-left: 2px; }
+.stat-row--3 .stat__lbl { font-size: 11.5px; }
+
+/* ════════════════════════════════════════════════════════════════════
+   STAT ROW (สตรีค + มื้อถัดไป) — ไทล์เล็ก 2 ช่อง
+   ════════════════════════════════════════════════════════════════════ */
+.stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.stat { border-radius: var(--r-xl); padding: 16px; box-shadow: var(--shadow-card); position: relative; overflow: hidden; }
+.stat--streak { background: linear-gradient(150deg, #FFE8B0, #FFD98A); }
+.stat--next   { background: var(--pastel-purple); }
+.stat__ico { width: 40px; height: 40px; object-fit: contain;
+             filter: drop-shadow(0 3px 4px rgba(24,21,15,.12)); }
+.stat__big { font-family: var(--font-num); font-size: 30px; font-weight: 700; color: var(--c-ink);
+             letter-spacing: -.02em; margin-top: 8px; line-height: 1; }
+.stat__big--sm { font-size: 17px; font-weight: 600; margin-top: 4px; line-height: 1.25; }
+.stat__unit { font-size: 15px; font-weight: 600; color: var(--c-muted); margin-left: 4px; }
+.stat__lbl { font-family: var(--font-sans); font-size: 12.5px; font-weight: 500; color: var(--c-muted); margin-top: 4px; }
+.stat--next .stat__lbl { margin-top: 6px; }
+
+/* meal/slot icon = ตัวการ์ตูน (ไม่ตัดขอบเป็นวงกลม) */
+.meal__icon { background: rgba(255,255,255,.5) !important; }
+.meal__icon img { border-radius: 0 !important; width: 80% !important; height: 80% !important;
+                  object-fit: contain !important; margin: 0 !important; }
+.slot__icon img { border-radius: 0 !important; object-fit: contain !important; width: 78% !important; height: 78% !important; }
+.ptag__i { width: 18px; height: 18px; object-fit: contain; vertical-align: -4px; margin-right: 4px; }
+
+/* slot: ไอคอนซ้าย · ป้าย เช้า/เย็น ไปทางขวา + ตัวใหญ่อ่านง่าย (#27) */
+.slot { flex-direction: row !important; align-items: center !important; gap: 9px !important;
+        justify-content: flex-start !important; padding: 8px 12px !important; }
+.slot__label { font-size: 15.5px !important; font-weight: 700 !important; color: var(--c-ink) !important; }
+.slot__kcal  { margin-left: auto !important; font-size: 14px !important; font-weight: 700 !important; }
+
+/* ════════════════════════════════════════════════════════════════════
+   CALCULATOR — 2 แถบ เน้น "กรัม" (เม็ดอย่างเดียว / เม็ด+เนื้อ)
+   ════════════════════════════════════════════════════════════════════ */
+.calc2 { display: flex; flex-direction: column; gap: 10px; margin-top: var(--sp-3); }
+.calc2__row { border-radius: var(--r-lg); padding: 14px 16px; background: var(--pastel-green); }
+.calc2__row--meat { background: var(--pastel-peach); }
+.calc2__head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.calc2__i { width: 26px; height: 26px; object-fit: contain; }
+.calc2__tag { font-family: var(--font-serif); font-size: 13.5px; font-weight: 600; color: var(--c-ink); }
+.calc2__main { display: flex; justify-content: space-between; align-items: flex-end; }
+.calc2__col--r { text-align: right; }
+.calc2__big { font-family: var(--font-num); font-size: 27px; font-weight: 700; color: var(--c-ink);
+              letter-spacing: -.02em; line-height: 1.05; }
+.calc2__big i { font-family: var(--font-sans); font-size: 13px; font-weight: 600; font-style: normal;
+                color: var(--c-muted); margin: 0 1px; }
+.calc2__sub { font-family: var(--font-sans); font-size: 11px; font-weight: 500; color: var(--c-muted); margin-top: 3px; }
+.calc-tip { margin-top: var(--sp-3); padding: var(--sp-3); background: var(--pastel-yellow);
+            border-radius: var(--r-md); font-size: 11.5px; color: #6a5410; line-height: 1.55; }
+.calc-foot { margin-top: var(--sp-2); font-size: 10.5px; color: var(--c-faint); }
+
+/* goal toggle: ลูกศรให้ชัด */
+.goal svg { stroke-width: 2.6 !important; }
+.goal { color: var(--c-ink) !important; }
+.goal:not(.goal--active) svg { color: var(--c-accent) !important; }
+
+/* ════════════════════════════════════════════════════════════════════
+   ปุ่มนำทางเดือน (ปฏิทิน) — ชัด + อยู่ในการ์ด
+   ════════════════════════════════════════════════════════════════════ */
+.cal-head { padding: 2px 4px 14px !important; }
+/* ชนะ legacy #page-calendar .cal-nav (ที่ทำให้กลายเป็น grid ว่าง) */
+#page-calendar .cal-nav, .cal-nav {
+  width: 36px !important; height: 36px !important; border-radius: 50% !important;
+  background: var(--pastel-green) !important; color: var(--c-sage-deep) !important;
+  display: flex !important; align-items: center !important; justify-content: center !important;
+  flex-shrink: 0 !important; margin: 0 !important; grid-template-columns: none !important; padding: 0 !important;
+}
+.cal-nav svg { stroke-width: 2.6 !important; }
+.cal-head h2 { font-size: 19px !important; }
+
+/* ════════════════════════════════════════════════════════════════════
+   DASH สัปดาห์/เดือน → พาสเทลม่วง (เลิกม่วงเข้มหลุดโทน)
+   ════════════════════════════════════════════════════════════════════ */
+.dash.week-streak, .dash.dash-month {
+  background: var(--pastel-purple) !important; color: var(--c-ink) !important; border: none !important;
+}
+.dash.week-streak .label, .dash.dash-month .label,
+.dash.week-streak .sub,  .dash.dash-month .dash-month__cap,
+.week-cell__lbl { color: var(--c-muted) !important; }
+.dash.week-streak .big, .dash.dash-month .big,
+.dash-month__num { color: var(--c-ink) !important; }
+.streak-badge { background: var(--c-accent) !important; color: #fff !important; }
+.week-pill { background: rgba(255,255,255,.6) !important; color: var(--c-muted) !important; }
+.week-pill--complete { background: var(--c-sage) !important; color: #1c3d0a !important; }
+.week-pill--partial  { background: #FFD24D !important; color: #6a4a05 !important; }
+.week-pill--today    { background: var(--c-accent) !important; color: #fff !important; }
+.dash-month__grid { border-top-color: rgba(24,21,15,.12) !important; }
+
+/* toast */
+.toast { font-family: var(--font-sans) !important; border-radius: 16px !important; font-weight: 600;
+         background: var(--c-accent) !important; color: #fff !important; }

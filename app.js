@@ -5,9 +5,9 @@
 
 // ── Storage helpers ───────────────────────────────────────────────────
 function getCfg() {
-  const cfg = JSON.parse(localStorage.getItem('cfg')||'null') || { name:'มอคค่า', times:['07:00','12:00','18:00','21:00'] };
+  const cfg = JSON.parse(localStorage.getItem('cfg')||'null') || { name:'มอคค่า', times:['07:00','17:30'] };
   if (!Array.isArray(cfg.times)) cfg.times = [];
-  while (cfg.times.length < 4) cfg.times.push('21:00');
+  while (cfg.times.length < MEALS.length) cfg.times.push('17:30');
   return cfg;
 }
 function todayKey() { const d=new Date(); return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; }
@@ -46,7 +46,7 @@ function saveNotes(arr, k) {
 function asFed(v) { if (!v) return null; return typeof v==='string' ? {time:v,by:'',food:''} : v; }
 
 // helper เล็ก ๆ
-function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escHtml(s) { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 // ── Header / date card ───────────────────────────────────────────────
 function renderHeader() {
@@ -61,6 +61,15 @@ function renderDateCard() {
   const dayEl=document.getElementById('dcDay'), dateEl=document.getElementById('dcDate');
   if (dayEl) dayEl.textContent = `วัน${DAYS_F[now.getDay()]}`;
   if (dateEl) dateEl.textContent = `${now.getDate()} ${MONTHS_S[now.getMonth()]}`;
+
+  const greetEl=document.getElementById('dcGreet');
+  if (greetEl) {
+    const h=now.getHours();
+    greetEl.textContent = h<11 ? 'สวัสดีตอนเช้า'
+      : h<15 ? 'สวัสดีตอนกลางวัน'
+      : h<18 ? 'สวัสดีตอนบ่าย'
+      : 'สวัสดีตอนเย็น';
+  }
 
   let nextMin=Infinity, nextLabel='';
   MEALS.forEach((m,i) => {
@@ -235,7 +244,7 @@ function deleteNote(id) {
 
 // ── Today cards (Cozy v3) ────────────────────────────────────────────
 // Map meal id → time-of-day asset key (assumes 4 meals in order)
-const TIME_ASSET = ['morning','noon','evening','night'];
+const TIME_ASSET = ['morning','evening'];
 
 function renderToday() {
   const cfg=getCfg(), log=getLog(), now=new Date(), c=document.getElementById('cards');
@@ -249,7 +258,8 @@ function renderToday() {
     const mt=new Date(now); mt.setHours(h,mn,0,0);
     const overdue=!fed && now>mt;
     const card=document.createElement('article');
-    const timeIcon = `<div class="meal__icon" aria-hidden="true"><img src="img/time-${TIME_ASSET[i]||'morning'}.png" alt="" width="22" height="22"></div>`;
+    const mealEl = ['el-orange','el-mug'][i] || 'el-orange';
+    const timeIcon = `<div class="meal__icon" aria-hidden="true"><img src="img/elements/${mealEl}.png" alt="" width="22" height="22"></div>`;
 
     if (fed && fed.skipped) {
       const reason = fed.skipReason ? `<div class="meal__detail"><div class="meal__foods" style="color:var(--c-rust)">${escHtml(fed.skipReason)}</div></div>` : '';
@@ -282,6 +292,7 @@ function renderToday() {
         </div>
         <div class="meal__label">${meal.label}</div>
         <div class="meal__time">${t}${(fed.time && /^\d{1,2}:\d{2}$/.test(fed.time) && fed.time!==t) ? ' · '+fed.time : ''}</div>
+        <div class="meal__portion"><span class="ptag"><img class="ptag__i" src="img/elements/el-ricebowl.png" alt="">${PORTION.dry} ก.</span><span class="ptag ptag--meat"><img class="ptag__i" src="img/elements/el-sandwich.png" alt="">เนื้อ ${PORTION.meat} ก.</span></div>
         ${info ? `<div class="meal__detail"><div class="meal__foods">${escHtml(info)}</div></div>` : ''}
         <button class="meal__undo-mini" onclick="event.stopPropagation();undoFeed('${meal.id}')" aria-label="ยกเลิก">↩</button>`;
     } else {
@@ -297,6 +308,7 @@ function renderToday() {
         </div>
         <div class="meal__label">${meal.label}</div>
         <div class="meal__time">${t}</div>
+        <div class="meal__portion"><span class="ptag"><img class="ptag__i" src="img/elements/el-ricebowl.png" alt="">${PORTION.dry} ก.</span><span class="ptag ptag--meat"><img class="ptag__i" src="img/elements/el-sandwich.png" alt="">เนื้อ ${PORTION.meat} ก.</span></div>
         <div class="meal__actions">
           <button class="btn btn--primary" onclick="openFeed('${meal.id}')" data-action="log-meal">ให้อาหาร</button>
           <button class="btn btn--ghost" onclick="markSkip('${meal.id}','${meal.label}')" data-action="skip-meal">ไม่กิน</button>
@@ -349,7 +361,7 @@ function renderToday() {
     : streak < 3
       ? 'เริ่มต้นดี · มาต่อกันได้'
       : streak < 7
-        ? 'กินครบ 4 มื้อ · เก่งมากมอคค่า'
+        ? 'กินครบทุกมื้อ · เก่งมากมอคค่า'
         : 'นี่คือมาตรฐาน · สุดยอด!';
 }
 
@@ -398,6 +410,92 @@ function openMealDetail(id, label, idx) {
   document.getElementById('ovMealDetail').classList.add('open');
 }
 function closeMealDetail() { document.getElementById('ovMealDetail').classList.remove('open'); }
+
+// ── Nutrition info sheet (กล่อง → ป๊อปอัพ) ────────────────────────────
+const INFO_SHEET = {
+  eat:    { title:'อาหารที่กินได้',          char:'el-tomato',     lead:'เหมาะสำหรับ Toy Poodle ให้เป็นประจำได้' },
+  danger: { title:'อาหารต้องห้าม',           char:'el-bottle',     lead:'อันตรายถึงชีวิต — ห้ามให้เด็ดขาด' },
+  tips:   { title:'คำแนะนำการดูแล',          char:'el-gum',        lead:'เคล็ดลับเลี้ยงมอคค่าให้แข็งแรง' },
+  cook:   { title:'น้ำหนัก = อาหารหลังปรุงสุก', char:'el-ricecooker', lead:'กรัมที่แสดงในแอป = น้ำหนัก<b>ตอนเสิร์ฟ</b> (หลังปรุงสุกแล้ว)' },
+};
+
+function openInfoSheet(kind) {
+  const title = document.getElementById('infoTitle');
+  const body  = document.getElementById('infoBody');
+  const meta  = INFO_SHEET[kind];
+  if (!title || !body || !meta) return;
+  title.textContent = meta.title;
+
+  let listHtml;
+  if (kind === 'eat') {
+    listHtml = `<div class="foodsec__list">${CAN_EAT_LIST.map(i => chipRow(i)).join('')}</div>`;
+  } else if (kind === 'danger') {
+    listHtml = `<div class="foodsec__list">${DANGER_LIST.map(i => chipRow(i, { iconBg:'rgba(241,90,41,.12)', danger:true })).join('')}</div>`;
+  } else if (kind === 'tips') {
+    const tipEls = ['el-cake','el-acorn','el-dango','el-teapot','el-orange2'];
+    listHtml = `<div class="foodsec__list">${TIPS_LIST.map((t,i) => chipRow({ ...t, el: tipEls[i % tipEls.length] })).join('')}</div>`;
+  } else { // cook
+    listHtml = `<ul class="info-ul">
+        <li>เนื้อสัตว์/ผัก = ต้มหรืออบ <b>ไม่ใส่น้ำมัน เกลือ เครื่องปรุง</b></li>
+        <li>ชั่งหลังสุก เพราะน้ำหนักเปลี่ยนหลังโดนความร้อน</li>
+        <li>อาหารเม็ดชั่งตามปกติ (แห้งอยู่แล้ว)</li>
+      </ul>`;
+  }
+
+  body.innerHTML = `
+    <div class="info-top">
+      <img class="info-char" src="img/elements/${meta.char}.png" alt="">
+      <p class="info-lead">${meta.lead}</p>
+    </div>
+    ${listHtml}`;
+  document.getElementById('ovInfo').classList.add('open');
+}
+function closeInfoSheet() { document.getElementById('ovInfo').classList.remove('open'); }
+
+// ── Reminders (หน้าปฏิทิน) — หาหมอ / ยาพยาธิ / วัคซีน ฯลฯ ──────────────
+function getReminders() { return JSON.parse(localStorage.getItem('reminders')||'[]'); }
+function saveReminders(a) { localStorage.setItem('reminders', JSON.stringify(a)); }
+function openReminderModal() {
+  document.getElementById('rmDate').value = '';
+  document.getElementById('rmText').value = '';
+  document.getElementById('ovReminder').classList.add('open');
+}
+function closeReminderModal() { document.getElementById('ovReminder').classList.remove('open'); }
+function saveReminder() {
+  const date = document.getElementById('rmDate').value;
+  const text = document.getElementById('rmText').value.trim();
+  if (!text) { showToast('ใส่เรื่องที่จะเตือนก่อน','warn'); return; }
+  const a = getReminders();
+  a.push({ id:'r'+Date.now(), date, text });
+  saveReminders(a); closeReminderModal(); renderReminders(); showToast('บันทึกแล้ว','ok');
+}
+function deleteReminder(id) {
+  showConfirm('ลบเตือนความจำนี้?', () => {
+    saveReminders(getReminders().filter(r => r.id !== id));
+    renderReminders(); showToast('ลบแล้ว','ok');
+  }, '🗑', 'ลบ', true);
+}
+function _fmtRmDate(iso) {
+  const [y,m,d] = iso.split('-').map(Number);
+  return `${d} ${MONTHS_S[m-1]} ${y+543}`;
+}
+function renderReminders() {
+  const el = document.getElementById('reminderList'); if (!el) return;
+  const a = getReminders().slice().sort((x,y) => (x.date||'9999').localeCompare(y.date||'9999'));
+  if (!a.length) {
+    el.innerHTML = '<div class="note-empty" style="padding:18px 14px;color:var(--c-muted);font-size:13px;text-align:center">ยังไม่มีเตือนความจำ — แตะ “เพิ่ม” จดวันหาหมอ ยาพยาธิ ฯลฯ</div>';
+    return;
+  }
+  el.innerHTML = a.map(r => `
+    <div class="note">
+      <div class="rm-dot"></div>
+      <div class="note-body" style="flex:1">
+        <div class="note__text">${escHtml(r.text)}</div>
+        ${r.date ? `<div class="note__time">${_fmtRmDate(r.date)}</div>` : ''}
+      </div>
+      <button class="note-del-x" onclick="deleteReminder('${r.id}')" aria-label="ลบ">×</button>
+    </div>`).join('');
+}
 
 // ── Feed Modal (3 steps) ──────────────────────────────────────────────
 let pendingId=null, feedStep=1;
@@ -635,6 +733,30 @@ function renderCalendar() {
     if (!isFuture) btn.onclick = () => openDay(key, d);
     grid.appendChild(btn);
   }
+  renderCalStats();
+}
+
+// ── Month summary stats (header tiles) ──────────────────────────────
+function renderCalStats() {
+  const allLog = JSON.parse(localStorage.getItem('log')||'{}');
+  const today = new Date();
+  const lastDate = new Date(calY, calM+1, 0).getDate();
+  const isCurMonth = (calY===today.getFullYear() && calM===today.getMonth());
+  const elapsed = isCurMonth ? today.getDate() : lastDate;
+  const dayComplete = (y,m,d) => {
+    const dl = allLog[`${y}-${m+1}-${d}`]||{};
+    return MEALS.filter(x=>{ const f=asFed(dl[x.id]); return f && !f.skipped; }).length >= MEALS.length;
+  };
+  let complete = 0;
+  for (let d=1; d<=elapsed; d++) if (dayComplete(calY,calM,d)) complete++;
+  const pct = elapsed ? Math.round(complete/elapsed*100) : 0;
+  // current streak (consecutive complete days up to today)
+  let streak = 0; const cur = new Date(today);
+  while (dayComplete(cur.getFullYear(), cur.getMonth(), cur.getDate())) {
+    streak++; cur.setDate(cur.getDate()-1);
+  }
+  const set = (id,v) => { const e=document.getElementById(id); if (e) e.textContent=v; };
+  set('mComplete', complete); set('mStreak', streak); set('mPct', pct+'%');
 }
 
 // ── Day detail ────────────────────────────────────────────────────────
@@ -727,8 +849,6 @@ function openSettings() {
   const cfg=getCfg();
   document.getElementById('cfg0').value=cfg.times[0];
   document.getElementById('cfg1').value=cfg.times[1];
-  document.getElementById('cfg2').value=cfg.times[2];
-  document.getElementById('cfg3').value=cfg.times[3]||'21:00';
   updateNotifBtn();
   document.getElementById('ovSettings').classList.add('open');
 }
@@ -737,7 +857,7 @@ function saveSettings() {
   const prev = getCfg();
   const cfg = {
     name: prev.name,
-    times:[document.getElementById('cfg0').value,document.getElementById('cfg1').value,document.getElementById('cfg2').value,document.getElementById('cfg3').value],
+    times:[document.getElementById('cfg0').value,document.getElementById('cfg1').value],
   };
   localStorage.setItem('cfg', JSON.stringify(cfg));
   if (window.db) try { window.db.collection('config').doc('dog').set(cfg); } catch(e){}
@@ -777,14 +897,14 @@ function showPage(name, btn) {
   document.querySelectorAll('.tab').forEach(t=>{ t.classList.remove('tab--active'); t.setAttribute('aria-selected','false'); });
   document.getElementById(`page-${name}`).classList.add('active');
   btn.classList.add('tab--active'); btn.setAttribute('aria-selected','true');
-  if(name==='calendar') { renderCalendar(); renderDash(); }
-  if(name==='nutrition') { renderInfo(); renderCalc(); renderFoodProducts(); renderCanEat(); renderDanger(); renderTips(); }
+  if(name==='calendar') { renderCalendar(); renderDash(); renderReminders(); }
+  if(name==='nutrition') { renderInfo(); renderCalc(); }
   window.scrollTo({ top:0, behavior:'instant' });
 }
 
 // ── Overlay dismiss (click outside) ───────────────────────────────────
 function bindOverlayDismiss() {
-  [['ovFeed',closeFeed],['ovNote',closeNoteModal],['ovDay',closeDay],['ovSettings',closeSettings],['ovMealDetail',closeMealDetail],['ovConfirm',confirmNo],['ovPin',closePin]].forEach(([id,fn])=>{
+  [['ovFeed',closeFeed],['ovNote',closeNoteModal],['ovDay',closeDay],['ovSettings',closeSettings],['ovMealDetail',closeMealDetail],['ovInfo',closeInfoSheet],['ovReminder',closeReminderModal],['ovConfirm',confirmNo],['ovPin',closePin]].forEach(([id,fn])=>{
     document.getElementById(id).addEventListener('click',e=>{if(e.target===e.currentTarget) fn();});
   });
 }
@@ -857,7 +977,7 @@ function startSync() {
     if (!data) return;
     const local = JSON.parse(localStorage.getItem('cfg')||'null');
     const merged = { ...(local||{}), ...data };
-    if (!Array.isArray(merged.times) || merged.times.length < 3) return;
+    if (!Array.isArray(merged.times) || merged.times.length < 2) return;
     if (localStorage.getItem('cfg') === JSON.stringify(merged)) return;
     localStorage.setItem('cfg', JSON.stringify(merged));
     renderHeader(); renderToday();
@@ -930,7 +1050,7 @@ function renderInfo() {
           <img src="img/mocha-sit.png" alt="" class="anim-breath">
         </div>
         <div class="profile__id">
-          <div class="profile__breed">TOY POODLE <span class="sym">·&nbsp;♂</span></div>
+          <div class="profile__breed">TOY POODLE <span class="sym">·&nbsp;♀</span></div>
           <input id="ei-name" value="${escHtml(info.name)}" style="font-family:var(--font-serif);font-size:38px;font-weight:500;color:var(--c-ink);background:transparent;border:none;border-bottom:1px solid var(--rule);padding:2px 0;width:100%;letter-spacing:-.03em;line-height:1.05">
           <input id="ei-quote" value="${escHtml(quote)}" placeholder="ใส่คำพูดน่ารักๆ..." style="font-family:var(--font-serif);font-style:italic;font-size:13px;color:var(--c-mocha);background:var(--c-cream);border:none;outline:none;padding:4px 8px;border-radius:6px;width:100%;margin-top:6px">
         </div>
@@ -968,7 +1088,7 @@ function renderInfo() {
           <img src="img/mocha-sit.png" alt="มอคค่านั่ง" class="anim-breath">
         </div>
         <div class="profile__id">
-          <div class="profile__breed">TOY POODLE <span class="sym">·&nbsp;♂</span></div>
+          <div class="profile__breed">TOY POODLE <span class="sym">·&nbsp;♀</span></div>
           <h1 class="profile__name">${escHtml(info.name)}</h1>
           <div class="profile__quote" id="profileQuote" onclick="editQuote(this)" title="แตะเพื่อแก้ไข">“ ${escHtml(quote)} ”</div>
         </div>
@@ -1086,16 +1206,16 @@ function renderFoodProducts() {
 
 // ── Allowed foods · Forbidden foods · Tips (chip rows) ───────────────
 const CAN_EAT_LIST = [
-  { img:'food-bowl.png',     bg:'var(--c-latte)',          label:'อาหารเม็ด Small Breed Adult', sub:'Royal Canin · ทุกมื้อ' },
-  { img:'food-chicken.png',  bg:'var(--c-blush)',          label:'เนื้อไก่ต้ม',                  sub:'165 kcal/100g · ไม่ใส่เกลือ' },
-  { img:'food-fish.png',     bg:'rgba(126,146,122,.25)',   label:'ปลาแซลมอน / ปลาทู',           sub:'160 kcal/100g · Omega-3' },
-  { img:'food-carrot.png',   bg:'rgba(169,184,154,.4)',    label:'แครอท',                       sub:'ดิบหรือต้ม · ดีต่อฟัน' },
-  { img:'food-beef.png',     bg:'var(--c-blush)',          label:'เนื้อวัว / หมูไม่ติดมัน',     sub:'180 kcal/100g · ต้ม/อบ' },
-  { img:'food-broccoli.png', bg:'rgba(169,184,154,.4)',    label:'บรอคโคลี / กะหล่ำ',           sub:'ต้มนิ่ม · ไม่เกิน 10% ของมื้อ' },
-  { img:'food-apple.png',    bg:'var(--c-blush)',          label:'แอปเปิ้ล (ไม่มีเมล็ด)',       sub:'Treat · เอาเมล็ดออก' },
-  { img:'food-rice.png',     bg:'var(--c-latte)',          label:'ข้าวสุก',                     sub:'ส่วนเสริม · ไม่ใส่เครื่องปรุง' },
-  { img:'food-egg.png',      bg:'var(--c-latte)',          label:'ไข่ต้ม',                       sub:'1/2 ฟอง · 2-3 ครั้ง/สัปดาห์' },
-  { img:'food-bowl.png',     bg:'var(--c-latte)',          label:'น้ำสะอาด',                    sub:'เปลี่ยนทุกวัน · 2 จุดในบ้าน' },
+  { el:'el-ricebowl',   bg:'var(--pastel-green)',  label:'อาหารเม็ด Small Breed Adult', sub:'Royal Canin · ทุกมื้อ' },
+  { el:'el-sandwich',   bg:'var(--pastel-peach)',  label:'เนื้อไก่ต้ม',                  sub:'165 kcal/100g · ไม่ใส่เกลือ' },
+  { el:'el-dango',      bg:'var(--pastel-blue)',   label:'ปลาแซลมอน / ปลาทู',           sub:'160 kcal/100g · Omega-3' },
+  { el:'el-orange',     bg:'var(--pastel-peach)',  label:'แครอท',                       sub:'ดิบหรือต้ม · ดีต่อฟัน' },
+  { el:'el-tomato',     bg:'var(--pastel-pink)',   label:'เนื้อวัว / หมูไม่ติดมัน',     sub:'180 kcal/100g · ต้ม/อบ' },
+  { el:'el-acorn',      bg:'var(--pastel-green)',  label:'บรอคโคลี / กะหล่ำ',           sub:'ต้มนิ่ม · ไม่เกิน 10% ของมื้อ' },
+  { el:'el-jam',        bg:'var(--pastel-pink)',   label:'แอปเปิ้ล (ไม่มีเมล็ด)',       sub:'Treat · เอาเมล็ดออก' },
+  { el:'el-ricecooker', bg:'var(--pastel-blue)',   label:'ข้าวสุก',                     sub:'ส่วนเสริม · ไม่ใส่เครื่องปรุง' },
+  { el:'el-yogurt',     bg:'var(--pastel-purple)', label:'ไข่ต้ม',                       sub:'1/2 ฟอง · 2-3 ครั้ง/สัปดาห์' },
+  { el:'el-mug',        bg:'var(--pastel-blue)',   label:'น้ำสะอาด',                    sub:'เปลี่ยนทุกวัน · 2 จุดในบ้าน' },
 ];
 
 const DANGER_LIST = [
@@ -1123,9 +1243,11 @@ function chipRow(item, opts = {}) {
   const isDanger = (item.danger !== undefined) ? item.danger : !!opts.danger;
   const danger = isDanger ? ' chip--danger' : '';
   const iconBg = opts.iconBg || item.bg || 'var(--c-latte)';
-  const iconHtml = item.img
-    ? `<img src="img/${item.img}" alt="" width="17" height="17">`
-    : `<span style="color:var(--c-mocha);font-size:14px">${item.emoji || '•'}</span>`;
+  const iconHtml = item.el
+    ? `<img src="img/elements/${item.el}.png" alt="" width="24" height="24">`
+    : item.img
+      ? `<img src="img/${item.img}" alt="" width="17" height="17">`
+      : `<span style="color:var(--c-mocha);font-size:14px">${item.emoji || '•'}</span>`;
   const tag = item.tag
     ? `<span class="tag ${item.tagCls || ''}">${item.tag}</span>`
     : '';
@@ -1256,27 +1378,50 @@ function renderCalc() {
 
   if (formula) formula.textContent = `RER × ${goal.factor}`;
 
-  // Single result block matching reference: per-meal kcal + dry-food grams + progress bar
-  const pct = Math.min(100, Math.round((dryG / 35) * 100)); // 35g ~= typical large portion → full bar
+  // 2 แถบ: เน้น "กรัม" เป็นหลัก (kcal เป็นรอง) — แถวบนเม็ดอย่างเดียว · แถวล่างเม็ด+เนื้อ
+  const MEAT_KCAL = 165;                       // ไก่ต้ม 165 kcal/100g
+  const meatKcal  = Math.round(perKcal * 0.25); // เนื้อ ~25% ของพลังงานต่อมื้อ
+  const meatG     = Math.round(meatKcal / MEAT_KCAL * 100);
+  const dryWithMeatG = Math.round((perKcal - meatKcal) / DRY_KCAL * 100);
+
   document.getElementById('calcResult').innerHTML = `
-    <div class="result" style="margin-top:var(--sp-3)">
-      <div class="result__row">
-        <div class="result__group">
-          <div class="label">${meals} มื้อ · ต่อมื้อ</div>
-          <div class="result__big">${perKcal}<sub>kcal</sub></div>
+    <div class="calc2">
+      <div class="calc2__row">
+        <div class="calc2__head">
+          <img class="calc2__i" src="img/elements/el-ricebowl.png" alt="">
+          <span class="calc2__tag">เม็ดอย่างเดียว</span>
         </div>
-        <div class="result__group" style="text-align:right">
-          <div class="label">อาหารเม็ด</div>
-          <div class="result__mid">${dryG}<sub>g</sub></div>
+        <div class="calc2__main">
+          <div class="calc2__col">
+            <div class="calc2__big">${dryG}<i>ก.</i></div>
+            <div class="calc2__sub">อาหารเม็ด</div>
+          </div>
+          <div class="calc2__col calc2__col--r">
+            <div class="calc2__big">${perKcal}<i>kcal</i></div>
+            <div class="calc2__sub">ต่อมื้อ</div>
+          </div>
         </div>
       </div>
-      <div class="bar"><div class="bar__fill" style="width:${pct}%"></div></div>
+      <div class="calc2__row calc2__row--meat">
+        <div class="calc2__head">
+          <img class="calc2__i" src="img/elements/el-sandwich.png" alt="">
+          <span class="calc2__tag">เม็ด + เนื้อสัตว์</span>
+        </div>
+        <div class="calc2__main">
+          <div class="calc2__col">
+            <div class="calc2__big">${dryWithMeatG}<i>+</i>${meatG}<i>ก.</i></div>
+            <div class="calc2__sub">เม็ด + เนื้อ(ต้ม)</div>
+          </div>
+          <div class="calc2__col calc2__col--r">
+            <div class="calc2__big">${perKcal}<i>kcal</i></div>
+            <div class="calc2__sub">ต่อมื้อ</div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div style="margin-top:var(--sp-3);padding:var(--sp-3);background:rgba(126,146,122,.08);border-radius:var(--r-md);font-size:11.5px;color:var(--c-muted);line-height:1.5">
-      ${goal.tip}
-    </div>
-    <div style="margin-top:var(--sp-2);font-size:10.5px;color:var(--c-faint);font-style:italic">
-      RER = 70 × น้ำหนัก<sup>0.75</sup> · NRC 2006 · อาหารเม็ด Small Breed Adult ~370 kcal/100g
+    <div class="calc-tip">${goal.tip}</div>
+    <div class="calc-foot">
+      RER = 70 × น้ำหนัก<sup>0.75</sup> · ${meals} มื้อ/วัน · NRC 2006 · อาหารเม็ด ~${DRY_KCAL} kcal/100g
     </div>`;
 }
 
@@ -1317,7 +1462,7 @@ function _renderDayCard() {
     const kcal = f && !f.skipped ? (perMealKcal ? perMealKcal : '✓') : '—';
     return `
       <div class="slot${doneCls}">
-        <div class="slot__icon"><img src="img/time-${TIME_ASSET[i]||'morning'}.png" alt="" width="22" height="22"></div>
+        <div class="slot__icon"><img src="img/elements/${['el-orange','el-mug'][i]||'el-orange'}.png" alt="" width="22" height="22"></div>
         <span class="slot__label">${lbl}</span>
         <span class="slot__kcal">${kcal}</span>
       </div>`;
@@ -1480,9 +1625,8 @@ function boot() {
   applyDarkMode();
   bindOverlayDismiss();
   renderHeader(); renderToday(); renderNotes(); renderSkipBanner();
-  renderInfo(); renderCalc(); renderFoodProducts();
-  renderCanEat(); renderDanger(); renderTips();
-  renderCalendar(); renderDash();
+  renderInfo(); renderCalc();
+  renderCalendar(); renderDash(); renderReminders();
   startSync();
   tickClock();
   setInterval(tickClock, 1000);

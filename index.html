@@ -7,15 +7,19 @@
   <title>Mocha</title>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon.png">
-  <meta name="theme-color" content="#9B6B45">
+  <meta name="theme-color" content="#1F9E57">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Mocha">
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <script src="firebase-config.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="mocha-cozy.css">
+  <link rel="stylesheet" href="mocha-fun.css">
 </head>
 <body>
 
@@ -55,67 +59,46 @@
 
     <main class="app__scroll">
 
-      <!-- HERO · date / count / mascot peek -->
-      <article class="hero">
-        <img class="hero__mascot anim-breath" src="img/mocha-peek.png" alt="">
-
-        <div class="hero__row">
-          <div>
-            <div class="hero__weekday" id="dcDay">—</div>
-            <div class="hero__date" id="dcDate">—</div>
-            <div class="hero__greet" id="dcClock">--:--:--</div>
-          </div>
-
-          <div class="hero__count">
-            <div class="hero__count-label">มื้อวันนี้</div>
-            <div class="hero__count-value"><span id="dcCount">0</span><sub>/4</sub></div>
-            <div class="hero__dots" id="dcDots" aria-hidden="true">
-              <i></i><i></i><i></i><i></i>
-            </div>
+      <!-- GREETING -->
+      <section class="greet">
+        <div class="greet__txt">
+          <div class="greet__hi" id="dcGreet">สวัสดี!</div>
+          <h1 class="greet__q">มอคค่ากินครบยัง?</h1>
+          <div class="greet__meta">
+            <span class="greet__chip"><span id="dcDay">—</span> <span id="dcDate">—</span></span>
+            <span class="greet__chip greet__chip--count"><b id="dcCount">0</b>/2 มื้อ</span>
+            <span class="greet__chip greet__chip--kcal" id="kcalMeta"></span>
           </div>
         </div>
-
-        <div class="hero__next">
-          <div>
-            <div class="hero__next-label">มื้อถัดไป</div>
-            <div class="hero__next-time" id="dcNext">—</div>
-          </div>
-        </div>
-      </article>
+        <img class="greet__mascot anim-breath" src="img/mocha-peek.png" alt="">
+        <span class="hero__bubble">หิวแล้วน้า~</span>
+        <span id="dcClock" hidden></span>
+        <span id="dcDots" hidden></span>
+      </section>
 
       <!-- SKIP-MEAL BANNER -->
       <aside id="skipBanner" class="banner banner--alert" style="display:none" role="alert"></aside>
 
-      <!-- MEAL GRID -->
-      <section class="section">
-        <header class="section__head">
-          <h2 class="section__title">การให้อาหาร</h2>
-          <span class="section__meta" id="kcalMeta"></span>
-        </header>
+      <!-- MEAL GRID (2-up) -->
+      <section class="section section--meals">
         <div class="meal-grid" id="cards"></div>
       </section>
 
-      <!-- STREAK -->
-      <article class="streak" aria-label="สถิติการให้อาหารต่อเนื่อง">
-        <div class="streak__pack" aria-hidden="true">
-          <img class="anim-bob" src="img/mocha-trot.png" alt="">
-          <img class="anim-bob" src="img/mocha-trot.png" alt="">
-          <img class="anim-bob" src="img/mocha-trot.png" alt="">
+      <!-- STAT ROW: streak + next meal -->
+      <section class="section">
+        <div class="stat-row">
+          <article class="stat stat--streak" aria-label="สถิติต่อเนื่อง">
+            <img class="stat__ico" src="img/elements/el-flame.png" alt="">
+            <div class="stat__big"><span id="streakDays">0</span><span class="stat__unit">วัน</span></div>
+            <div class="stat__lbl" id="streakQuote">ติดต่อกัน</div>
+          </article>
+          <article class="stat stat--next" aria-label="มื้อถัดไป">
+            <img class="stat__ico" src="img/elements/el-spoon.png" alt="">
+            <div class="stat__lbl">มื้อถัดไป</div>
+            <div class="stat__big stat__big--sm" id="dcNext">—</div>
+          </article>
         </div>
-        <div class="streak__icon" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-            <path d="M12 3s4 4 4 8a4 4 0 01-8 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-4-1-5 0-1 1-2 1-2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-            <path d="M7 15a5 5 0 0010 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <div class="streak__main">
-          <div>
-            <span class="streak__count" id="streakDays">0</span>
-            <span class="streak__count-label">วันติดต่อกัน</span>
-          </div>
-          <div class="streak__quote" id="streakQuote">กินครบ 4 มื้อ · เก่งมาก</div>
-        </div>
-      </article>
+      </section>
 
       <!-- NOTES -->
       <section class="section">
@@ -176,7 +159,7 @@
       </article>
 
       <div class="legend" aria-label="คำอธิบายสี">
-        <span class="legend__item"><i style="background: var(--c-sage)"></i><span>ครบ 4 มื้อ</span></span>
+        <span class="legend__item"><i style="background: var(--c-sage)"></i><span>ครบทุกมื้อ</span></span>
         <span class="legend__item"><i style="background: var(--c-caramel)"></i><span>บางมื้อ</span></span>
         <span class="legend__item"><i style="background: var(--c-latte)"></i><span>ไม่มีบันทึก</span></span>
         <span class="legend__item"><i style="background: var(--c-blush)"></i><span>มีบันทึก</span></span>
@@ -192,6 +175,18 @@
 
       <!-- DASHBOARD CARD -->
       <article class="dash" id="dashCard"></article>
+
+      <!-- REMINDERS / NOTES -->
+      <section class="section">
+        <header class="section__head">
+          <h2 class="section__title">บันทึก &amp; เตือนความจำ</h2>
+          <button class="btn btn--add" onclick="openReminderModal()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            เพิ่ม
+          </button>
+        </header>
+        <div class="notes" id="reminderList"></div>
+      </section>
 
     </main>
   </section>
@@ -223,34 +218,6 @@
       <!-- PROFILE -->
       <article class="profile" id="profileCard"></article>
 
-      <!-- 🔥 สุก banner -->
-      <aside class="banner">
-        <div class="banner__icon" aria-hidden="true">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M12 3s4 4 4 8a4 4 0 01-8 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-4-1-5 0-1 1-2 1-2z" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/>
-            <path d="M7 15a5 5 0 0010 0" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <div class="banner__body">
-          <div class="banner__title">น้ำหนักทั้งหมด = อาหารหลังปรุงสุก</div>
-          <p>เนื้อสัตว์/ผัก = ต้มหรืออบ ไม่ใส่น้ำมัน · กรัมที่แสดงคือน้ำหนักตอนเสิร์ฟ</p>
-        </div>
-      </aside>
-
-      <!-- SEARCH -->
-      <form class="search" role="search" onsubmit="return false;">
-        <span class="search__icon" aria-hidden="true">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="2"/>
-            <path d="M16 16l5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </span>
-        <input class="search__input" id="nutrSearch" type="search"
-               placeholder="ค้นหาอาหาร / สิ่งที่ห้าม / เคล็ดลับ…"
-               aria-label="ค้นหา" oninput="nutrSearch(this.value)">
-      </form>
-      <div class="search-hint" id="searchHint" style="padding:0 var(--sp-5) var(--sp-3);font-size:11px;color:var(--c-muted)"></div>
-
       <!-- CALCULATOR -->
       <article class="calc" id="calcCard">
         <header class="calc__head">
@@ -281,33 +248,33 @@
         </div>
       </article>
 
-      <!-- BRAND CAROUSEL -->
-      <section class="brand-row" id="brandRow"></section>
-
-      <!-- ALLOWED FOODS -->
-      <section class="foodsec" id="canEatSec">
-        <header class="foodsec__head">
-          <div class="foodsec__title">อาหารที่กินได้</div>
-          <p class="foodsec__subtitle">เหมาะสำหรับ Toy Poodle อายุ 1 ปี ให้เป็นประจำได้</p>
+      <!-- INFO TILES (กดแล้วเด้งรายละเอียด) -->
+      <section class="section">
+        <header class="section__head">
+          <h2 class="section__title">รู้ไว้ดูแลมอคค่า</h2>
         </header>
-        <div class="foodsec__list" id="canEatList"></div>
-      </section>
-
-      <!-- FORBIDDEN FOODS -->
-      <section class="foodsec foodsec--danger" id="dangerSec">
-        <header class="foodsec__head">
-          <div class="foodsec__title">อาหารต้องห้าม</div>
-          <p class="foodsec__subtitle">อันตรายถึงชีวิต — ห้ามให้เด็ดขาด</p>
-        </header>
-        <div class="foodsec__list" id="dangerList"></div>
-      </section>
-
-      <!-- TIPS -->
-      <section class="foodsec" id="tipsSec">
-        <header class="foodsec__head">
-          <div class="foodsec__title">คำแนะนำการดูแล</div>
-        </header>
-        <div class="foodsec__list" id="tipsList"></div>
+        <div class="info-tiles">
+          <button class="itile itile--eat" onclick="openInfoSheet('eat')">
+            <img class="itile__ico" src="img/elements/el-tomato.png" alt="">
+            <span class="itile__t">อาหารที่กินได้</span>
+            <span class="itile__s">10 อย่าง · แตะดู</span>
+          </button>
+          <button class="itile itile--danger" onclick="openInfoSheet('danger')">
+            <img class="itile__ico" src="img/elements/el-bottle.png" alt="">
+            <span class="itile__t">อาหารต้องห้าม</span>
+            <span class="itile__s">9 อย่าง · แตะดู</span>
+          </button>
+          <button class="itile itile--tips" onclick="openInfoSheet('tips')">
+            <img class="itile__ico" src="img/elements/el-gum.png" alt="">
+            <span class="itile__t">คำแนะนำดูแล</span>
+            <span class="itile__s">5 ข้อ · แตะดู</span>
+          </button>
+          <button class="itile itile--cook" onclick="openInfoSheet('cook')">
+            <img class="itile__ico" src="img/elements/el-ricecooker.png" alt="">
+            <span class="itile__t">เรื่องน้ำหนักสุก</span>
+            <span class="itile__s">วิธีชั่ง · แตะดู</span>
+          </button>
+        </div>
       </section>
 
     </main>
@@ -480,6 +447,38 @@
     </div>
   </div>
 
+  <!-- Nutrition Info Sheet -->
+  <div class="ov" id="ovInfo">
+    <div class="modal">
+      <div class="modal-drag"></div>
+      <div class="modal-inner">
+        <div class="modal-head">
+          <span class="modal-title" id="infoTitle"></span>
+          <button class="btn-close" onclick="closeInfoSheet()">✕</button>
+        </div>
+        <div id="infoBody"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reminder Add Modal -->
+  <div class="ov" id="ovReminder">
+    <div class="modal">
+      <div class="modal-drag"></div>
+      <div class="modal-inner">
+        <div class="modal-head">
+          <span class="modal-title">เพิ่มเตือนความจำ</span>
+          <button class="btn-close" onclick="closeReminderModal()">✕</button>
+        </div>
+        <label class="rm-lbl">วันที่ (ถ้ามี)</label>
+        <input type="date" id="rmDate" class="rm-input">
+        <label class="rm-lbl">เรื่อง</label>
+        <textarea id="rmText" placeholder="เช่น หาหมอ, กินยาพยาธิ, ตัดขน, ฉีดวัคซีน..."></textarea>
+        <button class="btn-save" onclick="saveReminder()">บันทึก</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Day Detail Modal -->
   <div class="ov" id="ovDay">
     <div class="modal">
@@ -504,12 +503,9 @@
           <button class="btn-close" onclick="closeSettings()">✕</button>
         </div>
         <button class="btn-notif" id="notifBtn" onclick="reqNotif()">🔔 เปิดการแจ้งเตือน</button>
-        <button class="btn-notif" id="darkBtn" onclick="toggleDark()" style="margin-top:8px">🌙 โหมดมืด</button>
         <div class="time-grid">
           <div class="fld"><label>🌅 มื้อเช้า</label><input id="cfg0" type="time"></div>
-          <div class="fld"><label>☀️ มื้อกลางวัน</label><input id="cfg1" type="time"></div>
-          <div class="fld"><label>🌆 มื้อเย็น</label><input id="cfg2" type="time"></div>
-          <div class="fld"><label>🌙 มื้อดึก</label><input id="cfg3" type="time"></div>
+          <div class="fld"><label>🌆 มื้อเย็น</label><input id="cfg1" type="time"></div>
         </div>
         <button class="btn-edit-profile" onclick="goEditProfile()">👤 แก้ไขข้อมูลโปรไฟล์</button>
         <button class="btn-save" onclick="saveSettings()">บันทึก</button>
